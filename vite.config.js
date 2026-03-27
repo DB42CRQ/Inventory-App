@@ -38,8 +38,7 @@ export default defineConfig({
             src: 'screenshot-mobile.png',
             sizes: '390x844',
             type: 'image/png',
-            ,
-            label: 'Inventar App'
+            label: 'Inventar App Mobile'
           },
           {
             src: 'screenshot-desktop.png',
