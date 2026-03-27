@@ -113,6 +113,11 @@ export const translations = {
     signOutBtn: 'Abmelden',
 
     // Language
+    installTitle: 'App installieren',
+    installHint: 'Zum Home-Bildschirm hinzufügen für schnellen Zugriff',
+    installBtn: 'Installieren',
+    installIOS: 'Tippe auf Teilen',
+    installIOSHint: 'und dann "Zum Home-Bildschirm"',
     feedbackTitle: 'Feedback & Ideen',
     feedbackLabel: 'Dein Vorschlag oder Feedback',
     feedbackPlaceholder: 'Was könnte besser sein? Was vermisst du?',
@@ -223,6 +228,11 @@ export const translations = {
     addHouseholdTitle: 'Add household',
 
     signOutBtn: 'Sign out',
+    installTitle: 'Install app',
+    installHint: 'Add to home screen for quick access',
+    installBtn: 'Install',
+    installIOS: 'Tap Share',
+    installIOSHint: 'then "Add to Home Screen"',
     feedbackTitle: 'Feedback & Ideas',
     feedbackLabel: 'Your suggestion or feedback',
     feedbackPlaceholder: 'What could be better? What are you missing?',
@@ -333,6 +343,11 @@ export const translations = {
     addHouseholdTitle: 'Añadir hogar',
 
     signOutBtn: 'Cerrar sesión',
+    installTitle: 'Instalar app',
+    installHint: 'Añadir a la pantalla de inicio para acceso rápido',
+    installBtn: 'Instalar',
+    installIOS: 'Toca Compartir',
+    installIOSHint: 'y luego "Añadir a inicio"',
     feedbackTitle: 'Comentarios e ideas',
     feedbackLabel: 'Tu sugerencia o comentario',
     feedbackPlaceholder: '¿Qué podría mejorar? ¿Qué echas en falta?',
