@@ -11,7 +11,7 @@ import { CategoryModal } from './CategoryModal'
 import { MembersPanel } from '../household/MembersPanel'
 import HouseholdSetup from '../household/HouseholdSetup'
 import { FeedbackButton } from '../ui/FeedbackButton'
-import { InstallBanner } from '../ui/InstallBanner'
+import { InstallSection } from '../ui/InstallBanner'
 
 export default function InventoryPage() {
   const { profile, signOut }                                = useAuth()
@@ -236,12 +236,12 @@ export default function InventoryPage() {
               ))}
             </div>
           </div>
+          <InstallSection />
           <Button variant="danger" onClick={signOut} className="w-full">{t.signOutBtn}</Button>
         </div>
       </Modal>
 
       <FeedbackButton />
-      <InstallBanner />
 
       <AddItemModal open={showAdd} onClose={() => setShowAdd(false)} categories={categories} onAdd={addItem} />
       <EditItemModal open={!!editItem} onClose={() => setEditItem(null)} item={editItem} categories={categories} onSave={updateItem} />
