@@ -68,7 +68,7 @@ export default function AuthPage() {
           <div className="w-14 h-14 bg-primary-500 rounded-2xl flex items-center justify-center mx-auto mb-3">
             <span className="text-2xl">📦</span>
           </div>
-          <h1 className="text-xl font-bold text-gray-900">Inventar</h1>
+          <h1 className="text-xl font-bold text-gray-900">Inventory42</h1>
           <p className="text-sm text-gray-500 mt-1">{t.appTagline}</p>
         </div>
 

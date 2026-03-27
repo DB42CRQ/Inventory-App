@@ -34,19 +34,18 @@ export function InstallSection() {
 
   if (installed) return null
 
+  const steps = isIOS
+    ? [t.installStep1iOS, t.installStep2iOS, t.installStep3iOS]
+    : [t.installStep1, t.installStep2, t.installStep3]
+
   return (
     <div className="bg-primary-50 border border-primary-100 rounded-xl p-3">
       <p className="text-sm font-medium text-primary-800 mb-2">
         {t.installTitle}
       </p>
 
-      {isIOS ? (
-        // iOS
-        <p className="text-xs text-primary-600">
-          {t.installIOS} ⎋ {t.installIOSHint}
-        </p>
-      ) : prompt ? (
-        // Android — nativer Install-Prompt verfügbar
+      {prompt ? (
+        // Android — nativer Install-Prompt
         <div className="flex items-center justify-between">
           <p className="text-xs text-primary-600">{t.installHint}</p>
           <button onClick={install}
@@ -56,9 +55,10 @@ export function InstallSection() {
           </button>
         </div>
       ) : (
-        // Android — manuelle Anleitung
+        // iOS oder Android ohne Prompt — Schritt-für-Schritt
         <div className="flex flex-col gap-1.5">
-          {[t.installStep1, t.installStep2, t.installStep3].map((step, i) => (
+          <p className="text-xs text-primary-600 mb-1">{t.installIOS}</p>
+          {steps.map((step, i) => (
             <div key={i} className="flex items-start gap-2 text-xs text-primary-700">
               <span className="w-5 h-5 bg-primary-200 rounded-full flex items-center justify-center
                 font-bold shrink-0 text-primary-800">
