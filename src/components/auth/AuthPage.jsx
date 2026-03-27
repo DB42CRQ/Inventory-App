@@ -78,7 +78,7 @@ export default function AuthPage() {
             <button key={l} onClick={() => setLang(l)}
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-all
                 ${lang === l ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
-              {l === 'de' ? '🇩🇪 DE' : l === 'en' ? '🇬🇧 EN' : '🇪🇸 ES'}
+              {l === 'de' ? '🇩🇪 DE' : l === 'en' ? '🇬🇧 EN' : '🇵🇪 ES'}
             </button>
           ))}
         </div>

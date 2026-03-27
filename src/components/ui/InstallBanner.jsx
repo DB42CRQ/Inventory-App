@@ -32,35 +32,42 @@ export function InstallSection() {
     }
   }
 
-  // Bereits installiert — nichts anzeigen
   if (installed) return null
 
   return (
     <div className="bg-primary-50 border border-primary-100 rounded-xl p-3">
-      <p className="text-sm font-medium text-primary-800 mb-1">
-        {t.installTitle ?? 'App installieren'}
+      <p className="text-sm font-medium text-primary-800 mb-2">
+        {t.installTitle}
       </p>
+
       {isIOS ? (
+        // iOS
         <p className="text-xs text-primary-600">
-          {t.installIOS ?? 'Tippe auf Teilen'} ⎋ {t.installIOSHint ?? 'und dann "Zum Home-Bildschirm"'}
+          {t.installIOS} ⎋ {t.installIOSHint}
         </p>
       ) : prompt ? (
-        // Android mit Install-Prompt
-        <div className="flex items-center justify-between mt-1">
-          <p className="text-xs text-primary-600">
-            {t.installHint ?? 'Zum Home-Bildschirm hinzufügen'}
-          </p>
+        // Android — nativer Install-Prompt verfügbar
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-primary-600">{t.installHint}</p>
           <button onClick={install}
             className="px-3 py-1.5 bg-primary-500 text-white text-xs font-medium
               rounded-lg hover:bg-primary-600 transition-all shrink-0 ml-2">
-            {t.installBtn ?? 'Installieren'}
+            {t.installBtn}
           </button>
         </div>
       ) : (
-        // Android ohne automatischen Prompt — manuelle Anleitung
-        <p className="text-xs text-primary-600">
-          Tippe auf ⋮ und dann <strong>"Zum Startbildschirm hinzufügen"</strong>
-        </p>
+        // Android — manuelle Anleitung
+        <div className="flex flex-col gap-1.5">
+          {[t.installStep1, t.installStep2, t.installStep3].map((step, i) => (
+            <div key={i} className="flex items-start gap-2 text-xs text-primary-700">
+              <span className="w-5 h-5 bg-primary-200 rounded-full flex items-center justify-center
+                font-bold shrink-0 text-primary-800">
+                {i + 1}
+              </span>
+              <span dangerouslySetInnerHTML={{ __html: step.replace(/"([^"]+)"/g, '<strong>"$1"</strong>') }} />
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )

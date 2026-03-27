@@ -231,7 +231,7 @@ export default function InventoryPage() {
                 <button key={l} onClick={() => setLang(l)}
                   className={`flex-1 py-2 rounded-xl text-sm font-medium transition-all border
                     ${lang === l ? 'bg-primary-500 text-white border-primary-500' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}`}>
-                  {l === 'de' ? '🇩🇪 DE' : l === 'en' ? '🇬🇧 EN' : '🇪🇸 ES'}
+                  {l === 'de' ? '🇩🇪 DE' : l === 'en' ? '🇬🇧 EN' : '🇵🇪 ES'}
                 </button>
               ))}
             </div>
