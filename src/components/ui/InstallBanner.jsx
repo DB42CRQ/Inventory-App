@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 
-export function useInstallPrompt() {
+export function InstallSection() {
+  const { t } = useTranslation()
   const [prompt,    setPrompt]    = useState(null)
   const [isIOS,     setIsIOS]     = useState(false)
   const [installed, setInstalled] = useState(false)
 
   useEffect(() => {
-    // Schon als PWA geöffnet?
     if (window.matchMedia('(display-mode: standalone)').matches) {
       setInstalled(true)
       return
@@ -25,24 +25,15 @@ export function useInstallPrompt() {
   }, [])
 
   async function install() {
-    if (!prompt) return
-    prompt.prompt()
-    const { outcome } = await prompt.userChoice
-    if (outcome === 'accepted') setInstalled(true)
+    if (prompt) {
+      prompt.prompt()
+      const { outcome } = await prompt.userChoice
+      if (outcome === 'accepted') setInstalled(true)
+    }
   }
 
-  return { prompt, isIOS, installed, install }
-}
-
-export function InstallSection() {
-  const { t } = useTranslation()
-  const { prompt, isIOS, installed, install } = useInstallPrompt()
-
-  // Verstecken wenn bereits installiert
+  // Bereits installiert — nichts anzeigen
   if (installed) return null
-
-  // Auf Desktop ohne Install-Prompt auch nichts zeigen
-  if (!isIOS && !prompt) return null
 
   return (
     <div className="bg-primary-50 border border-primary-100 rounded-xl p-3">
@@ -53,8 +44,9 @@ export function InstallSection() {
         <p className="text-xs text-primary-600">
           {t.installIOS ?? 'Tippe auf Teilen'} ⎋ {t.installIOSHint ?? 'und dann "Zum Home-Bildschirm"'}
         </p>
-      ) : (
-        <div className="flex items-center justify-between mt-2">
+      ) : prompt ? (
+        // Android mit Install-Prompt
+        <div className="flex items-center justify-between mt-1">
           <p className="text-xs text-primary-600">
             {t.installHint ?? 'Zum Home-Bildschirm hinzufügen'}
           </p>
@@ -64,6 +56,11 @@ export function InstallSection() {
             {t.installBtn ?? 'Installieren'}
           </button>
         </div>
+      ) : (
+        // Android ohne automatischen Prompt — manuelle Anleitung
+        <p className="text-xs text-primary-600">
+          Tippe auf ⋮ und dann <strong>"Zum Startbildschirm hinzufügen"</strong>
+        </p>
       )}
     </div>
   )
