@@ -12,7 +12,7 @@ import { MembersPanel } from '../household/MembersPanel'
 import HouseholdSetup from '../household/HouseholdSetup'
 import { VersionModal } from '../versions/VersionModal'
 import { useVersions } from '../../hooks/useVersions'
-import { useFeedback } from '../../hooks/useFeedback'
+import { useDeveloper } from '../../hooks/useDeveloper'
 import { FeedbackButton } from '../ui/FeedbackButton'
 import { InstallSection } from '../ui/InstallBanner'
 
@@ -26,8 +26,8 @@ export default function InventoryPage() {
     addCategory, deleteCategory,
   } = useInventory(household?.id)
 
-  const { isDeveloper } = useFeedback()
-  const { versions, hasNew, markAsSeen, createVersion, deleteVersion } = useVersions(isDeveloper)
+  const { isDeveloper } = useDeveloper()
+  const { versions, hasNew, markAsSeen, createVersion, deleteVersion } = useVersions()
 
   const [tab,          setTab]          = useState('inventory')
   const [showAdd,      setShowAdd]      = useState(false)

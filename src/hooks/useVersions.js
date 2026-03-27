@@ -4,11 +4,11 @@ import { useAuth } from './useAuth'
 
 const STORAGE_KEY = 'last_seen_version'
 
-export function useVersions(isDeveloper) {
+export function useVersions() {
   const { user } = useAuth()
-  const [versions,    setVersions]    = useState([])
-  const [hasNew,      setHasNew]      = useState(false)
-  const [loading,     setLoading]     = useState(true)
+  const [versions, setVersions] = useState([])
+  const [hasNew,   setHasNew]   = useState(false)
+  const [loading,  setLoading]  = useState(true)
 
   useEffect(() => {
     if (!user) return
@@ -21,12 +21,15 @@ export function useVersions(isDeveloper) {
       .from('versions')
       .select('*')
       .order('created_at', { ascending: false })
-    setVersions(data ?? [])
 
-    // Prüfen ob neue Version seit letztem Besuch
-    if (data && data.length > 0) {
+    const list = data ?? []
+    setVersions(list)
+
+    if (list.length > 0) {
       const lastSeen = localStorage.getItem(STORAGE_KEY)
-      if (lastSeen !== data[0].id) setHasNew(true)
+      setHasNew(lastSeen !== list[0].id)
+    } else {
+      setHasNew(false)
     }
     setLoading(false)
   }
@@ -39,16 +42,24 @@ export function useVersions(isDeveloper) {
   }
 
   async function createVersion(version, notes) {
-    const { error } = await supabase
-      .from('versions')
-      .insert({ version, notes })
+    const { error } = await supabase.from('versions').insert({ version, notes })
     if (!error) await fetchVersions()
     return { error }
   }
 
   async function deleteVersion(id) {
     const { error } = await supabase.from('versions').delete().eq('id', id)
-    if (!error) setVersions(prev => prev.filter(v => v.id !== id))
+    if (!error) {
+      const updated = versions.filter(v => v.id !== id)
+      setVersions(updated)
+      // Badge neu prüfen
+      if (updated.length > 0) {
+        const lastSeen = localStorage.getItem(STORAGE_KEY)
+        setHasNew(lastSeen !== updated[0].id)
+      } else {
+        setHasNew(false)
+      }
+    }
     return { error }
   }
 

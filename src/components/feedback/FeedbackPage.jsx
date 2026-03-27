@@ -1,4 +1,5 @@
 import { useFeedback } from '../../hooks/useFeedback'
+import { useDeveloper } from '../../hooks/useDeveloper'
 import { useTranslation } from '../../i18n/useTranslation'
 import { Spinner } from '../ui'
 
@@ -14,7 +15,8 @@ const STATUS_COLORS = {
 
 export default function FeedbackPage({ onClose }) {
   const { t } = useTranslation()
-  const { feedback, isDeveloper, loading, updateStatus } = useFeedback()
+  const { isDeveloper } = useDeveloper()
+  const { feedback, loading, updateStatus } = useFeedback(isDeveloper)
 
   const STATUS_LABELS = {
     submitted:    t.statusSubmitted    ?? 'Eingereicht',

@@ -2,29 +2,18 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
 
-export function useFeedback() {
+export function useFeedback(isDeveloper) {
   const { user } = useAuth()
-  const [feedback,     setFeedback]     = useState([])
-  const [isDeveloper,  setIsDeveloper]  = useState(false)
-  const [loading,      setLoading]      = useState(true)
+  const [feedback, setFeedback] = useState([])
+  const [loading,  setLoading]  = useState(true)
 
   useEffect(() => {
     if (!user) return
-    fetchAll()
+    fetchFeedback()
   }, [user])
 
-  async function fetchAll() {
+  async function fetchFeedback() {
     setLoading(true)
-
-    // Prüfen ob Developer
-    const { data: dev } = await supabase
-      .from('developers')
-      .select('profile_id')
-      .eq('profile_id', user.id)
-      .single()
-    setIsDeveloper(!!dev)
-
-    // Feedback laden
     const { data } = await supabase
       .from('feedback')
       .select('*, profiles(display_name, email)')
@@ -38,22 +27,9 @@ export function useFeedback() {
       .from('feedback')
       .update({ status })
       .eq('id', feedbackId)
-    if (!error) {
-      setFeedback(prev => prev.map(f => f.id === feedbackId ? { ...f, status } : f))
-    }
+    if (!error) setFeedback(prev => prev.map(f => f.id === feedbackId ? { ...f, status } : f))
     return { error }
   }
 
-  async function submitFeedback(message, householdId) {
-    const { error } = await supabase.from('feedback').insert({
-      profile_id:   user.id,
-      household_id: householdId ?? null,
-      message,
-      status:       'submitted',
-    })
-    if (!error) fetchAll()
-    return { error }
-  }
-
-  return { feedback, isDeveloper, loading, updateStatus, submitFeedback }
+  return { feedback, loading, updateStatus }
 }
