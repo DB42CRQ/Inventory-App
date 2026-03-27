@@ -10,6 +10,9 @@ import { EditItemModal } from './EditItemModal'
 import { CategoryModal } from './CategoryModal'
 import { MembersPanel } from '../household/MembersPanel'
 import HouseholdSetup from '../household/HouseholdSetup'
+import { VersionModal } from '../versions/VersionModal'
+import { useVersions } from '../../hooks/useVersions'
+import { useFeedback } from '../../hooks/useFeedback'
 import { FeedbackButton } from '../ui/FeedbackButton'
 import { InstallSection } from '../ui/InstallBanner'
 
@@ -23,6 +26,9 @@ export default function InventoryPage() {
     addCategory, deleteCategory,
   } = useInventory(household?.id)
 
+  const { isDeveloper } = useFeedback()
+  const { versions, hasNew, markAsSeen, createVersion, deleteVersion } = useVersions(isDeveloper)
+
   const [tab,          setTab]          = useState('inventory')
   const [showAdd,      setShowAdd]      = useState(false)
   const [editItem,     setEditItem]     = useState(null)
@@ -30,6 +36,7 @@ export default function InventoryPage() {
   const [showSettings, setShowSettings] = useState(false)
   const [showSwitch,   setShowSwitch]   = useState(false)
   const [showNewHh,    setShowNewHh]    = useState(false)
+  const [showVersions, setShowVersions] = useState(false)
   const [search,       setSearch]       = useState('')
   const [filterCat,    setFilterCat]    = useState('all')
 
@@ -84,6 +91,17 @@ export default function InventoryPage() {
               </button>
             ))}
           </div>
+
+          <button onClick={() => setShowVersions(true)}
+            className="relative w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all flex items-center justify-center">
+            🚀
+            {hasNew && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full
+                flex items-center justify-center text-white text-[9px] font-bold">
+                N
+              </span>
+            )}
+          </button>
 
           <button onClick={() => setShowSettings(true)}
             className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all flex items-center justify-center">
@@ -242,6 +260,16 @@ export default function InventoryPage() {
       </Modal>
 
       <FeedbackButton />
+
+      <VersionModal
+        open={showVersions}
+        onClose={() => setShowVersions(false)}
+        versions={versions}
+        isDeveloper={isDeveloper}
+        markAsSeen={markAsSeen}
+        createVersion={createVersion}
+        deleteVersion={deleteVersion}
+      />
 
       <AddItemModal open={showAdd} onClose={() => setShowAdd(false)} categories={categories} onAdd={addItem} />
       <EditItemModal open={!!editItem} onClose={() => setEditItem(null)} item={editItem} categories={categories} onSave={updateItem} />
