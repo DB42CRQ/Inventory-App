@@ -2,13 +2,11 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
 
-const STORAGE_KEY = 'last_seen_version'
-
 export function useVersions() {
   const { user } = useAuth()
-  const [versions, setVersions] = useState([])
-  const [hasNew,   setHasNew]   = useState(false)
-  const [loading,  setLoading]  = useState(true)
+  const [versions,    setVersions]    = useState([])
+  const [newVersion,  setNewVersion]  = useState(null) // neueste ungesehene Version
+  const [loading,     setLoading]     = useState(true)
 
   useEffect(() => {
     if (!user) return
@@ -17,28 +15,39 @@ export function useVersions() {
 
   async function fetchVersions() {
     setLoading(true)
-    const { data } = await supabase
+
+    const { data: versionData } = await supabase
       .from('versions')
       .select('*')
       .order('created_at', { ascending: false })
 
-    const list = data ?? []
+    const list = versionData ?? []
     setVersions(list)
 
     if (list.length > 0) {
-      const lastSeen = localStorage.getItem(STORAGE_KEY)
-      setHasNew(lastSeen !== list[0].id)
-    } else {
-      setHasNew(false)
+      // Prüfen ob der User die neueste Version schon gesehen hat
+      const { data: viewData } = await supabase
+        .from('version_views')
+        .select('version_id')
+        .eq('profile_id', user.id)
+        .eq('version_id', list[0].id)
+        .single()
+
+      if (!viewData) {
+        setNewVersion(list[0])
+      } else {
+        setNewVersion(null)
+      }
     }
     setLoading(false)
   }
 
-  function markAsSeen() {
-    if (versions.length > 0) {
-      localStorage.setItem(STORAGE_KEY, versions[0].id)
-      setHasNew(false)
-    }
+  async function markAsSeen(versionId) {
+    await supabase.from('version_views').insert({
+      profile_id: user.id,
+      version_id: versionId,
+    })
+    setNewVersion(null)
   }
 
   async function createVersion(version, notes) {
@@ -52,16 +61,12 @@ export function useVersions() {
     if (!error) {
       const updated = versions.filter(v => v.id !== id)
       setVersions(updated)
-      // Badge neu prüfen
-      if (updated.length > 0) {
-        const lastSeen = localStorage.getItem(STORAGE_KEY)
-        setHasNew(lastSeen !== updated[0].id)
-      } else {
-        setHasNew(false)
-      }
+      if (newVersion?.id === id) setNewVersion(null)
     }
     return { error }
   }
 
-  return { versions, hasNew, loading, markAsSeen, createVersion, deleteVersion }
+  const hasNew = !!newVersion
+
+  return { versions, hasNew, newVersion, loading, markAsSeen, createVersion, deleteVersion }
 }

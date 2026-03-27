@@ -9,8 +9,6 @@ export function VersionModal({ open, onClose, versions, isDeveloper, markAsSeen,
   const [error,   setError]   = useState('')
   const [confirm, setConfirm] = useState(null)
 
-  if (open) markAsSeen()
-
   async function handleCreate(e) {
     e.preventDefault()
     if (!form.version.trim() || !form.notes.trim()) return

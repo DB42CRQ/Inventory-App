@@ -11,6 +11,7 @@ import { CategoryModal } from './CategoryModal'
 import { MembersPanel } from '../household/MembersPanel'
 import HouseholdSetup from '../household/HouseholdSetup'
 import { VersionModal } from '../versions/VersionModal'
+import { VersionBanner } from '../versions/VersionBanner'
 import { useVersions } from '../../hooks/useVersions'
 import { useDeveloper } from '../../hooks/useDeveloper'
 import { FeedbackButton } from '../ui/FeedbackButton'
@@ -27,7 +28,7 @@ export default function InventoryPage() {
   } = useInventory(household?.id)
 
   const { isDeveloper } = useDeveloper()
-  const { versions, hasNew, markAsSeen, createVersion, deleteVersion } = useVersions()
+  const { versions, hasNew, newVersion, markAsSeen, createVersion, deleteVersion } = useVersions()
 
   const [tab,          setTab]          = useState('inventory')
   const [showAdd,      setShowAdd]      = useState(false)
@@ -261,12 +262,14 @@ export default function InventoryPage() {
 
       <FeedbackButton />
 
+      <VersionBanner version={newVersion} onDismiss={markAsSeen} />
+
       <VersionModal
         open={showVersions}
         onClose={() => setShowVersions(false)}
         versions={versions}
         isDeveloper={isDeveloper}
-        markAsSeen={markAsSeen}
+        markAsSeen={() => newVersion && markAsSeen(newVersion.id)}
         createVersion={createVersion}
         deleteVersion={deleteVersion}
       />
