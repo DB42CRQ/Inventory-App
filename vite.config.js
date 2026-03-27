@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'pwa-192x192.png', 'pwa-512x512.png'],
       manifest: {
-        name: 'Haushalt Inventar',
-        short_name: 'Inventar',
+        name: 'Inventory42',
+        short_name: 'Inventory42',
         description: 'Behalte den Überblick über deinen Haushalt',
         theme_color: '#6366f1',
         background_color: '#6366f1',
@@ -31,21 +31,6 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
-          }
-        ],
-        screenshots: [
-          {
-            src: 'screenshot-mobile.png',
-            sizes: '390x844',
-            type: 'image/png',
-            label: 'Inventar App Mobile'
-          },
-          {
-            src: 'screenshot-desktop.png',
-            sizes: '1280x800',
-            type: 'image/png',
-            form_factor: 'wide',
-            label: 'Inventar App Desktop'
           }
         ]
       },
