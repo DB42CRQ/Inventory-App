@@ -306,7 +306,7 @@ export function VersionModal({ open, onClose, versions, isDeveloper, createVersi
                     <Button type="button" variant="secondary" onClick={() => { setShowForm(false); setError(''); setTranslated({ en: '', es: '' }) }}>
                       {t.cancel ?? 'Abbrechen'}
                     </Button>
-                    <Button type="button" disabled={loading || !translated.en}
+                    <Button type="button" disabled={loading || !form.notes.trim() || !form.version.trim()}
                       variant="secondary"
                       onClick={(e) => handleCreate(e, true)}>
                       {loading ? t.saving : t.versionSaveDraft ?? 'Als Draft speichern'}
@@ -317,7 +317,7 @@ export function VersionModal({ open, onClose, versions, isDeveloper, createVersi
                     </Button>
                   </div>
                   {!translated.en && (
-                    <p className="text-xs text-gray-400 text-center">{t.versionTranslateFirst ?? 'Bitte erst übersetzen'}</p>
+                    <p className="text-xs text-gray-400 text-center">{t.versionTranslateHint ?? 'Für Publizieren bitte erst übersetzen'}</p>
                   )}
                 </form>
               )}
