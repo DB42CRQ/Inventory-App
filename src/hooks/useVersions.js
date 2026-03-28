@@ -66,7 +66,16 @@ export function useVersions() {
 
   async function publishVersion(id) {
     const { error } = await supabase.from('versions').update({ is_draft: false }).eq('id', id)
-    if (!error) await fetchVersions()
+    if (!error) {
+      setVersions(prev => prev.map(v => v.id === id ? { ...v, is_draft: false } : v))
+      // Banner prüfen
+      const updated = versions.map(v => v.id === id ? { ...v, is_draft: false } : v)
+      const published = updated.filter(v => !v.is_draft)
+      if (published.length > 0) {
+        const alreadySeen = published[0].version_views?.some(v => v.profile_id === user.id)
+        setNewVersion(alreadySeen ? null : published[0])
+      }
+    }
     return { error }
   }
 
