@@ -46,7 +46,8 @@ export default function FeedbackPage({ onClose }) {
   const { isDeveloper } = useDeveloper()
   const { feedback, loading, updateStatus, updateVersion } = useFeedback()
   const { versions } = useVersions()
-  const [filterCat, setFilterCat] = useState('all')
+  const [filterCat,    setFilterCat]    = useState('all')
+  const [filterStatus, setFilterStatus] = useState('all')
 
   const STATUS_LABELS = {
     submitted:    t.statusSubmitted    ?? 'Eingereicht',
@@ -56,9 +57,11 @@ export default function FeedbackPage({ onClose }) {
     rejected:     t.statusRejected     ?? 'Abgelehnt',
   }
 
-  const filtered = filterCat === 'all'
-    ? feedback
-    : feedback.filter(f => f.category === filterCat)
+  const filtered = feedback.filter(f => {
+    const matchCat    = filterCat    === 'all' || f.category === filterCat
+    const matchStatus = filterStatus === 'all' || f.status   === filterStatus
+    return matchCat && matchStatus
+  })
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
@@ -92,6 +95,23 @@ export default function FeedbackPage({ onClose }) {
             {cat === 'all' ? t.all ?? 'Alle' :
              cat === 'idea' ? <>💡 {t.feedbackCategoryIdea ?? 'Ideen'}</> :
              <>🐛 {t.feedbackCategoryBug ?? 'Bugs'}</>}
+          </button>
+        ))}
+      </div>
+
+      {/* Status Filter */}
+      <div className="bg-white border-b border-gray-100 px-4 py-2 flex gap-2 overflow-x-auto">
+        <button onClick={() => setFilterStatus('all')}
+          className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border
+            ${filterStatus === 'all' ? 'bg-gray-700 text-white border-transparent' : 'bg-white text-gray-600 border-gray-200'}`}>
+          {t.all ?? 'Alle'}
+        </button>
+        {STATUSES.map(s => (
+          <button key={s} onClick={() => setFilterStatus(s)}
+            className={`shrink-0 px-3 py-1.5 rounded-xl text-xs font-medium transition-all border
+              ${filterStatus === s ? 'text-white border-transparent' : 'bg-white text-gray-600 border-gray-200'}`}
+            style={filterStatus === s ? { backgroundColor: STATUS_COLORS[s]?.text } : {}}>
+            {STATUS_LABELS[s]}
           </button>
         ))}
       </div>
