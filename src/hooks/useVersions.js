@@ -20,7 +20,6 @@ export function useVersions() {
 
   async function fetchVersions() {
     setLoading(true)
-
     const { data: versionData } = await supabase
       .from('versions')
       .select('*, version_views(profile_id, installed, viewed_at, profiles(display_name, email))')
@@ -29,11 +28,12 @@ export function useVersions() {
     const list = versionData ?? []
     setVersions(list)
 
-    // Nur publizierte Versionen für Banner
     const published = list.filter(v => !v.is_draft)
     if (published.length > 0) {
       const alreadySeen = published[0].version_views?.some(v => v.profile_id === user.id)
       setNewVersion(alreadySeen ? null : published[0])
+    } else {
+      setNewVersion(null)
     }
     setLoading(false)
   }
@@ -46,19 +46,20 @@ export function useVersions() {
       viewed_at:  new Date().toISOString(),
     })
     setNewVersion(null)
-    // Update local state
     setVersions(prev => prev.map(v => {
       if (v.id !== versionId) return v
       const existing = v.version_views?.filter(vv => vv.profile_id !== user.id) ?? []
-      return {
-        ...v,
-        version_views: [...existing, { profile_id: user.id, installed, viewed_at: new Date().toISOString() }]
-      }
+      return { ...v, version_views: [...existing, { profile_id: user.id, installed, viewed_at: new Date().toISOString() }] }
     }))
   }
 
   async function createVersion(version, notes, notes_en, notes_es, is_draft = false) {
-    const { error } = await supabase.from('versions').insert({ version, notes, notes_en: notes_en || null, notes_es: notes_es || null, is_draft })
+    const { error } = await supabase.from('versions').insert({
+      version, notes,
+      notes_en: notes_en || null,
+      notes_es: notes_es || null,
+      is_draft
+    })
     if (!error) await fetchVersions()
     return { error }
   }
@@ -70,19 +71,11 @@ export function useVersions() {
   }
 
   async function updateDraftNotes(id, notes, notes_en, notes_es) {
-    const { error } = await supabase.from('versions').update({ notes, notes_en, notes_es }).eq('id', id)
-    if (!error) setVersions(prev => prev.map(v => v.id === id ? { ...v, notes, notes_en, notes_es } : v))
-    return { error }
-  }
-
-  async function publishVersion(id) {
-    const { error } = await supabase.from('versions').update({ is_draft: false }).eq('id', id)
-    if (!error) await fetchVersions()
-    return { error }
-  }
-
-  async function updateDraftNotes(id, notes, notes_en, notes_es) {
-    const { error } = await supabase.from('versions').update({ notes, notes_en: notes_en || null, notes_es: notes_es || null }).eq('id', id)
+    const { error } = await supabase.from('versions').update({
+      notes,
+      notes_en: notes_en || null,
+      notes_es: notes_es || null
+    }).eq('id', id)
     if (!error) setVersions(prev => prev.map(v => v.id === id ? { ...v, notes, notes_en, notes_es } : v))
     return { error }
   }
