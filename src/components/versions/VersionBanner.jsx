@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 
-export function VersionBanner({ version, onDismiss }) {
+export function VersionBanner({ version, onDismiss, onSkip }) {
   const { t } = useTranslation()
   const [isIOS,     setIsIOS]     = useState(false)
   const [isAndroid, setIsAndroid] = useState(false)
@@ -121,8 +121,8 @@ export function VersionBanner({ version, onDismiss }) {
               : (t.versionConfirmInstalled ?? 'Ich habe die App installiert ✓')}
           </button>
 
-          {/* Überspringen — immer verfügbar */}
-          <button onClick={() => onDismiss(version.id)}
+          {/* Überspringen — schließt nur lokal, kein DB-Eintrag */}
+          <button onClick={onSkip}
             className="w-full py-2 text-gray-400 hover:text-gray-600 text-sm transition-all">
             {t.versionSkip ?? 'Überspringen'}
           </button>

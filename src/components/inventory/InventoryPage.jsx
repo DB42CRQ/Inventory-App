@@ -38,6 +38,7 @@ export default function InventoryPage() {
   const [showSwitch,   setShowSwitch]   = useState(false)
   const [showNewHh,    setShowNewHh]    = useState(false)
   const [showVersions, setShowVersions] = useState(false)
+  const [skipped,      setSkipped]      = useState(false)
   const [search,       setSearch]       = useState('')
   const [filterCat,    setFilterCat]    = useState('all')
 
@@ -262,7 +263,7 @@ export default function InventoryPage() {
 
       <FeedbackButton />
 
-      <VersionBanner version={newVersion} onDismiss={(id, installed) => markAsSeen(id, installed)} />
+      {!skipped && <VersionBanner version={newVersion} onDismiss={(id, installed) => markAsSeen(id, installed)} onSkip={() => setSkipped(true)} />}
 
       <VersionModal
         open={showVersions}
