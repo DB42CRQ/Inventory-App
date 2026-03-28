@@ -151,11 +151,19 @@ export function VersionModal({ open, onClose, versions, isDeveloper, createVersi
                 <TranslateSection notes={form.notes} />
                 {error && <p className="text-sm text-red-500">{error}</p>}
                 <div className="flex gap-2">
-                  <Button type="button" variant="secondary" className="flex-1" onClick={cancelEdit}>
+                  <Button type="button" variant="secondary" onClick={cancelEdit}>
                     {t.cancel ?? 'Abbrechen'}
                   </Button>
-                  <Button type="submit" className="flex-1" disabled={loading || !translated.en}>
+                  <Button type="submit" variant="secondary" disabled={loading}>
                     {loading ? t.saving : t.save ?? 'Speichern'}
+                  </Button>
+                  <Button type="button" disabled={loading || !translated.en}
+                    onClick={async () => {
+                      await updateDraftNotes(editingDraft.id, form.notes.trim(), translated.en, translated.es)
+                      await publishVersion(editingDraft.id)
+                      cancelEdit()
+                    }}>
+                    {t.versionsPublish ?? 'Publizieren'}
                   </Button>
                 </div>
               </form>
