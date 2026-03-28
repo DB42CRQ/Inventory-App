@@ -40,7 +40,7 @@ export default function InventoryPage() {
   const [showNewHh,    setShowNewHh]    = useState(false)
   const [showVersions, setShowVersions] = useState(false)
   const [showWiki,     setShowWiki]     = useState(false)
-  const [dismissed,    setDismissed]    = useState(null) // version id dismissed this session
+  const [dismissed,    setDismissed]    = useState(null)
   const [search,       setSearch]       = useState('')
   const [filterCat,    setFilterCat]    = useState('all')
 
@@ -250,7 +250,6 @@ export default function InventoryPage() {
             <p className="text-sm font-medium text-gray-800 mb-1">{household?.name}</p>
             <p className="text-xs text-gray-400 break-all">{household?.id}</p>
           </div>
-          {/* Wiki */}
           <button onClick={() => { setShowSettings(false); setShowWiki(true) }}
             className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl
               hover:bg-gray-100 transition-all text-left">
@@ -258,8 +257,6 @@ export default function InventoryPage() {
             <span className="text-sm font-medium text-gray-700">{t.wikiBtn ?? 'Hilfe & Wiki'}</span>
             <span className="ml-auto text-gray-400">›</span>
           </button>
-
-          {/* Sprache */}
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">{t.language}</p>
             <div className="flex gap-2">
@@ -299,9 +296,12 @@ export default function InventoryPage() {
         deleteVersion={deleteVersion}
       />
 
-      <AddItemModal open={showAdd} onClose={() => setShowAdd(false)} categories={categories} onAdd={addItem} />
-      <EditItemModal open={!!editItem} onClose={() => setEditItem(null)} item={editItem} categories={categories} onSave={updateItem} />
-      <CategoryModal open={showCats} onClose={() => setShowCats(false)} categories={categories} onAdd={addCategory} onDelete={deleteCategory} />
+      <AddItemModal open={showAdd} onClose={() => setShowAdd(false)}
+        categories={categories} onAdd={addItem} />
+      <EditItemModal open={!!editItem} onClose={() => setEditItem(null)}
+        item={editItem} categories={categories} onSave={updateItem} onDelete={handleDeleteItem} />
+      <CategoryModal open={showCats} onClose={() => setShowCats(false)}
+        categories={categories} onAdd={addCategory} onUpdate={updateCategory} onDelete={deleteCategory} />
     </div>
   )
 }
