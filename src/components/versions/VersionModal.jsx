@@ -2,21 +2,14 @@ import { useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 import { Button, Input } from '../ui'
 
-async function translateText(text, targetLang) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+async function translateBoth(text) {
+  const response = await fetch('/api/translate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: [{
-        role: 'user',
-        content: `Translate the following release notes to ${targetLang}. Keep the same formatting (bullet points, line breaks). Only return the translated text, nothing else:\n\n${text}`
-      }]
-    })
+    body: JSON.stringify({ text })
   })
-  const data = await response.json()
-  return data.content?.[0]?.text ?? text
+  if (!response.ok) throw new Error('Translation failed')
+  return await response.json()
 }
 
 export function VersionModal({ open, onClose, versions, isDeveloper, createVersion, deleteVersion }) {
@@ -36,10 +29,7 @@ export function VersionModal({ open, onClose, versions, isDeveloper, createVersi
     if (!form.notes.trim()) return
     setTranslating(true)
     try {
-      const [en, es] = await Promise.all([
-        translateText(form.notes, 'English'),
-        translateText(form.notes, 'Spanish'),
-      ])
+      const { en, es } = await translateBoth(form.notes)
       setTranslated({ en, es })
     } catch (e) {
       setError('Übersetzung fehlgeschlagen.')
