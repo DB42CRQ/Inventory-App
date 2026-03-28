@@ -150,20 +150,25 @@ export function VersionModal({ open, onClose, versions, isDeveloper, createVersi
                 </div>
                 <TranslateSection notes={form.notes} />
                 {error && <p className="text-sm text-red-500">{error}</p>}
-                <div className="flex gap-2">
-                  <Button type="button" variant="secondary" onClick={cancelEdit}>
-                    {t.cancel ?? 'Abbrechen'}
-                  </Button>
-                  <Button type="submit" variant="secondary" disabled={loading}>
-                    {loading ? t.saving : t.save ?? 'Speichern'}
-                  </Button>
-                  <Button type="button" disabled={loading || !translated.en}
-                    onClick={async () => {
+                <div className="flex flex-col gap-2">
+                  <div className="flex gap-2">
+                    <Button type="button" variant="secondary" className="flex-1" onClick={cancelEdit}>
+                      {t.cancel ?? 'Abbrechen'}
+                    </Button>
+                    <Button type="submit" variant="secondary" className="flex-1" disabled={loading}>
+                      {loading ? t.saving : t.save ?? 'Speichern'}
+                    </Button>
+                  </div>
+                  <Button type="button" className="w-full" disabled={loading || !translated.en}
+                    onClick={async (e) => {
+                      e.preventDefault()
+                      setLoading(true)
                       await updateDraftNotes(editingDraft.id, form.notes.trim(), translated.en, translated.es)
                       await publishVersion(editingDraft.id)
+                      setLoading(false)
                       cancelEdit()
                     }}>
-                    {t.versionsPublish ?? 'Publizieren'}
+                    🚀 {t.versionsPublish ?? 'Publizieren'}
                   </Button>
                 </div>
               </form>
