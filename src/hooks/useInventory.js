@@ -76,6 +76,7 @@ export function useInventory(householdId) {
 
   async function deleteItem(itemId) {
     const { error } = await supabase.from('items').delete().eq('id', itemId)
+    if (!error) setItems(prev => prev.filter(i => i.id !== itemId))
     return { error }
   }
 
