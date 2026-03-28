@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
 
-export function useFeedback(isDeveloper) {
+export function useFeedback() {
   const { user } = useAuth()
   const [feedback, setFeedback] = useState([])
   const [loading,  setLoading]  = useState(true)
@@ -16,7 +16,7 @@ export function useFeedback(isDeveloper) {
     setLoading(true)
     const { data } = await supabase
       .from('feedback')
-      .select('*, profiles(display_name, email)')
+      .select('*, profiles(display_name, email), versions(version)')
       .order('created_at', { ascending: false })
     setFeedback(data ?? [])
     setLoading(false)
@@ -31,5 +31,16 @@ export function useFeedback(isDeveloper) {
     return { error }
   }
 
-  return { feedback, loading, updateStatus }
+  async function updateVersion(feedbackId, versionId) {
+    const { error } = await supabase
+      .from('feedback')
+      .update({ version_id: versionId || null })
+      .eq('id', feedbackId)
+    if (!error) {
+      await fetchFeedback()
+    }
+    return { error }
+  }
+
+  return { feedback, loading, updateStatus, updateVersion }
 }

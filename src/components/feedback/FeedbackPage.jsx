@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useFeedback } from '../../hooks/useFeedback'
 import { useDeveloper } from '../../hooks/useDeveloper'
+import { useVersions } from '../../hooks/useVersions'
 import { useTranslation } from '../../i18n/useTranslation'
 import { Spinner } from '../ui'
 
@@ -15,14 +16,15 @@ const STATUS_COLORS = {
 }
 
 const CATEGORY_CONFIG = {
-  idea: { icon: '💡', color: '#6366f1', bg: '#eef2ff' },
-  bug:  { icon: '🐛', color: '#dc2626', bg: '#fef2f2' },
+  idea: { icon: '💡' },
+  bug:  { icon: '🐛' },
 }
 
 export default function FeedbackPage({ onClose }) {
   const { t } = useTranslation()
   const { isDeveloper } = useDeveloper()
-  const { feedback, loading, updateStatus } = useFeedback()
+  const { feedback, loading, updateStatus, updateVersion } = useFeedback()
+  const { versions } = useVersions()
   const [filterCat, setFilterCat] = useState('all')
 
   const STATUS_LABELS = {
@@ -64,7 +66,7 @@ export default function FeedbackPage({ onClose }) {
                 ? 'text-white border-transparent'
                 : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
             style={filterCat === cat ? {
-              backgroundColor: cat === 'bug' ? '#dc2626' : cat === 'idea' ? '#6366f1' : '#6366f1'
+              backgroundColor: cat === 'bug' ? '#dc2626' : '#6366f1'
             } : {}}>
             {cat === 'all' ? t.all ?? 'Alle' :
              cat === 'idea' ? <>💡 {t.feedbackCategoryIdea ?? 'Ideen'}</> :
@@ -92,7 +94,6 @@ export default function FeedbackPage({ onClose }) {
                       </p>
                     )}
                     <div className="flex items-start gap-2">
-                      {/* Kategorie-Badge */}
                       <span className="text-base shrink-0 mt-0.5">
                         {CATEGORY_CONFIG[item.category]?.icon ?? '💡'}
                       </span>
@@ -100,13 +101,22 @@ export default function FeedbackPage({ onClose }) {
                     </div>
                   </div>
 
-                  <span className="text-xs px-2 py-1 rounded-full font-medium shrink-0"
-                    style={{
-                      backgroundColor: STATUS_COLORS[item.status]?.bg,
-                      color: STATUS_COLORS[item.status]?.text
-                    }}>
-                    {STATUS_LABELS[item.status]}
-                  </span>
+                  <div className="flex flex-col items-end gap-1 shrink-0">
+                    <span className="text-xs px-2 py-1 rounded-full font-medium"
+                      style={{
+                        backgroundColor: STATUS_COLORS[item.status]?.bg,
+                        color: STATUS_COLORS[item.status]?.text
+                      }}>
+                      {STATUS_LABELS[item.status]}
+                    </span>
+                    {/* Version Badge für User */}
+                    {item.versions && (
+                      <span className="text-xs bg-green-50 text-green-700 border border-green-100
+                        px-2 py-0.5 rounded-full font-medium">
+                        v{item.versions.version}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <p className="text-xs text-gray-400 ml-6">
@@ -116,18 +126,41 @@ export default function FeedbackPage({ onClose }) {
                   })}
                 </p>
 
+                {/* Developer controls */}
                 {isDeveloper && (
-                  <div className="mt-3 flex flex-wrap gap-1.5 ml-6">
-                    {STATUSES.map(s => (
-                      <button key={s} onClick={() => updateStatus(item.id, s)}
-                        className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-all border
-                          ${item.status === s
-                            ? 'text-white border-transparent'
-                            : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
-                        style={item.status === s ? { backgroundColor: STATUS_COLORS[s]?.text } : {}}>
-                        {STATUS_LABELS[s]}
-                      </button>
-                    ))}
+                  <div className="mt-3 ml-6 flex flex-col gap-2">
+                    {/* Status Buttons */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {STATUSES.map(s => (
+                        <button key={s} onClick={() => updateStatus(item.id, s)}
+                          className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-all border
+                            ${item.status === s
+                              ? 'text-white border-transparent'
+                              : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300'}`}
+                          style={item.status === s ? { backgroundColor: STATUS_COLORS[s]?.text } : {}}>
+                          {STATUS_LABELS[s]}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Version Dropdown — nur wenn deployed */}
+                    {item.status === 'deployed' && versions.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <label className="text-xs text-gray-500 shrink-0">
+                          {t.feedbackVersion ?? 'Version:'}
+                        </label>
+                        <select
+                          value={item.version_id ?? ''}
+                          onChange={e => updateVersion(item.id, e.target.value)}
+                          className="flex-1 rounded-lg border border-gray-200 px-2 py-1 text-xs
+                            text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500">
+                          <option value="">{t.feedbackVersionNone ?? '— Version wählen'}</option>
+                          {versions.map(v => (
+                            <option key={v.id} value={v.id}>v{v.version}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
