@@ -29,7 +29,7 @@ export default function InventoryPage() {
   } = useInventory(household?.id)
 
   const { isDeveloper } = useDeveloper()
-  const { versions, hasNew, newVersion, markAsSeen, createVersion, deleteVersion } = useVersions()
+  const { versions, hasNew, newVersion, markAsSeen, createVersion, publishVersion, updateDraftNotes, deleteVersion } = useVersions()
 
   const [tab,          setTab]          = useState('inventory')
   const [showAdd,      setShowAdd]      = useState(false)
@@ -293,6 +293,8 @@ export default function InventoryPage() {
         isDeveloper={isDeveloper}
         markAsSeen={() => newVersion && markAsSeen(newVersion.id)}
         createVersion={createVersion}
+        publishVersion={publishVersion}
+        updateDraftNotes={updateDraftNotes}
         deleteVersion={deleteVersion}
       />
 

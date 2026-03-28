@@ -29,9 +29,11 @@ export function useVersions() {
     const list = versionData ?? []
     setVersions(list)
 
-    if (list.length > 0) {
-      const alreadySeen = list[0].version_views?.some(v => v.profile_id === user.id)
-      setNewVersion(alreadySeen ? null : list[0])
+    // Nur publizierte Versionen für Banner
+    const published = list.filter(v => !v.is_draft)
+    if (published.length > 0) {
+      const alreadySeen = published[0].version_views?.some(v => v.profile_id === user.id)
+      setNewVersion(alreadySeen ? null : published[0])
     }
     setLoading(false)
   }
@@ -55,9 +57,33 @@ export function useVersions() {
     }))
   }
 
-  async function createVersion(version, notes, notes_en, notes_es) {
-    const { error } = await supabase.from('versions').insert({ version, notes, notes_en: notes_en || null, notes_es: notes_es || null })
+  async function createVersion(version, notes, notes_en, notes_es, is_draft = false) {
+    const { error } = await supabase.from('versions').insert({ version, notes, notes_en: notes_en || null, notes_es: notes_es || null, is_draft })
     if (!error) await fetchVersions()
+    return { error }
+  }
+
+  async function publishVersion(id) {
+    const { error } = await supabase.from('versions').update({ is_draft: false }).eq('id', id)
+    if (!error) await fetchVersions()
+    return { error }
+  }
+
+  async function updateDraftNotes(id, notes, notes_en, notes_es) {
+    const { error } = await supabase.from('versions').update({ notes, notes_en, notes_es }).eq('id', id)
+    if (!error) setVersions(prev => prev.map(v => v.id === id ? { ...v, notes, notes_en, notes_es } : v))
+    return { error }
+  }
+
+  async function publishVersion(id) {
+    const { error } = await supabase.from('versions').update({ is_draft: false }).eq('id', id)
+    if (!error) await fetchVersions()
+    return { error }
+  }
+
+  async function updateDraftNotes(id, notes, notes_en, notes_es) {
+    const { error } = await supabase.from('versions').update({ notes, notes_en: notes_en || null, notes_es: notes_es || null }).eq('id', id)
+    if (!error) setVersions(prev => prev.map(v => v.id === id ? { ...v, notes, notes_en, notes_es } : v))
     return { error }
   }
 
@@ -71,5 +97,5 @@ export function useVersions() {
   }
 
   const hasNew = !!newVersion
-  return { versions, hasNew, newVersion, loading, markAsSeen, createVersion, deleteVersion }
+  return { versions, hasNew, newVersion, loading, markAsSeen, createVersion, publishVersion, updateDraftNotes, deleteVersion }
 }
