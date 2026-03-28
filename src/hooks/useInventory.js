@@ -91,11 +91,19 @@ export function useInventory(householdId) {
 
   async function updateCategory(categoryId, fields) {
     const { error } = await supabase.from('categories').update(fields).eq('id', categoryId)
+    if (!error) {
+      setCategories(prev => prev.map(c => c.id === categoryId ? { ...c, ...fields } : c))
+    }
     return { error }
   }
 
   async function deleteCategory(categoryId) {
     const { error } = await supabase.from('categories').delete().eq('id', categoryId)
+    if (!error) {
+      setCategories(prev => prev.filter(c => c.id !== categoryId))
+      // Items mit dieser Kategorie auf null setzen
+      setItems(prev => prev.map(i => i.category_id === categoryId ? { ...i, category_id: null } : i))
+    }
     return { error }
   }
 

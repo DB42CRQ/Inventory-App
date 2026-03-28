@@ -38,6 +38,7 @@ export function EditItemModal({ open, onClose, item, categories, onSave, onDelet
     setDeleting(true)
     await onDelete(item.id)
     setDeleting(false)
+    setConfirm(false)
     onClose()
   }
 
