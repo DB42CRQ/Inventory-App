@@ -10,12 +10,13 @@ export function FeedbackButton() {
   const { household } = useHousehold()
   const { t } = useTranslation()
 
-  const [open,       setOpen]       = useState(false)
-  const [showPage,   setShowPage]   = useState(false)
-  const [message,    setMessage]    = useState('')
-  const [loading,    setLoading]    = useState(false)
-  const [success,    setSuccess]    = useState(false)
-  const [error,      setError]      = useState('')
+  const [open,      setOpen]      = useState(false)
+  const [showPage,  setShowPage]  = useState(false)
+  const [message,   setMessage]   = useState('')
+  const [category,  setCategory]  = useState('idea')
+  const [loading,   setLoading]   = useState(false)
+  const [success,   setSuccess]   = useState(false)
+  const [error,     setError]     = useState('')
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -26,11 +27,17 @@ export function FeedbackButton() {
       household_id: household?.id ?? null,
       message:      message.trim(),
       status:       'submitted',
+      category,
     })
     if (error) { setError(error.message); setLoading(false); return }
     setSuccess(true)
     setLoading(false)
-    setTimeout(() => { setOpen(false); setSuccess(false); setMessage('') }, 2000)
+    setTimeout(() => { setOpen(false); setSuccess(false); setMessage(''); setCategory('idea') }, 2000)
+  }
+
+  const CATEGORY_CONFIG = {
+    idea: { label: t.feedbackCategoryIdea ?? 'Idee', icon: '💡', color: 'primary' },
+    bug:  { label: t.feedbackCategoryBug  ?? 'Bug',  icon: '🐛', color: 'red' },
   }
 
   return (
@@ -63,15 +70,46 @@ export function FeedbackButton() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+
+                {/* Kategorie-Auswahl */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-gray-700">
+                    {t.feedbackCategoryLabel ?? 'Art'}
+                  </label>
+                  <div className="flex gap-2">
+                    {Object.entries(CATEGORY_CONFIG).map(([key, cfg]) => (
+                      <button key={key} type="button"
+                        onClick={() => setCategory(key)}
+                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl
+                          border text-sm font-medium transition-all
+                          ${category === key
+                            ? key === 'bug'
+                              ? 'bg-red-50 border-red-300 text-red-700'
+                              : 'bg-primary-50 border-primary-300 text-primary-700'
+                            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                        <span>{cfg.icon}</span>
+                        {cfg.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="flex flex-col gap-1">
                   <label className="text-sm font-medium text-gray-700">{t.feedbackLabel}</label>
                   <textarea value={message} onChange={e => setMessage(e.target.value)}
-                    placeholder={t.feedbackPlaceholder} rows={4} required autoFocus
+                    placeholder={
+                      category === 'bug'
+                        ? (t.feedbackBugPlaceholder ?? 'Was ist passiert? Wie kann man es nachstellen?')
+                        : t.feedbackPlaceholder
+                    }
+                    rows={4} required autoFocus
                     className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm
                       text-gray-900 placeholder-gray-400 resize-none focus:outline-none
                       focus:ring-2 focus:ring-primary-500" />
                 </div>
+
                 {error && <p className="text-sm text-red-500">{error}</p>}
+
                 <div className="flex gap-2">
                   <button type="button" onClick={() => setOpen(false)}
                     className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm
@@ -84,7 +122,7 @@ export function FeedbackButton() {
                     {loading ? t.saving : t.feedbackSend}
                   </button>
                 </div>
-                {/* Link zu eigenen Vorschlägen */}
+
                 <button type="button"
                   onClick={() => { setOpen(false); setShowPage(true) }}
                   className="text-xs text-primary-500 hover:text-primary-700 text-center">
