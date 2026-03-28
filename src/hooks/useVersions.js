@@ -55,8 +55,8 @@ export function useVersions() {
     }))
   }
 
-  async function createVersion(version, notes) {
-    const { error } = await supabase.from('versions').insert({ version, notes })
+  async function createVersion(version, notes, notes_en, notes_es) {
+    const { error } = await supabase.from('versions').insert({ version, notes, notes_en: notes_en || null, notes_es: notes_es || null })
     if (!error) await fetchVersions()
     return { error }
   }

@@ -1,8 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 
+
 export function VersionBanner({ version, onDismiss, onSkip }) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
+
+  function getLocalizedNotes(v) {
+    if (lang === 'en' && v.notes_en) return v.notes_en
+    if (lang === 'es' && v.notes_es) return v.notes_es
+    return v.notes
+  }
   const [isIOS,     setIsIOS]     = useState(false)
   const [isAndroid, setIsAndroid] = useState(false)
   const [installed, setInstalled] = useState(false)
@@ -60,7 +67,7 @@ export function VersionBanner({ version, onDismiss, onSkip }) {
             {t.versionWhatsNew ?? 'Was ist neu?'}
           </p>
           <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed">
-            {version.notes}
+            {getLocalizedNotes(version)}
           </p>
           <p className="text-xs text-gray-400 mt-3">
             {new Date(version.created_at).toLocaleDateString('de-DE', {

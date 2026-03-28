@@ -2,30 +2,76 @@ import { useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 import { Button, Input } from '../ui'
 
+async function translateText(text, targetLang) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      messages: [{
+        role: 'user',
+        content: `Translate the following release notes to ${targetLang}. Keep the same formatting (bullet points, line breaks). Only return the translated text, nothing else:\n\n${text}`
+      }]
+    })
+  })
+  const data = await response.json()
+  return data.content?.[0]?.text ?? text
+}
+
 export function VersionModal({ open, onClose, versions, isDeveloper, createVersion, deleteVersion }) {
-  const { t } = useTranslation()
-  const [form,     setForm]     = useState({ version: '', notes: '' })
-  const [loading,  setLoading]  = useState(false)
-  const [error,    setError]    = useState('')
-  const [confirm,  setConfirm]  = useState(null)
-  const [expanded, setExpanded] = useState(null)
-  const [showForm, setShowForm] = useState(false)
+  const { t, lang } = useTranslation()
+  const [form,        setForm]        = useState({ version: '', notes: '' })
+  const [translating, setTranslating] = useState(false)
+  const [translated,  setTranslated]  = useState({ en: '', es: '' })
+  const [loading,     setLoading]     = useState(false)
+  const [error,       setError]       = useState('')
+  const [confirm,     setConfirm]     = useState(null)
+  const [expanded,    setExpanded]    = useState(null)
+  const [showForm,    setShowForm]    = useState(false)
 
   if (!open) return null
+
+  async function handleTranslate() {
+    if (!form.notes.trim()) return
+    setTranslating(true)
+    try {
+      const [en, es] = await Promise.all([
+        translateText(form.notes, 'English'),
+        translateText(form.notes, 'Spanish'),
+      ])
+      setTranslated({ en, es })
+    } catch (e) {
+      setError('Übersetzung fehlgeschlagen.')
+    }
+    setTranslating(false)
+  }
 
   async function handleCreate(e) {
     e.preventDefault()
     if (!form.version.trim() || !form.notes.trim()) return
     setLoading(true); setError('')
-    const { error } = await createVersion(form.version.trim(), form.notes.trim())
+    const { error } = await createVersion(
+      form.version.trim(),
+      form.notes.trim(),
+      translated.en,
+      translated.es
+    )
     if (error) { setError(error.message); setLoading(false); return }
     setForm({ version: '', notes: '' })
+    setTranslated({ en: '', es: '' })
     setShowForm(false)
     setLoading(false)
   }
 
   function toggleExpand(id) {
     setExpanded(prev => prev === id ? null : id)
+  }
+
+  function getLocalizedNotes(v) {
+    if (lang === 'en' && v.notes_en) return v.notes_en
+    if (lang === 'es' && v.notes_es) return v.notes_es
+    return v.notes
   }
 
   return (
@@ -57,7 +103,6 @@ export function VersionModal({ open, onClose, versions, isDeveloper, createVersi
 
                 return (
                   <div key={v.id} className="border border-gray-200 rounded-xl overflow-hidden">
-                    {/* Header */}
                     <button onClick={() => toggleExpand(v.id)}
                       className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-all text-left">
                       <span className="text-gray-400 text-xs w-3 shrink-0">
@@ -92,11 +137,10 @@ export function VersionModal({ open, onClose, versions, isDeveloper, createVersi
                       )}
                     </button>
 
-                    {/* Expanded */}
                     {isOpen && (
                       <div className="px-4 py-4 border-t border-gray-100 bg-white">
                         <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
-                          {v.notes}
+                          {getLocalizedNotes(v)}
                         </p>
 
                         {isDeveloper && views.length > 0 && (
@@ -116,9 +160,7 @@ export function VersionModal({ open, onClose, versions, isDeveloper, createVersi
                                     <p className="text-xs font-medium text-gray-800 truncate">
                                       {vv.profiles?.display_name ?? '—'}
                                     </p>
-                                    <p className="text-xs text-gray-400 truncate">
-                                      {vv.profiles?.email}
-                                    </p>
+                                    <p className="text-xs text-gray-400 truncate">{vv.profiles?.email}</p>
                                   </div>
                                   <span className="text-xs text-gray-300 shrink-0">
                                     {new Date(vv.viewed_at).toLocaleDateString('de-DE')}
@@ -160,26 +202,66 @@ export function VersionModal({ open, onClose, versions, isDeveloper, createVersi
                   />
                   <div className="flex flex-col gap-1">
                     <label className="text-sm font-medium text-gray-700">
-                      {t.versionNotes ?? 'Was ist neu?'}
+                      {t.versionNotes ?? 'Was ist neu?'} (Deutsch)
                     </label>
                     <textarea value={form.notes}
-                      onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+                      onChange={e => {
+                        setForm(f => ({ ...f, notes: e.target.value }))
+                        setTranslated({ en: '', es: '' })
+                      }}
                       placeholder={t.versionNotesPlaceholder ?? '- Feature A hinzugefügt\n- Bug B behoben'}
                       rows={4} required
                       className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm
                         text-gray-900 placeholder-gray-400 resize-none focus:outline-none
                         focus:ring-2 focus:ring-primary-500" />
                   </div>
+
+                  {/* Übersetzung */}
+                  {!translated.en ? (
+                    <button type="button" onClick={handleTranslate} disabled={translating || !form.notes.trim()}
+                      className="flex items-center justify-center gap-2 py-2 rounded-xl border border-gray-200
+                        text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-all">
+                      {translating ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-gray-300 border-t-primary-500 rounded-full animate-spin" />
+                          {t.versionTranslating ?? 'Übersetze…'}
+                        </>
+                      ) : (
+                        <>🌐 {t.versionTranslate ?? 'Automatisch übersetzen'}</>
+                      )}
+                    </button>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <div className="bg-green-50 border border-green-100 rounded-xl p-3">
+                        <p className="text-xs font-medium text-green-700 mb-1">🇬🇧 English</p>
+                        <p className="text-xs text-green-600 whitespace-pre-line">{translated.en}</p>
+                      </div>
+                      <div className="bg-green-50 border border-green-100 rounded-xl p-3">
+                        <p className="text-xs font-medium text-green-700 mb-1">🇵🇪 Español</p>
+                        <p className="text-xs text-green-600 whitespace-pre-line">{translated.es}</p>
+                      </div>
+                      <button type="button" onClick={() => setTranslated({ en: '', es: '' })}
+                        className="text-xs text-gray-400 hover:text-gray-600 text-center">
+                        {t.versionRetranslate ?? 'Neu übersetzen'}
+                      </button>
+                    </div>
+                  )}
+
                   {error && <p className="text-sm text-red-500">{error}</p>}
                   <div className="flex gap-2">
                     <Button type="button" variant="secondary" className="flex-1"
-                      onClick={() => { setShowForm(false); setError('') }}>
+                      onClick={() => { setShowForm(false); setError(''); setTranslated({ en: '', es: '' }) }}>
                       {t.cancel ?? 'Abbrechen'}
                     </Button>
-                    <Button type="submit" className="flex-1" disabled={loading}>
+                    <Button type="submit" className="flex-1" disabled={loading || !translated.en}>
                       {loading ? t.saving : t.versionsPublish ?? 'Veröffentlichen'}
                     </Button>
                   </div>
+                  {!translated.en && (
+                    <p className="text-xs text-gray-400 text-center">
+                      {t.versionTranslateFirst ?? 'Bitte erst übersetzen'}
+                    </p>
+                  )}
                 </form>
               )}
             </div>
