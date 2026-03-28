@@ -262,7 +262,7 @@ export default function InventoryPage() {
 
       <FeedbackButton />
 
-      <VersionBanner version={newVersion} onDismiss={markAsSeen} />
+      <VersionBanner version={newVersion} onDismiss={(id, installed) => markAsSeen(id, installed)} />
 
       <VersionModal
         open={showVersions}

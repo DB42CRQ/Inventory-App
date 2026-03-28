@@ -113,7 +113,7 @@ export function VersionBanner({ version, onDismiss }) {
         {/* Buttons */}
         <div className="px-5 pb-5 flex flex-col gap-2">
           {/* Hauptbutton: Installiert bestätigen */}
-          <button onClick={() => onDismiss(version.id)}
+          <button onClick={() => onDismiss(version.id, true)}
             className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium
               rounded-xl transition-all text-sm">
             {installed

@@ -4,9 +4,9 @@ import { useAuth } from './useAuth'
 
 export function useVersions() {
   const { user } = useAuth()
-  const [versions,    setVersions]    = useState([])
-  const [newVersion,  setNewVersion]  = useState(null) // neueste ungesehene Version
-  const [loading,     setLoading]     = useState(true)
+  const [versions,   setVersions]   = useState([])
+  const [newVersion, setNewVersion] = useState(null)
+  const [loading,    setLoading]    = useState(true)
 
   useEffect(() => {
     if (!user) return
@@ -18,36 +18,36 @@ export function useVersions() {
 
     const { data: versionData } = await supabase
       .from('versions')
-      .select('*')
+      .select('*, version_views(profile_id, installed, viewed_at, profiles(display_name, email))')
       .order('created_at', { ascending: false })
 
     const list = versionData ?? []
     setVersions(list)
 
     if (list.length > 0) {
-      // Prüfen ob der User die neueste Version schon gesehen hat
-      const { data: viewData } = await supabase
-        .from('version_views')
-        .select('version_id')
-        .eq('profile_id', user.id)
-        .eq('version_id', list[0].id)
-        .single()
-
-      if (!viewData) {
-        setNewVersion(list[0])
-      } else {
-        setNewVersion(null)
-      }
+      const alreadySeen = list[0].version_views?.some(v => v.profile_id === user.id)
+      setNewVersion(alreadySeen ? null : list[0])
     }
     setLoading(false)
   }
 
-  async function markAsSeen(versionId) {
-    await supabase.from('version_views').insert({
+  async function markAsSeen(versionId, installed = false) {
+    await supabase.from('version_views').upsert({
       profile_id: user.id,
       version_id: versionId,
+      installed,
+      viewed_at:  new Date().toISOString(),
     })
     setNewVersion(null)
+    // Update local state
+    setVersions(prev => prev.map(v => {
+      if (v.id !== versionId) return v
+      const existing = v.version_views?.filter(vv => vv.profile_id !== user.id) ?? []
+      return {
+        ...v,
+        version_views: [...existing, { profile_id: user.id, installed, viewed_at: new Date().toISOString() }]
+      }
+    }))
   }
 
   async function createVersion(version, notes) {
@@ -59,14 +59,12 @@ export function useVersions() {
   async function deleteVersion(id) {
     const { error } = await supabase.from('versions').delete().eq('id', id)
     if (!error) {
-      const updated = versions.filter(v => v.id !== id)
-      setVersions(updated)
+      setVersions(prev => prev.filter(v => v.id !== id))
       if (newVersion?.id === id) setNewVersion(null)
     }
     return { error }
   }
 
   const hasNew = !!newVersion
-
   return { versions, hasNew, newVersion, loading, markAsSeen, createVersion, deleteVersion }
 }
