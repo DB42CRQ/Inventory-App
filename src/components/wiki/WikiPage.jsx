@@ -58,7 +58,7 @@ const WIKI_CONTENT = {
         { type: 'step', n: 1, text: 'Tippe auf den + Button unten rechts um einen neuen Artikel hinzuzufügen.' },
         { type: 'step', n: 2, text: 'Gib Name, Menge und Einheit ein. Optional: Kategorie und Mindestmenge.' },
         { type: 'step', n: 3, text: 'Die Menge kannst du direkt mit − und + anpassen, oder auf die Zahl tippen um einen genauen Wert einzugeben.' },
-        { type: 'step', n: 4, text: 'Zum Bearbeiten tippe auf das ✏️-Symbol. Zum Löschen auf das ×-Symbol.' },
+        { type: 'step', n: 4, text: 'Tippe auf ✏️ um einen Artikel zu bearbeiten. Im Bearbeitungsfenster kannst du ihn unten auch löschen — mit Rückfrage.' },
         { type: 'tip', text: 'Artikel mit Mindestmenge werden orange markiert wenn der Bestand zur Neige geht.' },
       ]
     },
@@ -67,7 +67,7 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Tippe auf "Kategorien" neben der Suchleiste um Kategorien zu verwalten.' },
         { type: 'step', n: 2, text: 'Erstelle neue Kategorien mit eigenem Namen, Icon und Farbe.' },
-        { type: 'step', n: 3, text: 'Kategorien sind pro Haushalt — jeder Haushalt hat seine eigenen.' },
+        { type: 'step', n: 3, text: 'Tippe auf ✏️ neben einer Kategorie um sie zu bearbeiten oder zu löschen.' },
         { type: 'step', n: 4, text: 'Filtere die Artikelliste nach Kategorie über die Pills unter der Suchleiste.' },
         { type: 'tip', text: 'Der Filter "Niedrig" zeigt alle Artikel bei denen der Bestand unter der Mindestmenge liegt.' },
       ]
@@ -112,8 +112,9 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Tippe auf den 💡-Button unten rechts um Feedback zu geben.' },
         { type: 'step', n: 2, text: 'Wähle zwischen "Idee" (neue Funktion) und "Bug" (Fehler melden).' },
-        { type: 'step', n: 3, text: 'Über "Meine Vorschläge ansehen" siehst du den Status deiner Einreichungen.' },
-        { type: 'tip', text: 'Status: Eingereicht → In Prüfung → In Umsetzung → Deployed (oder Abgelehnt).' },
+        { type: 'step', n: 3, text: 'Bei Bugs kannst du optional einen Screenshot anhängen.' },
+        { type: 'step', n: 4, text: 'Über "Meine Vorschläge ansehen" siehst du den Status deiner Einreichungen.' },
+        { type: 'tip', text: 'Bei Status "Deployed" wird die zugehörige Version angezeigt.' },
       ]
     },
     {
@@ -143,7 +144,7 @@ const WIKI_CONTENT = {
         { type: 'step', n: 1, text: 'Tap the + button in the bottom right to add a new item.' },
         { type: 'step', n: 2, text: 'Enter name, quantity and unit. Optionally: category and minimum quantity.' },
         { type: 'step', n: 3, text: 'Adjust quantity directly with − and +, or tap the number to enter an exact value.' },
-        { type: 'step', n: 4, text: 'To edit, tap ✏️. To delete, tap ×.' },
+        { type: 'step', n: 4, text: 'Tap ✏️ to edit an item. In the edit screen you can also delete it at the bottom — with a confirmation prompt.' },
         { type: 'tip', text: 'Items with a minimum quantity are highlighted in orange when stock runs low.' },
       ]
     },
@@ -152,7 +153,7 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Tap "Categories" next to the search bar to manage categories.' },
         { type: 'step', n: 2, text: 'Create new categories with a custom name, icon and color.' },
-        { type: 'step', n: 3, text: 'Categories are per household — each household has its own.' },
+        { type: 'step', n: 3, text: 'Tap ✏️ next to a category to edit or delete it.' },
         { type: 'step', n: 4, text: 'Filter the item list by category using the pills below the search bar.' },
         { type: 'tip', text: 'The "Low" filter shows all items where stock is below the minimum quantity.' },
       ]
@@ -197,8 +198,9 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Tap the 💡 button in the bottom right to give feedback.' },
         { type: 'step', n: 2, text: 'Choose between "Idea" (new feature) and "Bug" (report an error).' },
-        { type: 'step', n: 3, text: 'Via "View my suggestions" you can see the status of your submissions.' },
-        { type: 'tip', text: 'Status: Submitted → Under Review → In Progress → Deployed (or Rejected).' },
+        { type: 'step', n: 3, text: 'For bugs, you can optionally attach a screenshot.' },
+        { type: 'step', n: 4, text: 'Via "View my suggestions" you can see the status of your submissions.' },
+        { type: 'tip', text: 'When status is "Deployed", the related version is shown.' },
       ]
     },
     {
@@ -228,7 +230,7 @@ const WIKI_CONTENT = {
         { type: 'step', n: 1, text: 'Toca el botón + abajo a la derecha para añadir un nuevo artículo.' },
         { type: 'step', n: 2, text: 'Introduce nombre, cantidad y unidad. Opcionalmente: categoría y cantidad mínima.' },
         { type: 'step', n: 3, text: 'Ajusta la cantidad directamente con − y +, o toca el número para introducir un valor exacto.' },
-        { type: 'step', n: 4, text: 'Para editar, toca ✏️. Para eliminar, toca ×.' },
+        { type: 'step', n: 4, text: 'Toca ✏️ para editar un artículo. En la pantalla de edición también puedes eliminarlo abajo — con confirmación.' },
         { type: 'tip', text: 'Los artículos con cantidad mínima se resaltan en naranja cuando el stock es bajo.' },
       ]
     },
@@ -237,7 +239,7 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Toca "Categorías" junto a la barra de búsqueda para gestionarlas.' },
         { type: 'step', n: 2, text: 'Crea nuevas categorías con nombre, icono y color personalizados.' },
-        { type: 'step', n: 3, text: 'Las categorías son por hogar — cada hogar tiene las suyas.' },
+        { type: 'step', n: 3, text: 'Toca ✏️ junto a una categoría para editarla o eliminarla.' },
         { type: 'step', n: 4, text: 'Filtra la lista de artículos por categoría usando los botones bajo la barra de búsqueda.' },
         { type: 'tip', text: 'El filtro "Bajo" muestra todos los artículos con stock por debajo de la cantidad mínima.' },
       ]
@@ -282,8 +284,9 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Toca el botón 💡 abajo a la derecha para dar feedback.' },
         { type: 'step', n: 2, text: 'Elige entre "Idea" (nueva función) y "Error" (reportar un fallo).' },
-        { type: 'step', n: 3, text: 'Con "Ver mis sugerencias" puedes ver el estado de tus envíos.' },
-        { type: 'tip', text: 'Estado: Enviado → En revisión → En progreso → Implementado (o Rechazado).' },
+        { type: 'step', n: 3, text: 'Para errores, puedes adjuntar opcionalmente una captura de pantalla.' },
+        { type: 'step', n: 4, text: 'Con "Ver mis sugerencias" puedes ver el estado de tus envíos.' },
+        { type: 'tip', text: 'Cuando el estado es "Implementado", se muestra la versión correspondiente.' },
       ]
     },
     {
