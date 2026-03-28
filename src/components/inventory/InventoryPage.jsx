@@ -11,6 +11,7 @@ import { CategoryModal } from './CategoryModal'
 import { MembersPanel } from '../household/MembersPanel'
 import HouseholdSetup from '../household/HouseholdSetup'
 import { VersionModal } from '../versions/VersionModal'
+import WikiPage from '../wiki/WikiPage'
 import { VersionBanner } from '../versions/VersionBanner'
 import { useVersions } from '../../hooks/useVersions'
 import { useDeveloper } from '../../hooks/useDeveloper'
@@ -38,6 +39,7 @@ export default function InventoryPage() {
   const [showSwitch,   setShowSwitch]   = useState(false)
   const [showNewHh,    setShowNewHh]    = useState(false)
   const [showVersions, setShowVersions] = useState(false)
+  const [showWiki,     setShowWiki]     = useState(false)
   const [dismissed,    setDismissed]    = useState(null) // version id dismissed this session
   const [search,       setSearch]       = useState('')
   const [filterCat,    setFilterCat]    = useState('all')
@@ -243,6 +245,15 @@ export default function InventoryPage() {
             <p className="text-sm font-medium text-gray-800 mb-1">{household?.name}</p>
             <p className="text-xs text-gray-400 break-all">{household?.id}</p>
           </div>
+          {/* Wiki */}
+          <button onClick={() => { setShowSettings(false); setShowWiki(true) }}
+            className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl
+              hover:bg-gray-100 transition-all text-left">
+            <span className="text-xl">📖</span>
+            <span className="text-sm font-medium text-gray-700">{t.wikiBtn ?? 'Hilfe & Wiki'}</span>
+            <span className="ml-auto text-gray-400">›</span>
+          </button>
+
           {/* Sprache */}
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2">{t.language}</p>
@@ -262,6 +273,8 @@ export default function InventoryPage() {
       </Modal>
 
       <FeedbackButton />
+
+      {showWiki && <WikiPage onClose={() => setShowWiki(false)} />}
 
       {newVersion && dismissed !== newVersion.id && (
         <VersionBanner

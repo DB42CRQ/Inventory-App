@@ -159,6 +159,9 @@ export const translations = {
     feedbackPlaceholder: 'Was könnte besser sein? Was vermisst du?',
     feedbackSend: 'Absenden',
     feedbackSuccess: 'Danke für dein Feedback!',
+    wikiTitle: 'Hilfe & Wiki',
+    wikiIntro: 'Hier findest du Erklärungen zu allen Funktionen der App.',
+    wikiBtn: 'Hilfe & Wiki',
     language: 'Sprache',
   },
 
@@ -310,6 +313,9 @@ export const translations = {
     feedbackPlaceholder: 'What could be better? What are you missing?',
     feedbackSend: 'Submit',
     feedbackSuccess: 'Thanks for your feedback!',
+    wikiTitle: 'Help & Wiki',
+    wikiIntro: 'Here you can find explanations for all app features.',
+    wikiBtn: 'Help & Wiki',
     language: 'Language',
   },
 
@@ -461,6 +467,9 @@ export const translations = {
     feedbackPlaceholder: '¿Qué podría mejorar? ¿Qué echas en falta?',
     feedbackSend: 'Enviar',
     feedbackSuccess: '¡Gracias por tu comentario!',
+    wikiTitle: 'Ayuda y Wiki',
+    wikiIntro: 'Aquí encontrarás explicaciones de todas las funciones de la app.',
+    wikiBtn: 'Ayuda y Wiki',
     language: 'Idioma',
   }
 }
