@@ -86,20 +86,20 @@ export function VersionModal({ open, onClose, versions, isDeveloper, createVersi
                         <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                           {t.versionUsers ?? 'User-Übersicht'}
                         </p>
-                        <div className="flex flex-col gap-1">
+                        <div className="flex flex-col gap-2">
                           {views.map(vv => (
-                            <div key={vv.profile_id} className="flex items-center gap-2 text-xs">
-                              <span className={`w-4 h-4 rounded-full flex items-center justify-center text-white text-[10px] shrink-0
+                            <div key={vv.profile_id} className="flex items-start gap-2 text-xs">
+                              <span className={`w-5 h-5 rounded-full flex items-center justify-center text-white text-[10px] shrink-0 mt-0.5
                                 ${vv.installed ? 'bg-green-500' : 'bg-gray-300'}`}>
                                 {vv.installed ? '✓' : '○'}
                               </span>
-                              <span className="text-gray-700 truncate">
-                                {vv.profiles?.display_name ?? '—'}
-                              </span>
-                              <span className="text-gray-400 truncate">
-                                {vv.profiles?.email}
-                              </span>
-                              <span className="text-gray-300 ml-auto shrink-0">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-gray-800 font-medium truncate">
+                                  {vv.profiles?.display_name ?? '—'}
+                                </p>
+                                <p className="text-gray-400 truncate">{vv.profiles?.email}</p>
+                              </div>
+                              <span className="text-gray-300 shrink-0 text-[10px] mt-0.5">
                                 {new Date(vv.viewed_at).toLocaleDateString('de-DE')}
                               </span>
                             </div>
