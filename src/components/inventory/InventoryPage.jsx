@@ -62,6 +62,11 @@ export default function InventoryPage() {
   }, [])
   const uncategorized = filtered.filter(i => !i.category_id)
 
+  async function handleDeleteItem(id) {
+    await deleteItem(id)
+    setEditItem(null)
+  }
+
   function handleSwitchHousehold(id) {
     setShowSwitch(false); setFilterCat('all'); setSearch('')
     switchHousehold(id)
