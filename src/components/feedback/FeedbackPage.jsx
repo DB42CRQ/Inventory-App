@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
 import { useFeedback } from '../../hooks/useFeedback'
 import { useDeveloper } from '../../hooks/useDeveloper'
 import { useVersions } from '../../hooks/useVersions'
 import { useTranslation } from '../../i18n/useTranslation'
 import { Spinner } from '../ui'
+import { supabase } from '../../lib/supabase'
 
 const STATUSES = ['submitted', 'reviewing', 'implementing', 'deployed', 'rejected']
 
@@ -18,6 +20,25 @@ const STATUS_COLORS = {
 const CATEGORY_CONFIG = {
   idea: { icon: '💡' },
   bug:  { icon: '🐛' },
+}
+
+function ScreenshotThumb({ path }) {
+  const [url, setUrl] = useState(null)
+
+  useEffect(() => {
+    supabase.storage.from('feedback-attachments')
+      .createSignedUrl(path, 3600)
+      .then(({ data }) => data?.signedUrl && setUrl(data.signedUrl))
+  }, [path])
+
+  if (!url) return null
+
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" className="block mt-2">
+      <img src={url} alt="Screenshot"
+        className="rounded-xl border border-gray-200 max-h-32 object-cover hover:opacity-90 transition-opacity" />
+    </a>
+  )
 }
 
 export default function FeedbackPage({ onClose }) {
@@ -97,7 +118,12 @@ export default function FeedbackPage({ onClose }) {
                       <span className="text-base shrink-0 mt-0.5">
                         {CATEGORY_CONFIG[item.category]?.icon ?? '💡'}
                       </span>
-                      <p className="text-sm text-gray-900">{item.message}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-900">{item.message}</p>
+                        {item.screenshot_url && (
+                          <ScreenshotThumb path={item.screenshot_url} />
+                        )}
+                      </div>
                     </div>
                   </div>
 
