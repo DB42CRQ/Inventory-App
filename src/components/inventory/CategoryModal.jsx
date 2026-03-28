@@ -7,7 +7,28 @@ const PRESET_COLORS = [
   '#f97316', '#eab308', '#22c55e', '#14b8a6',
   '#3b82f6', '#64748b',
 ]
-const PRESET_ICONS = ['🥦', '🍞', '🥛', '🧴', '🧹', '❄️', '💊', '🐾', '🍷', '📦']
+const PRESET_ICONS = [
+  // Lebensmittel
+  '🥦', '🥕', '🍅', '🧅', '🍎', '🍌', '🍋', '🥑',
+  '🍞', '🥐', '🧀', '🥚', '🥛', '🧈', '🍯', '🌾',
+  '🍗', '🥩', '🐟', '🦐', '🥓', '🌭', '🍕', '🍝',
+  '🥫', '🍜', '🥣', '🫙', '🧂', '🫒', '🌶️', '🧄',
+  // Getränke
+  '🍷', '🍺', '🧃', '☕', '🍵', '🧋', '💧', '🥤',
+  // Haushalt
+  '🧴', '🧹', '🧺', '🧻', '🪣', '🫧', '🧼', '🪥',
+  '🔌', '💡', '🔋', '🪫', '🧯', '🪤', '🔧', '🛠️',
+  // Bad & Pflege
+  '💊', '🩹', '🧬', '🪮', '💄', '🪒', '🧻', '🚿',
+  // Tiere
+  '🐾', '🐕', '🐈', '🐟', '🐇', '🐹', '🦜', '🦴',
+  // Büro & Technik
+  '💻', '📱', '🖨️', '📷', '🎮', '🎧', '📺', '⌨️',
+  // Kleidung
+  '👕', '👖', '👟', '🧥', '🧤', '🧦', '👗', '🎒',
+  // Sonstiges
+  '📦', '🎁', '🛒', '🏠', '🚗', '✈️', '🌱', '♻️',
+]
 
 export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDelete }) {
   const { t } = useTranslation()
@@ -64,7 +85,7 @@ export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDe
     <>
       <div className="flex flex-col gap-1">
         <label className="text-sm font-medium text-gray-700">{t.icon}</label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto pr-1">
           {PRESET_ICONS.map(ic => (
             <button key={ic} type="button" onClick={() => setForm(f => ({ ...f, icon: ic }))}
               className={`w-9 h-9 rounded-xl text-xl flex items-center justify-center transition-all
