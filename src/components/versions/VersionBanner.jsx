@@ -3,10 +3,10 @@ import { useTranslation } from '../../i18n/useTranslation'
 
 export function VersionBanner({ version, onDismiss }) {
   const { t } = useTranslation()
-  const [isIOS,      setIsIOS]      = useState(false)
-  const [isAndroid,  setIsAndroid]  = useState(false)
-  const [installed,  setInstalled]  = useState(false)
-  const [prompt,     setPrompt]     = useState(null)
+  const [isIOS,     setIsIOS]     = useState(false)
+  const [isAndroid, setIsAndroid] = useState(false)
+  const [installed, setInstalled] = useState(false)
+  const [prompt,    setPrompt]    = useState(null)
 
   useEffect(() => {
     if (window.matchMedia('(display-mode: standalone)').matches) {
@@ -14,9 +14,8 @@ export function VersionBanner({ version, onDismiss }) {
       return
     }
     const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream
-    const android = /android/i.test(navigator.userAgent)
     setIsIOS(ios)
-    setIsAndroid(android)
+    setIsAndroid(/android/i.test(navigator.userAgent))
 
     const handler = (e) => { e.preventDefault(); setPrompt(e) }
     window.addEventListener('beforeinstallprompt', handler)
@@ -55,7 +54,7 @@ export function VersionBanner({ version, onDismiss }) {
           </div>
         </div>
 
-        {/* Content */}
+        {/* Was ist neu */}
         <div className="px-5 py-4">
           <p className="text-sm font-semibold text-gray-700 mb-2">
             {t.versionWhatsNew ?? 'Was ist neu?'}
@@ -70,7 +69,7 @@ export function VersionBanner({ version, onDismiss }) {
           </p>
         </div>
 
-        {/* Install-Hinweis */}
+        {/* Install-Hinweis — nur wenn nicht installiert */}
         {showInstall && (
           <div className="mx-5 mb-4 bg-primary-50 border border-primary-100 rounded-xl p-3">
             <p className="text-xs font-semibold text-primary-800 mb-2">
@@ -111,12 +110,21 @@ export function VersionBanner({ version, onDismiss }) {
           </div>
         )}
 
-        {/* Button */}
-        <div className="px-5 pb-5">
+        {/* Buttons */}
+        <div className="px-5 pb-5 flex flex-col gap-2">
+          {/* Hauptbutton: Installiert bestätigen */}
           <button onClick={() => onDismiss(version.id)}
             className="w-full py-3 bg-primary-500 hover:bg-primary-600 text-white font-medium
               rounded-xl transition-all text-sm">
-            {t.versionGotIt ?? 'Verstanden!'}
+            {installed
+              ? (t.versionGotIt ?? 'Verstanden!')
+              : (t.versionConfirmInstalled ?? 'Ich habe die App installiert ✓')}
+          </button>
+
+          {/* Überspringen — immer verfügbar */}
+          <button onClick={() => onDismiss(version.id)}
+            className="w-full py-2 text-gray-400 hover:text-gray-600 text-sm transition-all">
+            {t.versionSkip ?? 'Überspringen'}
           </button>
         </div>
       </div>
