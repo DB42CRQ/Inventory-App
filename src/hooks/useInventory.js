@@ -89,6 +89,11 @@ export function useInventory(householdId) {
     return { error }
   }
 
+  async function updateCategory(categoryId, fields) {
+    const { error } = await supabase.from('categories').update(fields).eq('id', categoryId)
+    return { error }
+  }
+
   async function deleteCategory(categoryId) {
     const { error } = await supabase.from('categories').delete().eq('id', categoryId)
     return { error }
@@ -100,6 +105,6 @@ export function useInventory(householdId) {
   return {
     items, categories, loading, lowItems,
     addItem, updateQuantity, updateItem, deleteItem,
-    addCategory, deleteCategory,
+    addCategory, updateCategory, deleteCategory,
   }
 }

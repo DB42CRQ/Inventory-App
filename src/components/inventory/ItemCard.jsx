@@ -32,6 +32,7 @@ export function ItemCard({ item, category, onUpdateQty, onDelete, onEdit }) {
         </div>
       </div>
 
+      {/* Menge */}
       <div className="flex items-center gap-2 shrink-0">
         <button onClick={() => onUpdateQty(item.id, item.quantity - 1)} disabled={item.quantity <= 0}
           className="w-8 h-8 rounded-xl bg-gray-100 text-gray-600 font-bold hover:bg-gray-200
@@ -58,18 +59,12 @@ export function ItemCard({ item, category, onUpdateQty, onDelete, onEdit }) {
         </button>
       </div>
 
-      <div className="flex flex-col gap-1 shrink-0">
-        <button onClick={() => onEdit(item)}
-          className="w-7 h-7 rounded-lg text-gray-300 hover:text-primary-400 hover:bg-primary-50
-            transition-all flex items-center justify-center text-sm">
-          ✏️
-        </button>
-        <button onClick={() => onDelete(item.id)}
-          className="w-7 h-7 rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50
-            transition-all flex items-center justify-center text-lg leading-none">
-          ×
-        </button>
-      </div>
+      {/* Edit Button — zentriert, kein Delete mehr hier */}
+      <button onClick={() => onEdit(item)}
+        className="w-8 h-8 rounded-xl text-gray-300 hover:text-primary-400 hover:bg-primary-50
+          transition-all flex items-center justify-center shrink-0">
+        ✏️
+      </button>
     </div>
   )
 }
