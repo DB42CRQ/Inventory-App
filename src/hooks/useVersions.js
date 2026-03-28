@@ -9,7 +9,12 @@ export function useVersions() {
   const [loading,    setLoading]    = useState(true)
 
   useEffect(() => {
-    if (!user) return
+    if (!user) {
+      setVersions([])
+      setNewVersion(null)
+      setLoading(false)
+      return
+    }
     fetchVersions()
   }, [user])
 
