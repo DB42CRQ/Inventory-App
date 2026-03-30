@@ -41,7 +41,8 @@ const PRESET_ICONS = [
 ]
 
 export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDelete }) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
+  const getCatName = (cat) => lang === 'en' && cat.name_en ? cat.name_en : lang === 'es' && cat.name_es ? cat.name_es : cat.name
 
   // 'list' | 'add' | 'edit'
   const [view,    setView]    = useState('list')
@@ -165,7 +166,7 @@ export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDe
               className="flex items-center gap-3 bg-gray-50 rounded-xl px-3 py-2.5">
               <span className="text-lg w-6 text-center">{cat.icon || '📦'}</span>
               <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
-              <span className="flex-1 text-sm font-medium text-gray-800">{cat.name}</span>
+              <span className="flex-1 text-sm font-medium text-gray-800">{getCatName(cat)}</span>
               <button onClick={() => openEdit(cat)}
                 className="w-7 h-7 rounded-lg text-gray-300 hover:text-primary-400 hover:bg-primary-50
                   transition-all flex items-center justify-center text-sm">
