@@ -23,7 +23,7 @@ export default async function handler(req, res) {
           max_tokens: 1000,
           messages: [{
             role: 'user',
-            content: `Translate the following release notes to ${targetLang}. Keep the same formatting (bullet points, line breaks). Only return the translated text, nothing else:\n\n${text}`
+            content: `Translate the following text to ${targetLang}. Return ONLY the translated text. No explanations, notes, parentheses, or comments. If input is one word, return one word.\n\n${text}`
           }]
         })
       })
