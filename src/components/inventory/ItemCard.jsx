@@ -2,8 +2,16 @@ import { useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 import { Badge } from '../ui'
 
+
 export function ItemCard({ item, category, onUpdateQty, onDelete, onEdit }) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
+
+  function getCatName(cat) {
+    if (!cat) return ''
+    if (lang === 'en' && cat.name_en) return cat.name_en
+    if (lang === 'es' && cat.name_es) return cat.name_es
+    return cat.name
+  }
   const [editing, setEditing] = useState(false)
   const isLow = item.min_quantity > 0 && item.quantity <= item.min_quantity
 
@@ -23,7 +31,7 @@ export function ItemCard({ item, category, onUpdateQty, onDelete, onEdit }) {
           {category && (
             <Badge color={category.color}>
               {category.icon && <span className="mr-1">{category.icon}</span>}
-              {category.name}
+              {getCatName(category)}
             </Badge>
           )}
           {item.min_quantity > 0 && (

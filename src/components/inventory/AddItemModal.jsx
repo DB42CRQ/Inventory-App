@@ -5,7 +5,8 @@ import { Modal, Input, Button } from '../ui'
 const UNITS = ['Stück', 'g', 'kg', 'ml', 'l', 'Packung', 'Flasche', 'Dose', 'Beutel']
 
 export function AddItemModal({ open, onClose, categories, onAdd }) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
+  const getCatName = (c) => lang === 'en' && c.name_en ? c.name_en : lang === 'es' && c.name_es ? c.name_es : c.name
   const [form, setForm] = useState({ name: '', quantity: '1', unit: 'Stück', category_id: '', min_quantity: '0' })
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')
@@ -45,7 +46,7 @@ export function AddItemModal({ open, onClose, categories, onAdd }) {
             className="rounded-xl border border-gray-200 px-3 py-2.5 text-sm text-gray-900
               focus:outline-none focus:ring-2 focus:ring-primary-500">
             <option value="">{t.noCategory}</option>
-            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            {categories.map(c => <option key={c.id} value={c.id}>{getCatName(c)}</option>)}
           </select>
         </div>
         <Input label={t.minQuantity} type="number" min="0" step="0.1"

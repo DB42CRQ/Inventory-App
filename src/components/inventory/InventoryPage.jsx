@@ -46,6 +46,13 @@ export default function InventoryPage() {
 
   const catMap = Object.fromEntries(categories.map(c => [c.id, c]))
 
+  function getCatName(cat) {
+    if (!cat) return ''
+    if (lang === 'en' && cat.name_en) return cat.name_en
+    if (lang === 'es' && cat.name_es) return cat.name_es
+    return cat.name
+  }
+
   const filtered = items.filter(item => {
     const matchSearch = item.name.toLowerCase().includes(search.toLowerCase())
     const matchCat =
@@ -143,7 +150,7 @@ export default function InventoryPage() {
                     ${filterCat === c.id ? 'text-white border-transparent' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'}`}
                   style={filterCat === c.id ? { backgroundColor: c.color } : {}}>
                   {c.icon && <span>{c.icon}</span>}
-                  {c.name}
+                  {c.id === 'all' || c.id === 'low' ? c.name : getCatName(c)}
                 </button>
               ))}
             </div>
@@ -167,7 +174,7 @@ export default function InventoryPage() {
                   <h2 className="text-sm font-semibold text-gray-500 mb-2 flex items-center gap-2">
                     {cat.icon && <span>{cat.icon}</span>}
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: cat.color }} />
-                    {cat.name}
+                    {getCatName(cat)}
                     <span className="font-normal text-gray-400">({catItems.length})</span>
                   </h2>
                   <div className="flex flex-col gap-2">

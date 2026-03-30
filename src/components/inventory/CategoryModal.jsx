@@ -2,6 +2,16 @@ import { useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 import { Modal, Button, Input } from '../ui'
 
+async function translateName(name) {
+  const response = await fetch('/api/translate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: name })
+  })
+  if (!response.ok) throw new Error('Translation failed')
+  return await response.json()
+}
+
 const PRESET_COLORS = [
   '#6366f1', '#8b5cf6', '#ec4899', '#ef4444',
   '#f97316', '#eab308', '#22c55e', '#14b8a6',
@@ -37,9 +47,10 @@ export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDe
   const [view,    setView]    = useState('list')
   const [editing, setEditing] = useState(null) // category being edited
   const [form,    setForm]    = useState({ name: '', color: PRESET_COLORS[0], icon: '' })
-  const [loading, setLoading] = useState(false)
-  const [confirm, setConfirm] = useState(false)
-  const [error,   setError]   = useState('')
+  const [loading,     setLoading]     = useState(false)
+  const [translating, setTranslating] = useState(false)
+  const [confirm,     setConfirm]     = useState(false)
+  const [error,       setError]       = useState('')
 
   function openAdd() {
     setForm({ name: '', color: PRESET_COLORS[0], icon: '' })
@@ -61,7 +72,14 @@ export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDe
     e.preventDefault()
     if (!form.name.trim()) return
     setLoading(true); setError('')
-    const { error } = await onAdd({ name: form.name.trim(), color: form.color, icon: form.icon })
+    let name_en = null, name_es = null
+    try {
+      setTranslating(true)
+      const result = await translateName(form.name.trim())
+      name_en = result.en; name_es = result.es
+    } catch (e) { /* Übersetzung optional */ }
+    setTranslating(false)
+    const { error } = await onAdd({ name: form.name.trim(), color: form.color, icon: form.icon, name_en, name_es })
     if (error) { setError(error.message); setLoading(false); return }
     setLoading(false); setView('list')
   }
@@ -70,7 +88,14 @@ export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDe
     e.preventDefault()
     if (!form.name.trim()) return
     setLoading(true); setError('')
-    const { error } = await onUpdate(editing.id, { name: form.name.trim(), color: form.color, icon: form.icon })
+    let name_en = null, name_es = null
+    try {
+      setTranslating(true)
+      const result = await translateName(form.name.trim())
+      name_en = result.en; name_es = result.es
+    } catch (e) { /* Übersetzung optional */ }
+    setTranslating(false)
+    const { error } = await onUpdate(editing.id, { name: form.name.trim(), color: form.color, icon: form.icon, name_en, name_es })
     if (error) { setError(error.message); setLoading(false); return }
     setLoading(false); setView('list')
   }
@@ -168,7 +193,7 @@ export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDe
           <div className="flex gap-2">
             <Button type="button" variant="secondary" className="flex-1" onClick={goBack}>{t.cancel}</Button>
             <Button type="submit" className="flex-1" disabled={loading}>
-              {loading ? t.saving : t.add}
+              {translating ? (t.versionTranslating ?? 'Übersetze…') : loading ? t.saving : t.add}
             </Button>
           </div>
         </form>
@@ -184,7 +209,7 @@ export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDe
           <div className="flex gap-2">
             <Button type="button" variant="secondary" className="flex-1" onClick={goBack}>{t.cancel}</Button>
             <Button type="submit" className="flex-1" disabled={loading}>
-              {loading ? t.saving : t.save}
+              {translating ? (t.versionTranslating ?? 'Übersetze…') : loading ? t.saving : t.save}
             </Button>
           </div>
 
