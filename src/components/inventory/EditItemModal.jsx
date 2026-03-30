@@ -6,7 +6,7 @@ const UNITS = ['Stück', 'g', 'kg', 'ml', 'l', 'Packung', 'Flasche', 'Dose', 'Be
 
 export function EditItemModal({ open, onClose, item, categories, onSave, onDelete }) {
   const { t, lang } = useTranslation()
-  const getCatName = (c) => lang === 'en' && c.name_en ? c.name_en : lang === 'es' && c.name_es ? c.name_es : c.name
+  const getCatName = (c) => lang === 'en' && c.name_en ? c.name_en : lang === 'es' && c.name_es ? c.name_es : lang === 'de' && c.name_de ? c.name_de : c.name
   const [form, setForm] = useState({ name: '', quantity: '', unit: '', category_id: '', min_quantity: '' })
   const [loading,  setLoading]  = useState(false)
   const [deleting, setDeleting] = useState(false)

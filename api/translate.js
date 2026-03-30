@@ -31,12 +31,13 @@ export default async function handler(req, res) {
       return data.content?.[0]?.text ?? text
     }
 
-    const [en, es] = await Promise.all([
+    const [de, en, es] = await Promise.all([
+      translate('German'),
       translate('English'),
       translate('Spanish'),
     ])
 
-    return res.status(200).json({ en, es })
+    return res.status(200).json({ de, en, es })
   } catch (err) {
     return res.status(500).json({ error: err.message })
   }

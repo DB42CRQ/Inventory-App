@@ -42,7 +42,7 @@ const PRESET_ICONS = [
 
 export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDelete }) {
   const { t, lang } = useTranslation()
-  const getCatName = (cat) => lang === 'en' && cat.name_en ? cat.name_en : lang === 'es' && cat.name_es ? cat.name_es : cat.name
+  const getCatName = (cat) => lang === 'en' && cat.name_en ? cat.name_en : lang === 'es' && cat.name_es ? cat.name_es : lang === 'de' && cat.name_de ? cat.name_de : cat.name
 
   // 'list' | 'add' | 'edit'
   const [view,    setView]    = useState('list')
@@ -77,10 +77,10 @@ export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDe
     try {
       setTranslating(true)
       const result = await translateName(form.name.trim())
-      name_en = result.en; name_es = result.es
+      name_en = result.en; name_es = result.es; name_de = result.de
     } catch (e) { /* Übersetzung optional */ }
     setTranslating(false)
-    const { error } = await onAdd({ name: form.name.trim(), color: form.color, icon: form.icon, name_en, name_es })
+    const { error } = await onAdd({ name: form.name.trim(), color: form.color, icon: form.icon, name_en, name_es, name_de })
     if (error) { setError(error.message); setLoading(false); return }
     setLoading(false); setView('list')
   }
@@ -89,14 +89,14 @@ export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDe
     e.preventDefault()
     if (!form.name.trim()) return
     setLoading(true); setError('')
-    let name_en = null, name_es = null
+    let name_en = null, name_es = null, name_de = null
     try {
       setTranslating(true)
       const result = await translateName(form.name.trim())
-      name_en = result.en; name_es = result.es
+      name_en = result.en; name_es = result.es; name_de = result.de
     } catch (e) { /* Übersetzung optional */ }
     setTranslating(false)
-    const { error } = await onUpdate(editing.id, { name: form.name.trim(), color: form.color, icon: form.icon, name_en, name_es })
+    const { error } = await onUpdate(editing.id, { name: form.name.trim(), color: form.color, icon: form.icon, name_en, name_es, name_de })
     if (error) { setError(error.message); setLoading(false); return }
     setLoading(false); setView('list')
   }
