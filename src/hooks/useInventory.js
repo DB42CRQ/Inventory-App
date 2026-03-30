@@ -80,12 +80,14 @@ export function useInventory(householdId) {
     return { error }
   }
 
-  async function addCategory({ name, color, icon }) {
+  async function addCategory({ name, color, icon, name_en, name_es }) {
     const { error } = await supabase.from('categories').insert({
       household_id: householdId,
       name,
       color: color || '#6366f1',
       icon: icon || null,
+      name_en: name_en || null,
+      name_es: name_es || null,
     })
     return { error }
   }
