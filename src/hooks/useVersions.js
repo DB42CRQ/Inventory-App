@@ -80,11 +80,12 @@ export function useVersions() {
   }
 
   async function updateDraftNotes(id, notes, notes_en, notes_es) {
-    const { error } = await supabase.from('versions').update({
+    const { data, error } = await supabase.from('versions').update({
       notes,
       notes_en: notes_en || null,
       notes_es: notes_es || null
-    }).eq('id', id)
+    }).eq('id', id).select()
+    console.log('updateDraftNotes:', { id, notes, error, data })
     if (!error) setVersions(prev => prev.map(v => v.id === id ? { ...v, notes, notes_en, notes_es } : v))
     return { error }
   }
