@@ -6,7 +6,6 @@ import { Spinner, Button } from '../ui'
 
 function CheckModal({ item, onConfirm, onCancel, t }) {
   const [qty, setQty] = useState(item.quantity)
-
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
       onClick={onCancel}>
@@ -41,13 +40,10 @@ function CheckModal({ item, onConfirm, onCancel, t }) {
 
 function ShoppingItem({ item, onCheck, onUncheck, onRemove, t }) {
   const [showModal, setShowModal] = useState(false)
-
   return (
     <>
       <div className={`bg-white rounded-2xl border p-4 flex items-center gap-3 transition-all
         ${item.checked ? 'opacity-60 border-gray-100' : 'border-gray-100'}`}>
-
-        {/* Checkbox */}
         <button onClick={() => item.checked ? onUncheck(item) : setShowModal(true)}
           className={`w-7 h-7 rounded-full border-2 flex items-center justify-center shrink-0
             transition-all ${item.checked
@@ -55,8 +51,6 @@ function ShoppingItem({ item, onCheck, onUncheck, onRemove, t }) {
               : 'border-gray-300 hover:border-primary-400'}`}>
           {item.checked && <span className="text-sm">✓</span>}
         </button>
-
-        {/* Info */}
         <div className="flex-1 min-w-0">
           <p className={`font-medium text-gray-900 ${item.checked ? 'line-through text-gray-400' : ''}`}>
             {item.name}
@@ -68,15 +62,12 @@ function ShoppingItem({ item, onCheck, onUncheck, onRemove, t }) {
             {item.profiles?.display_name && ` · ${item.profiles.display_name}`}
           </p>
         </div>
-
-        {/* Löschen */}
         <button onClick={() => onRemove(item.id)}
           className="w-7 h-7 rounded-lg text-gray-300 hover:text-red-400 hover:bg-red-50
             transition-all flex items-center justify-center text-lg shrink-0">
           ×
         </button>
       </div>
-
       {showModal && (
         <CheckModal item={item} t={t}
           onCancel={() => setShowModal(false)}
@@ -92,9 +83,11 @@ export default function ShoppingPage({ onClose, household }) {
           checkItem, uncheckItem, removeItem, clearChecked } = useShoppingList(household?.id)
   const { items: inventoryItems, lowItems, categories } = useInventory(household?.id)
 
-  const [showAdd,    setShowAdd]    = useState(false)
-  const [search,     setSearch]     = useState('')
-  const [addedMsg,   setAddedMsg]   = useState('')
+  const [showAdd,      setShowAdd]      = useState(false)
+  const [search,       setSearch]       = useState('')
+  const [addedMsg,     setAddedMsg]     = useState('')
+  const [confirmClear, setConfirmClear] = useState(false) // 'all' | 'done' | false
+  const [filterCat,    setFilterCat]    = useState('all')
 
   const getCatName = (cat) => !cat ? '' :
     lang === 'en' && cat.name_en ? cat.name_en :
@@ -103,8 +96,11 @@ export default function ShoppingPage({ onClose, household }) {
 
   const catMap = Object.fromEntries(categories.map(c => [c.id, c]))
 
-  async function handleAddLow() {
-    const { count, error } = await addLowItems(lowItems)
+  async function handleAddLow(categoryId) {
+    const filtered = categoryId === 'all'
+      ? lowItems
+      : lowItems.filter(i => i.category_id === categoryId)
+    const { count, error } = await addLowItems(filtered)
     if (!error) {
       setAddedMsg(count > 0
         ? `${count} ${t.shoppingAddedLow ?? 'Artikel hinzugefügt'}`
@@ -121,8 +117,25 @@ export default function ShoppingPage({ onClose, household }) {
     await uncheckItem(item.id, item.item_id, item.quantity)
   }
 
+  async function handleClearAll() {
+    // Remove all items (checked and unchecked)
+    const allIds = [...unchecked, ...checked].map(i => i.id)
+    for (const id of allIds) await removeItem(id)
+    setConfirmClear(false)
+  }
+
+  async function handleClearDone() {
+    await clearChecked()
+    setConfirmClear(false)
+  }
+
   const filteredInventory = inventoryItems.filter(i =>
     i.name.toLowerCase().includes(search.toLowerCase())
+  )
+
+  // Kategorien mit niedrigen Artikeln
+  const lowCats = categories.filter(cat =>
+    lowItems.some(i => i.category_id === cat.id)
   )
 
   return (
@@ -131,9 +144,7 @@ export default function ShoppingPage({ onClose, household }) {
       <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0">
         <button onClick={onClose}
           className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
-            flex items-center justify-center text-gray-600 text-lg">
-          ←
-        </button>
+            flex items-center justify-center text-gray-600 text-lg">←</button>
         <h1 className="font-bold text-gray-900 text-lg flex-1">
           🛒 {t.shoppingTitle ?? 'Einkaufsliste'}
         </h1>
@@ -141,31 +152,66 @@ export default function ShoppingPage({ onClose, household }) {
       </header>
 
       {/* Actions */}
-      <div className="bg-white border-b border-gray-100 px-4 py-2 flex gap-2">
+      <div className="bg-white border-b border-gray-100 px-4 py-2 flex flex-wrap gap-2">
+        {/* Niedrige Bestände */}
         {lowItems.length > 0 && (
-          <button onClick={handleAddLow}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-orange-50 border
-              border-orange-200 text-orange-700 text-xs font-medium hover:bg-orange-100 transition-all">
-            ⚠️ {t.shoppingAddLow ?? 'Niedrige Bestände hinzufügen'} ({lowItems.length})
-          </button>
+          <div className="flex items-center gap-1 flex-wrap">
+            <button onClick={() => handleAddLow('all')}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-orange-50 border
+                border-orange-200 text-orange-700 text-xs font-medium hover:bg-orange-100 transition-all">
+              ⚠️ {t.shoppingAddLow ?? 'Alle niedrigen'} ({lowItems.length})
+            </button>
+            {lowCats.map(cat => (
+              <button key={cat.id} onClick={() => handleAddLow(cat.id)}
+                className="flex items-center gap-1 px-2 py-2 rounded-xl border border-orange-100
+                  text-orange-600 text-xs hover:bg-orange-50 transition-all">
+                {cat.icon && <span>{cat.icon}</span>}
+                {getCatName(cat)} ({lowItems.filter(i => i.category_id === cat.id).length})
+              </button>
+            ))}
+          </div>
         )}
-        <button onClick={() => setShowAdd(s => !s)}
-          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-medium
-            transition-all ${showAdd
-              ? 'bg-primary-50 border-primary-200 text-primary-700'
-              : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
-          + {t.shoppingAddFromInventory ?? 'Aus Inventar'}
-        </button>
-        {checked.length > 0 && (
-          <button onClick={clearChecked}
-            className="ml-auto flex items-center gap-1.5 px-3 py-2 rounded-xl border
-              border-gray-200 text-gray-500 text-xs font-medium hover:bg-gray-50 transition-all">
-            🗑 {t.shoppingClearDone ?? 'Erledigte löschen'}
+
+        <div className="flex gap-2 ml-auto">
+          {/* Aus Inventar */}
+          <button onClick={() => setShowAdd(s => !s)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-medium
+              transition-all ${showAdd
+                ? 'bg-primary-50 border-primary-200 text-primary-700'
+                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+            + {t.shoppingAddFromInventory ?? 'Aus Inventar'}
           </button>
-        )}
+
+          {/* Löschen Menü */}
+          {(unchecked.length > 0 || checked.length > 0) && (
+            confirmClear ? (
+              <div className="flex items-center gap-1 bg-red-50 border border-red-200 rounded-xl px-2 py-1">
+                <span className="text-xs text-red-600 font-medium">{t.deleteConfirmText ?? 'Wirklich?'}</span>
+                {checked.length > 0 && (
+                  <button onClick={handleClearDone}
+                    className="text-xs text-orange-600 font-medium px-1 hover:text-orange-800">
+                    {t.shoppingClearDone ?? 'Erledigte'}
+                  </button>
+                )}
+                <button onClick={handleClearAll}
+                  className="text-xs text-red-600 font-semibold px-1 hover:text-red-800">
+                  {t.shoppingClearAll ?? 'Alle'}
+                </button>
+                <button onClick={() => setConfirmClear(false)}
+                  className="text-xs text-gray-400 px-1">✕</button>
+              </div>
+            ) : (
+              <button onClick={() => setConfirmClear(true)}
+                className="flex items-center gap-1 px-3 py-2 rounded-xl border border-gray-200
+                  text-gray-500 text-xs font-medium hover:bg-gray-50 transition-all">
+                🗑 {t.shoppingClear ?? 'Leeren'}
+              </button>
+            )
+          )}
+        </div>
       </div>
 
-      {/* Feedback message */}
+      {/* Feedback */}
       {addedMsg && (
         <div className="mx-4 mt-3 bg-green-50 border border-green-200 rounded-xl px-3 py-2
           text-sm text-green-700 text-center">
@@ -197,9 +243,7 @@ export default function ShoppingPage({ onClose, household }) {
                         : 'hover:bg-primary-50 hover:text-primary-700'}`}>
                     <span className="flex-1 truncate">{item.name}</span>
                     {cat && <span className="text-xs text-gray-400">{getCatName(cat)}</span>}
-                    {onList
-                      ? <span className="text-xs text-green-500">✓</span>
-                      : <span className="text-primary-400">+</span>}
+                    {onList ? <span className="text-xs text-green-500">✓</span> : <span className="text-primary-400">+</span>}
                   </button>
                 )
               })}
@@ -211,38 +255,31 @@ export default function ShoppingPage({ onClose, household }) {
       {/* Liste */}
       <main className="flex-1 overflow-y-auto max-w-2xl w-full mx-auto px-4 py-4 pb-8">
         {loading ? <Spinner /> : (
-          <>
-            {unchecked.length === 0 && checked.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 text-center">
-                <div className="text-5xl mb-3">🛒</div>
-                <p className="font-semibold text-gray-900 mb-1">{t.shoppingEmpty ?? 'Liste ist leer'}</p>
-                <p className="text-sm text-gray-400">
-                  {t.shoppingEmptyHint ?? 'Füge Artikel aus dem Inventar hinzu oder importiere niedrige Bestände.'}
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                {/* Offene Artikel */}
-                {unchecked.map(item => (
-                  <ShoppingItem key={item.id} item={item} t={t}
-                    onCheck={handleCheck} onUncheck={handleUncheck} onRemove={removeItem} />
-                ))}
-
-                {/* Erledigte */}
-                {checked.length > 0 && (
-                  <>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mt-4 mb-1">
-                      ✓ {t.shoppingDone ?? 'Erledigt'} ({checked.length})
-                    </p>
-                    {checked.map(item => (
-                      <ShoppingItem key={item.id} item={item} t={t}
-                        onCheck={handleCheck} onUncheck={handleUncheck} onRemove={removeItem} />
-                    ))}
-                  </>
-                )}
-              </div>
-            )}
-          </>
+          unchecked.length === 0 && checked.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <div className="text-5xl mb-3">🛒</div>
+              <p className="font-semibold text-gray-900 mb-1">{t.shoppingEmpty ?? 'Liste ist leer'}</p>
+              <p className="text-sm text-gray-400">{t.shoppingEmptyHint ?? 'Füge Artikel hinzu.'}</p>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {unchecked.map(item => (
+                <ShoppingItem key={item.id} item={item} t={t}
+                  onCheck={handleCheck} onUncheck={handleUncheck} onRemove={removeItem} />
+              ))}
+              {checked.length > 0 && (
+                <>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mt-4 mb-1">
+                    ✓ {t.shoppingDone ?? 'Erledigt'} ({checked.length})
+                  </p>
+                  {checked.map(item => (
+                    <ShoppingItem key={item.id} item={item} t={t}
+                      onCheck={handleCheck} onUncheck={handleUncheck} onRemove={removeItem} />
+                  ))}
+                </>
+              )}
+            </div>
+          )
         )}
       </main>
     </div>
