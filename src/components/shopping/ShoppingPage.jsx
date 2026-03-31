@@ -155,20 +155,25 @@ export default function ShoppingPage({ onClose, household }) {
       <div className="bg-white border-b border-gray-100 px-4 py-2 flex flex-wrap gap-2">
         {/* Niedrige Bestände */}
         {lowItems.length > 0 && (
-          <div className="flex items-center gap-1 flex-wrap">
+          <div className="flex items-center gap-2">
             <button onClick={() => handleAddLow('all')}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-orange-50 border
                 border-orange-200 text-orange-700 text-xs font-medium hover:bg-orange-100 transition-all">
               ⚠️ {t.shoppingAddLow ?? 'Alle niedrigen'} ({lowItems.length})
             </button>
-            {lowCats.map(cat => (
-              <button key={cat.id} onClick={() => handleAddLow(cat.id)}
-                className="flex items-center gap-1 px-2 py-2 rounded-xl border border-orange-100
-                  text-orange-600 text-xs hover:bg-orange-50 transition-all">
-                {cat.icon && <span>{cat.icon}</span>}
-                {getCatName(cat)} ({lowItems.filter(i => i.category_id === cat.id).length})
-              </button>
-            ))}
+            {lowCats.length > 0 && (
+              <select
+                onChange={e => { if (e.target.value) { handleAddLow(e.target.value); e.target.value = '' } }}
+                className="px-2 py-2 rounded-xl border border-orange-200 bg-orange-50 text-orange-700
+                  text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-300 cursor-pointer">
+                <option value="">{t.shoppingByCategory ?? 'Nach Kategorie…'}</option>
+                {lowCats.map(cat => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.icon ? cat.icon + ' ' : ''}{getCatName(cat)} ({lowItems.filter(i => i.category_id === cat.id).length})
+                  </option>
+                ))}
+              </select>
+            )}
           </div>
         )}
 
