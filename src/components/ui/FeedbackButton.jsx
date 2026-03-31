@@ -5,12 +5,15 @@ import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../hooks/useAuth'
 import FeedbackPage from '../feedback/FeedbackPage'
 
-export function FeedbackButton() {
+export function FeedbackButton({ forceOpen, onForceClose }) {
   const { user } = useAuth()
   const { household } = useHousehold()
   const { t } = useTranslation()
 
   const [open,      setOpen]      = useState(false)
+
+  // Öffnen von außen
+  if (forceOpen && !open) setOpen(true)
   const [showPage,  setShowPage]  = useState(false)
   const [message,   setMessage]   = useState('')
   const [category,  setCategory]  = useState('idea')
@@ -89,6 +92,7 @@ export function FeedbackButton() {
     setOpen(false); setError('')
     setMessage(''); setCategory('idea')
     removeScreenshot()
+    onForceClose?.()
   }
 
   const CATEGORY_CONFIG = {
@@ -99,14 +103,6 @@ export function FeedbackButton() {
   return (
     <>
       {showPage && <FeedbackPage onClose={() => setShowPage(false)} />}
-
-      <button onClick={() => setOpen(true)}
-        className="fixed bottom-24 right-4 z-40 w-12 h-12 bg-white border border-gray-200
-          rounded-2xl shadow-md flex items-center justify-center text-xl
-          hover:bg-gray-50 hover:scale-105 active:scale-95 transition-all"
-        title={t.feedbackTitle}>
-        💡
-      </button>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
