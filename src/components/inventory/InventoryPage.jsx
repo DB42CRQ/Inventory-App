@@ -212,7 +212,7 @@ export default function InventoryPage() {
             </div>
           )
         )}
-        {tab === 'members' && <MembersPanel household={household} members={members} />}
+
       </main>
 
       {tab === 'inventory' && (
