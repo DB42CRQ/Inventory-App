@@ -73,7 +73,7 @@ export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDe
     e.preventDefault()
     if (!form.name.trim()) return
     setLoading(true); setError('')
-    let name_en = null, name_es = null
+    let name_en = null, name_es = null, name_de = null
     try {
       setTranslating(true)
       const result = await translateName(form.name.trim())
