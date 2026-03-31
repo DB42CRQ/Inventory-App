@@ -42,6 +42,7 @@ export default function InventoryPage() {
   const [showVersions, setShowVersions] = useState(false)
   const [showWiki,     setShowWiki]     = useState(false)
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
+  const [showMembers,      setShowMembers]      = useState(false)
   const [showShopping, setShowShopping] = useState(false)
   const [dismissed,    setDismissed]    = useState(null)
   const [search,       setSearch]       = useState('')
@@ -266,7 +267,7 @@ export default function InventoryPage() {
             <p className="text-sm font-medium text-gray-800 mb-1">{household?.name}</p>
             <p className="text-xs text-gray-400 break-all">{household?.id}</p>
           </div>
-          <button onClick={() => { setShowSettings(false); setTab('members') }}
+          <button onClick={() => { setShowSettings(false); setShowMembers(true) }}
             className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl
               hover:bg-gray-100 transition-all text-left">
             <span className="text-xl">👥</span>
@@ -307,6 +308,20 @@ export default function InventoryPage() {
       </Modal>
 
       {showShopping && <ShoppingPage onClose={() => setShowShopping(false)} household={household} />}
+
+      {showMembers && (
+        <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
+          <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0">
+            <button onClick={() => setShowMembers(false)}
+              className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
+                flex items-center justify-center text-gray-600 text-lg">←</button>
+            <h1 className="font-bold text-gray-900 text-lg">{t.members}</h1>
+          </header>
+          <div className="flex-1 overflow-y-auto max-w-2xl w-full mx-auto px-4 py-4">
+            <MembersPanel household={household} members={members} />
+          </div>
+        </div>
+      )}
 
       <FeedbackButton forceOpen={showFeedbackModal} onForceClose={() => setShowFeedbackModal(false)} />
 
