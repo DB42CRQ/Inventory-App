@@ -14,17 +14,17 @@ function CheckModal({ item, onConfirm, onCancel, t }) {
         onClick={e => e.stopPropagation()}>
         <h3 className="font-semibold text-gray-900 mb-1">{item.name}</h3>
         <p className="text-sm text-gray-500 mb-4">{t.shoppingHowMany ?? 'Wie viel hast du gekauft?'}</p>
-        <div className="flex items-center gap-3 mb-5">
+        <div className="flex items-center gap-2 mb-5">
           <button onClick={() => setQty(q => Math.max(0, Number(q) - 1))}
-            className="w-10 h-10 rounded-xl bg-gray-100 text-gray-700 font-bold
-              hover:bg-gray-200 flex items-center justify-center text-xl">−</button>
+            className="w-9 h-9 rounded-xl bg-gray-100 text-gray-700 font-bold
+              hover:bg-gray-200 flex items-center justify-center text-lg shrink-0">−</button>
           <input type="number" min="0" step="0.1" value={qty}
             onChange={e => setQty(e.target.value)}
-            className="flex-1 text-center text-xl font-semibold border border-gray-200
-              rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500" />
+            className="flex-1 min-w-0 text-center text-xl font-semibold border border-gray-200
+              rounded-xl px-2 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500" />
           <button onClick={() => setQty(q => Number(q) + 1)}
-            className="w-10 h-10 rounded-xl bg-primary-100 text-primary-700 font-bold
-              hover:bg-primary-200 flex items-center justify-center text-xl">+</button>
+            className="w-9 h-9 rounded-xl bg-primary-100 text-primary-700 font-bold
+              hover:bg-primary-200 flex items-center justify-center text-lg shrink-0">+</button>
           <span className="text-sm text-gray-500 shrink-0">{item.unit}</span>
         </div>
         <div className="flex gap-2">
