@@ -158,20 +158,21 @@ export default function ShoppingPage({ onClose, household }) {
           <div className="flex flex-col gap-1.5 w-full">
             <button onClick={() => handleAddLow('all')}
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-orange-50 border
-                border-orange-200 text-orange-700 text-xs font-medium hover:bg-orange-100 transition-all w-full">
+                border-orange-200 text-orange-700 text-xs font-medium hover:bg-orange-100 transition-all">
               ⚠️ {t.shoppingAddLow ?? 'Alle niedrigen'} ({lowItems.length})
             </button>
             {lowCats.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 pl-1">
+              <select
+                onChange={e => { if (e.target.value) { handleAddLow(e.target.value); e.target.value = '' } }}
+                className="px-3 py-2 rounded-xl border border-orange-200 bg-white text-orange-700
+                  text-xs font-medium focus:outline-none focus:ring-2 focus:ring-orange-300 cursor-pointer">
+                <option value="">{t.shoppingByCategory ?? 'Nach Kategorie…'}</option>
                 {lowCats.map(cat => (
-                  <button key={cat.id} onClick={() => handleAddLow(cat.id)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-orange-100
-                      bg-white text-orange-600 text-xs hover:bg-orange-50 transition-all">
-                    {cat.icon && <span>{cat.icon}</span>}
-                    {getCatName(cat)} ({lowItems.filter(i => i.category_id === cat.id).length})
-                  </button>
+                  <option key={cat.id} value={cat.id}>
+                    {cat.icon ? cat.icon + ' ' : ''}{getCatName(cat)} ({lowItems.filter(i => i.category_id === cat.id).length})
+                  </option>
                 ))}
-              </div>
+              </select>
             )}
           </div>
         )}
