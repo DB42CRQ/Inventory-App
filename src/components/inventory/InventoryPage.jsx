@@ -16,6 +16,7 @@ import { VersionBanner } from '../versions/VersionBanner'
 import { useVersions } from '../../hooks/useVersions'
 import { useDeveloper } from '../../hooks/useDeveloper'
 import { FeedbackButton } from '../ui/FeedbackButton'
+import ShoppingPage from '../shopping/ShoppingPage'
 import { InstallSection } from '../ui/InstallBanner'
 
 export default function InventoryPage() {
@@ -40,6 +41,7 @@ export default function InventoryPage() {
   const [showNewHh,    setShowNewHh]    = useState(false)
   const [showVersions, setShowVersions] = useState(false)
   const [showWiki,     setShowWiki]     = useState(false)
+  const [showShopping, setShowShopping] = useState(false)
   const [dismissed,    setDismissed]    = useState(null)
   const [search,       setSearch]       = useState('')
   const [filterCat,    setFilterCat]    = useState('all')
@@ -84,6 +86,8 @@ export default function InventoryPage() {
     { id: 'members',   label: '👥', title: t.members },
   ]
 
+  const shoppingCount = unchecked?.length ?? 0
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="bg-white border-b border-gray-100 sticky top-0 z-10">
@@ -107,6 +111,17 @@ export default function InventoryPage() {
               </button>
             ))}
           </div>
+
+          <button onClick={() => setShowShopping(true)}
+            className="relative w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all flex items-center justify-center">
+            🛒
+            {lowItems.length > 0 && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full
+                flex items-center justify-center text-white text-[9px] font-bold">
+                {lowItems.length}
+              </span>
+            )}
+          </button>
 
           <button onClick={() => setShowVersions(true)}
             className="relative w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all flex items-center justify-center">
@@ -280,6 +295,8 @@ export default function InventoryPage() {
           <Button variant="danger" onClick={signOut} className="w-full">{t.signOutBtn}</Button>
         </div>
       </Modal>
+
+      {showShopping && <ShoppingPage onClose={() => setShowShopping(false)} household={household} />}
 
       <FeedbackButton />
 
