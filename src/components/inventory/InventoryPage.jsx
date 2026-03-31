@@ -267,6 +267,14 @@ export default function InventoryPage() {
             <p className="text-sm font-medium text-gray-800 mb-1">{household?.name}</p>
             <p className="text-xs text-gray-400 break-all">{household?.id}</p>
           </div>
+          <button onClick={() => { setShowSettings(false); setTab('members') }}
+            className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl
+              hover:bg-gray-100 transition-all text-left">
+            <span className="text-xl">👥</span>
+            <span className="text-sm font-medium text-gray-700">{t.members}</span>
+            <span className="ml-auto text-gray-400">›</span>
+          </button>
+
           <button onClick={() => { setShowSettings(false); setShowFeedbackModal(true) }}
             className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl
               hover:bg-gray-100 transition-all text-left">
