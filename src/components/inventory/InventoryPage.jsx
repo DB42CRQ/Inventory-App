@@ -84,7 +84,6 @@ export default function InventoryPage() {
 
   const TABS = [
     { id: 'inventory', label: '📦', title: t.inventory },
-    { id: 'members',   label: '👥', title: t.members },
   ]
 
 
