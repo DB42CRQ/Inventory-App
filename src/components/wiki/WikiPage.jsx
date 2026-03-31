@@ -70,12 +70,24 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: 'Tippe auf ✏️ neben einer Kategorie um sie zu bearbeiten oder zu löschen.' },
         { type: 'step', n: 4, text: 'Filtere die Artikelliste nach Kategorie über die Pills unter der Suchleiste.' },
         { type: 'tip', text: 'Der Filter "Niedrig" zeigt alle Artikel bei denen der Bestand unter der Mindestmenge liegt.' },
+        { type: 'tip', text: 'Kategorienamen werden beim Anlegen automatisch in alle drei Sprachen übersetzt.' },
+      ]
+    },
+    {
+      title: '🛒 Einkaufsliste',
+      content: [
+        { type: 'step', n: 1, text: 'Tippe auf das 🛒-Symbol oben rechts um die Einkaufsliste zu öffnen.' },
+        { type: 'step', n: 2, text: 'Mit "⚠️ Alle niedrigen" werden alle Artikel mit niedrigem Bestand auf einmal hinzugefügt. Mit dem Dropdown darunter nur eine bestimmte Kategorie.' },
+        { type: 'step', n: 3, text: 'Mit "+ Aus Inventar" kannst du einzelne Artikel suchen und hinzufügen.' },
+        { type: 'step', n: 4, text: 'Tippe einen Artikel an um ihn abzuhaken — gib die gekaufte Menge ein und bestätige. Der Bestand im Inventar wird sofort aktualisiert.' },
+        { type: 'step', n: 5, text: 'Abgehakte Artikel erscheinen durchgestrichen unten. Mit "🗑 Leeren" kannst du erledigte oder alle Artikel löschen.' },
+        { type: 'tip', text: 'Die Einkaufsliste ist für alle Haushaltsmitglieder geteilt — Änderungen sind in Echtzeit sichtbar.' },
       ]
     },
     {
       title: '👥 Mitglieder',
       content: [
-        { type: 'step', n: 1, text: 'Tippe auf das 👥-Symbol oben rechts um die Mitgliederliste zu sehen.' },
+        { type: 'step', n: 1, text: 'Tippe auf ⚙️ oben rechts und dann auf "Mitglieder".' },
         { type: 'step', n: 2, text: 'Teile die Haushalt-ID mit anderen Personen damit sie beitreten können.' },
         { type: 'step', n: 3, text: 'Als Inhaber kannst du Mitglieder entfernen (× neben dem Namen).' },
         { type: 'tip', text: 'Änderungen von einem Mitglied sind für alle anderen sofort sichtbar — in Echtzeit.' },
@@ -110,7 +122,7 @@ const WIKI_CONTENT = {
     {
       title: '💡 Feedback & Ideen',
       content: [
-        { type: 'step', n: 1, text: 'Tippe auf den 💡-Button unten rechts um Feedback zu geben.' },
+        { type: 'step', n: 1, text: 'Tippe auf ⚙️ oben rechts und dann auf "Feedback & Ideen".' },
         { type: 'step', n: 2, text: 'Wähle zwischen "Idee" (neue Funktion) und "Bug" (Fehler melden).' },
         { type: 'step', n: 3, text: 'Bei Bugs kannst du optional einen Screenshot anhängen.' },
         { type: 'step', n: 4, text: 'Über "Meine Vorschläge ansehen" siehst du den Status deiner Einreichungen.' },
@@ -156,12 +168,24 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: 'Tap ✏️ next to a category to edit or delete it.' },
         { type: 'step', n: 4, text: 'Filter the item list by category using the pills below the search bar.' },
         { type: 'tip', text: 'The "Low" filter shows all items where stock is below the minimum quantity.' },
+        { type: 'tip', text: 'Category names are automatically translated into all three languages when created.' },
+      ]
+    },
+    {
+      title: '🛒 Shopping List',
+      content: [
+        { type: 'step', n: 1, text: 'Tap the 🛒 icon in the top right to open the shopping list.' },
+        { type: 'step', n: 2, text: '"⚠️ All low stock" adds all low-stock items at once. Use the dropdown below to add only a specific category.' },
+        { type: 'step', n: 3, text: '"+ From inventory" lets you search and add individual items.' },
+        { type: 'step', n: 4, text: 'Tap an item to check it off — enter the purchased quantity and confirm. The inventory stock is updated immediately.' },
+        { type: 'step', n: 5, text: 'Checked items appear crossed out at the bottom. Use "🗑 Clear" to delete done or all items.' },
+        { type: 'tip', text: 'The shopping list is shared with all household members — changes are visible in real time.' },
       ]
     },
     {
       title: '👥 Members',
       content: [
-        { type: 'step', n: 1, text: 'Tap the 👥 icon in the top right to see the member list.' },
+        { type: 'step', n: 1, text: 'Tap ⚙️ in the top right, then tap "Members".' },
         { type: 'step', n: 2, text: 'Share the household ID with others so they can join.' },
         { type: 'step', n: 3, text: 'As owner, you can remove members (× next to their name).' },
         { type: 'tip', text: 'Changes by one member are immediately visible to all others — in real time.' },
@@ -196,7 +220,7 @@ const WIKI_CONTENT = {
     {
       title: '💡 Feedback & Ideas',
       content: [
-        { type: 'step', n: 1, text: 'Tap the 💡 button in the bottom right to give feedback.' },
+        { type: 'step', n: 1, text: 'Tap ⚙️ in the top right, then tap "Feedback & Ideas".' },
         { type: 'step', n: 2, text: 'Choose between "Idea" (new feature) and "Bug" (report an error).' },
         { type: 'step', n: 3, text: 'For bugs, you can optionally attach a screenshot.' },
         { type: 'step', n: 4, text: 'Via "View my suggestions" you can see the status of your submissions.' },
@@ -242,12 +266,24 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: 'Toca ✏️ junto a una categoría para editarla o eliminarla.' },
         { type: 'step', n: 4, text: 'Filtra la lista de artículos por categoría usando los botones bajo la barra de búsqueda.' },
         { type: 'tip', text: 'El filtro "Bajo" muestra todos los artículos con stock por debajo de la cantidad mínima.' },
+        { type: 'tip', text: 'Los nombres de categorías se traducen automáticamente a los tres idiomas al crearlos.' },
+      ]
+    },
+    {
+      title: '🛒 Lista de compras',
+      content: [
+        { type: 'step', n: 1, text: 'Toca el icono 🛒 arriba a la derecha para abrir la lista de compras.' },
+        { type: 'step', n: 2, text: '"⚠️ Todos los bajos" añade todos los artículos con stock bajo de una vez. Usa el desplegable para añadir solo una categoría.' },
+        { type: 'step', n: 3, text: '"+ Del inventario" te permite buscar y añadir artículos individuales.' },
+        { type: 'step', n: 4, text: 'Toca un artículo para marcarlo — introduce la cantidad comprada y confirma. El stock del inventario se actualiza inmediatamente.' },
+        { type: 'step', n: 5, text: 'Los artículos marcados aparecen tachados abajo. Con "🗑 Vaciar" puedes eliminar los completados o todos.' },
+        { type: 'tip', text: 'La lista de compras es compartida por todos los miembros del hogar — los cambios son visibles en tiempo real.' },
       ]
     },
     {
       title: '👥 Miembros',
       content: [
-        { type: 'step', n: 1, text: 'Toca el icono 👥 arriba a la derecha para ver la lista de miembros.' },
+        { type: 'step', n: 1, text: 'Toca ⚙️ arriba a la derecha y luego "Miembros".' },
         { type: 'step', n: 2, text: 'Comparte el ID del hogar con otros para que puedan unirse.' },
         { type: 'step', n: 3, text: 'Como propietario, puedes eliminar miembros (× junto a su nombre).' },
         { type: 'tip', text: 'Los cambios de un miembro son inmediatamente visibles para todos los demás — en tiempo real.' },
@@ -282,7 +318,7 @@ const WIKI_CONTENT = {
     {
       title: '💡 Comentarios e ideas',
       content: [
-        { type: 'step', n: 1, text: 'Toca el botón 💡 abajo a la derecha para dar feedback.' },
+        { type: 'step', n: 1, text: 'Toca ⚙️ arriba a la derecha y luego "Comentarios e ideas".' },
         { type: 'step', n: 2, text: 'Elige entre "Idea" (nueva función) y "Error" (reportar un fallo).' },
         { type: 'step', n: 3, text: 'Para errores, puedes adjuntar opcionalmente una captura de pantalla.' },
         { type: 'step', n: 4, text: 'Con "Ver mis sugerencias" puedes ver el estado de tus envíos.' },
