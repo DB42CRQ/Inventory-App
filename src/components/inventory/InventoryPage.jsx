@@ -86,7 +86,6 @@ export default function InventoryPage() {
     { id: 'members',   label: '👥', title: t.members },
   ]
 
-  const shoppingCount = unchecked?.length ?? 0
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -115,12 +114,7 @@ export default function InventoryPage() {
           <button onClick={() => setShowShopping(true)}
             className="relative w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all flex items-center justify-center">
             🛒
-            {lowItems.length > 0 && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full
-                flex items-center justify-center text-white text-[9px] font-bold">
-                {lowItems.length}
-              </span>
-            )}
+{lowItems.length > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center text-white text-[9px] font-bold">{lowItems.length}</span>}
           </button>
 
           <button onClick={() => setShowVersions(true)}
