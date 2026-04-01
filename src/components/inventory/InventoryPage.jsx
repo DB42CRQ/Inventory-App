@@ -52,16 +52,16 @@ export default function InventoryPage() {
 
   function getCatName(cat) {
     if (!cat) return ''
-    if (lang === 'en' && cat.name_en) return cat.name_en
-    if (lang === 'es' && cat.name_es) return cat.name_es
-    return cat.name
+    if (lang === 'en') return cat.name_en || cat.name
+    if (lang === 'es') return cat.name_es || cat.name
+    return cat.name_de || cat.name
   }
 
   const filtered = items.filter(item => {
     const matchSearch = item.name.toLowerCase().includes(search.toLowerCase())
     const matchCat =
       filterCat === 'all' ? true :
-      filterCat === 'low' ? (item.min_quantity > 0 && item.quantity <= item.min_quantity) :
+      filterCat === 'low' ? (item.min_quantity != null && item.quantity <= item.min_quantity) :
       item.category_id === filterCat
     return matchSearch && matchCat
   })

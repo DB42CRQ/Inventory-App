@@ -111,8 +111,8 @@ export function useInventory(householdId) {
     return { error }
   }
 
-  // Artikel, bei denen quantity <= min_quantity
-  const lowItems = items.filter(i => i.min_quantity > 0 && i.quantity <= i.min_quantity)
+  // Artikel, bei denen quantity < min_quantity
+  const lowItems = items.filter(i => i.min_quantity != null && i.quantity <= i.min_quantity)
 
   return {
     items, categories, loading, lowItems,

@@ -42,7 +42,7 @@ const PRESET_ICONS = [
 
 export function CategoryModal({ open, onClose, categories, onAdd, onUpdate, onDelete }) {
   const { t, lang } = useTranslation()
-  const getCatName = (cat) => lang === 'en' && cat.name_en ? cat.name_en : lang === 'es' && cat.name_es ? cat.name_es : lang === 'de' && cat.name_de ? cat.name_de : cat.name
+  const getCatName = (cat) => lang === 'en' ? (cat.name_en || cat.name) : lang === 'es' ? (cat.name_es || cat.name) : (cat.name_de || cat.name)
 
   // 'list' | 'add' | 'edit'
   const [view,    setView]    = useState('list')

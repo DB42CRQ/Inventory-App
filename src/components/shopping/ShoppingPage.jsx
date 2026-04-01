@@ -90,9 +90,9 @@ export default function ShoppingPage({ onClose, household }) {
   const [filterCat,    setFilterCat]    = useState('all')
 
   const getCatName = (cat) => !cat ? '' :
-    lang === 'en' && cat.name_en ? cat.name_en :
-    lang === 'es' && cat.name_es ? cat.name_es :
-    lang === 'de' && cat.name_de ? cat.name_de : cat.name
+    lang === 'en' ? (cat.name_en || cat.name) :
+    lang === 'es' ? (cat.name_es || cat.name) :
+    (cat.name_de || cat.name)
 
   const catMap = Object.fromEntries(categories.map(c => [c.id, c]))
 

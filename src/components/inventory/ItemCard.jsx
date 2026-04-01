@@ -8,12 +8,12 @@ export function ItemCard({ item, category, onUpdateQty, onDelete, onEdit }) {
 
   function getCatName(cat) {
     if (!cat) return ''
-    if (lang === 'en' && cat.name_en) return cat.name_en
-    if (lang === 'es' && cat.name_es) return cat.name_es
-    return cat.name
+    if (lang === 'en') return cat.name_en || cat.name
+    if (lang === 'es') return cat.name_es || cat.name
+    return cat.name_de || cat.name
   }
   const [editing, setEditing] = useState(false)
-  const isLow = item.min_quantity > 0 && item.quantity <= item.min_quantity
+  const isLow = item.min_quantity != null && item.quantity <= item.min_quantity
 
   return (
     <div className={`bg-white rounded-2xl border p-4 flex items-center gap-3 transition-all
