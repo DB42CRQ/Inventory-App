@@ -3,6 +3,9 @@ import { useTranslation } from '../../i18n/useTranslation'
 import { useShoppingList } from '../../hooks/useShoppingList'
 import { useInventory } from '../../hooks/useInventory'
 import { Spinner, Button } from '../ui'
+import BarcodeScanner from './BarcodeScanner'
+import BarcodeScanResult from './BarcodeScanResult'
+import { processBarcode } from '../../hooks/useBarcodeScanner'
 
 function CheckModal({ item, onConfirm, onCancel, t }) {
   const [qty, setQty] = useState(item.quantity)
@@ -34,7 +37,33 @@ function CheckModal({ item, onConfirm, onCancel, t }) {
           </Button>
         </div>
       </div>
-    </div>
+    {showScanner && <BarcodeScanner onResult={handleScan} onClose={() => setShowScanner(false)} />}
+
+    {scanLoading && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+        <div className="bg-white rounded-2xl px-6 py-4 flex items-center gap-3">
+          <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+          <span className="text-sm font-medium text-gray-700">{t.barcodeSearching ?? 'Suche Produkt…'}</span>
+        </div>
+      </div>
+    )}
+
+    {scanResult && (
+      <BarcodeScanResult
+        result={scanResult}
+        t={t}
+        onClose={() => setScanResult(null)}
+        onConfirmCheck={async (item, qty) => {
+          await handleCheck(item, qty)
+          setScanResult(null)
+        }}
+        onAddNew={(name) => {
+          setScanResult(null)
+          setShowAdd(true)
+        }}
+      />
+    )}
+  </div>
   )
 }
 
@@ -86,7 +115,10 @@ export default function ShoppingPage({ onClose, household }) {
   const [showAdd,      setShowAdd]      = useState(false)
   const [search,       setSearch]       = useState('')
   const [addedMsg,     setAddedMsg]     = useState('')
-  const [confirmClear, setConfirmClear] = useState(false) // 'all' | 'done' | false
+  const [confirmClear, setConfirmClear] = useState(false)
+  const [showScanner,  setShowScanner]  = useState(false)
+  const [scanResult,   setScanResult]   = useState(null)
+  const [scanLoading,  setScanLoading]  = useState(false)
   const [filterCat,    setFilterCat]    = useState('all')
 
   const getCatName = (cat) => !cat ? '' :
@@ -107,6 +139,14 @@ export default function ShoppingPage({ onClose, household }) {
         : t.shoppingAllAdded ?? 'Alle bereits auf der Liste')
       setTimeout(() => setAddedMsg(''), 3000)
     }
+  }
+
+  async function handleScan(barcode) {
+    setShowScanner(false)
+    setScanLoading(true)
+    const result = await processBarcode(barcode, inventoryItems)
+    setScanLoading(false)
+    setScanResult(result)
   }
 
   async function handleCheck(item, qty) {
@@ -148,6 +188,11 @@ export default function ShoppingPage({ onClose, household }) {
         <h1 className="font-bold text-gray-900 text-lg flex-1">
           🛒 {t.shoppingTitle ?? 'Einkaufsliste'}
         </h1>
+        <button onClick={() => setShowScanner(true)}
+          className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
+            flex items-center justify-center text-lg">
+          📷
+        </button>
         <span className="text-sm text-gray-400">{unchecked.length} {t.shoppingItems ?? 'Artikel'}</span>
       </header>
 
