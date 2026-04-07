@@ -27,7 +27,7 @@ export default function InventoryPage() {
     items, categories, loading, lowItems,
     addItem, updateQuantity, updateItem, deleteItem,
     addCategory, updateCategory, deleteCategory,
-  } = useInventory(household?.id)
+  } = useInventory(household?.id, profile?.id)
 
   const { isDeveloper } = useDeveloper()
   const { versions, hasNew, newVersion, markAsSeen, createVersion, publishVersion, updateDraftNotes, deleteVersion } = useVersions()

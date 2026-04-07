@@ -2,6 +2,18 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
 
+async function trackHistory({ itemId, householdId, profileId, from, to, source }) {
+  if (from === to) return
+  await supabase.from('item_history').insert({
+    item_id:       itemId,
+    household_id:  householdId,
+    profile_id:    profileId,
+    quantity_from: from,
+    quantity_to:   to,
+    source,
+  })
+}
+
 export function useShoppingList(householdId) {
   const { user } = useAuth()
   const [items,   setItems]   = useState([])
@@ -65,14 +77,22 @@ export function useShoppingList(householdId) {
   }
 
   async function checkItem(listItemId, purchasedQty, inventoryItemId) {
-    // Bestand aktualisieren wenn mit Inventar verknüpft
     if (inventoryItemId && purchasedQty > 0) {
       const { data: invItem } = await supabase
         .from('items').select('quantity').eq('id', inventoryItemId).single()
       if (invItem) {
+        const newQty = invItem.quantity + Number(purchasedQty)
         await supabase.from('items')
-          .update({ quantity: invItem.quantity + Number(purchasedQty) })
+          .update({ quantity: newQty })
           .eq('id', inventoryItemId)
+        trackHistory({
+          itemId:      inventoryItemId,
+          householdId: householdId,
+          profileId:   user.id,
+          from:        invItem.quantity,
+          to:          newQty,
+          source:      'shopping_list',
+        })
       }
     }
     // Als erledigt markieren

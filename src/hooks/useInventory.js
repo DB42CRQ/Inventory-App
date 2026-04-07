@@ -1,7 +1,19 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-export function useInventory(householdId) {
+async function trackHistory({ itemId, householdId, profileId, from, to, source = 'manual' }) {
+  if (from === to) return // Keine Änderung
+  await supabase.from('item_history').insert({
+    item_id:       itemId,
+    household_id:  householdId,
+    profile_id:    profileId,
+    quantity_from: from,
+    quantity_to:   to,
+    source,
+  })
+}
+
+export function useInventory(householdId, profileId) {
   const [items,      setItems]      = useState([])
   const [categories, setCategories] = useState([])
   const [loading,    setLoading]    = useState(true)
@@ -59,10 +71,15 @@ export function useInventory(householdId) {
   }
 
   async function updateQuantity(itemId, newQty) {
+    const oldItem = items.find(i => i.id === itemId)
+    const safeQty = Math.max(0, newQty)
     const { error } = await supabase
       .from('items')
-      .update({ quantity: Math.max(0, newQty) })
+      .update({ quantity: safeQty })
       .eq('id', itemId)
+    if (!error && oldItem) {
+      trackHistory({ itemId, householdId, profileId, from: oldItem.quantity, to: safeQty, source: 'manual' })
+    }
     return { error }
   }
 

@@ -325,6 +325,13 @@ export default function ShoppingPage({ onClose, household }) {
             const { supabase } = await import('../../lib/supabase')
             const newQty = inventoryItem.quantity + Number(qty)
             await supabase.from('items').update({ quantity: newQty }).eq('id', inventoryItem.id)
+            await supabase.from('item_history').insert({
+              item_id:       inventoryItem.id,
+              household_id:  household.id,
+              quantity_from: inventoryItem.quantity,
+              quantity_to:   newQty,
+              source:        'barcode',
+            })
           }}
           onAddNew={() => {
             setScanResult(null)
