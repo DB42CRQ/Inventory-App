@@ -14,7 +14,7 @@ async function trackHistory({ itemId, householdId, profileId, from, to, source }
   })
 }
 
-export function useShoppingList(householdId) {
+export function useShoppingList(householdId, sendPush) {
   const { user } = useAuth()
   const [items,   setItems]   = useState([])
   const [loading, setLoading] = useState(true)
@@ -43,6 +43,10 @@ export function useShoppingList(householdId) {
   }
 
   async function addItem({ name, quantity, unit, item_id }) {
+    sendPush?.({
+      title: '🛒 Einkaufsliste',
+      body: `${name} wurde zur Einkaufsliste hinzugefügt`,
+    })
     // Prüfen ob Artikel schon auf der Liste
     const exists = items.find(i => i.item_id === item_id && !i.checked)
     if (exists) return { error: null, alreadyExists: true }

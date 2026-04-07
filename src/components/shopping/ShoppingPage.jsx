@@ -82,11 +82,11 @@ function ShoppingItem({ item, onCheck, onUncheck, onRemove, t, lang }) {
   )
 }
 
-export default function ShoppingPage({ onClose, household }) {
+export default function ShoppingPage({ onClose, household, sendPush }) {
   const { t, lang } = useTranslation()
   const { user } = useAuth()
   const { unchecked, checked, loading, addItem, addLowItems,
-          checkItem, uncheckItem, removeItem, clearChecked } = useShoppingList(household?.id)
+          checkItem, uncheckItem, removeItem, clearChecked } = useShoppingList(household?.id, sendPush)
   const { items: inventoryItems, lowItems, categories } = useInventory(household?.id)
 
   const [showAdd,      setShowAdd]      = useState(false)

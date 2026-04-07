@@ -16,6 +16,7 @@ import { VersionBanner } from '../versions/VersionBanner'
 import { useVersions } from '../../hooks/useVersions'
 import { useDeveloper } from '../../hooks/useDeveloper'
 import { FeedbackButton } from '../ui/FeedbackButton'
+import { usePushNotifications } from '../../hooks/usePushNotifications'
 import ShoppingPage from '../shopping/ShoppingPage'
 import { InstallSection } from '../ui/InstallBanner'
 
@@ -27,9 +28,10 @@ export default function InventoryPage() {
     items, categories, loading, lowItems,
     addItem, updateQuantity, updateItem, deleteItem,
     addCategory, updateCategory, deleteCategory,
-  } = useInventory(household?.id, profile?.id)
+  } = useInventory(household?.id, profile?.id, sendPush)
 
   const { isDeveloper } = useDeveloper()
+  const { supported: pushSupported, subscribed: pushSubscribed, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe, sendPush } = usePushNotifications()
   const { versions, hasNew, newVersion, markAsSeen, createVersion, publishVersion, updateDraftNotes, deleteVersion } = useVersions()
 
   const [tab,          setTab]          = useState('inventory')
@@ -302,12 +304,30 @@ export default function InventoryPage() {
               ))}
             </div>
           </div>
+          {/* Push Notifications */}
+          {pushSupported && (
+            <div className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl">
+              <div className="flex items-center gap-3">
+                <span className="text-xl">🔔</span>
+                <span className="text-sm font-medium text-gray-700">
+                  {t.pushNotifications ?? 'Benachrichtigungen'}
+                </span>
+              </div>
+              <button onClick={() => pushSubscribed ? pushUnsubscribe() : pushSubscribe()}
+                className={`w-11 h-6 rounded-full transition-all relative
+                  ${pushSubscribed ? 'bg-primary-500' : 'bg-gray-200'}`}>
+                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all
+                  ${pushSubscribed ? 'left-5' : 'left-0.5'}`} />
+              </button>
+            </div>
+          )}
+
           <InstallSection />
           <Button variant="danger" onClick={signOut} className="w-full">{t.signOutBtn}</Button>
         </div>
       </Modal>
 
-      {showShopping && <ShoppingPage onClose={() => setShowShopping(false)} household={household} />}
+      {showShopping && <ShoppingPage onClose={() => setShowShopping(false)} household={household} sendPush={sendPush} />}
 
       {showMembers && (
         <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
@@ -327,6 +347,7 @@ export default function InventoryPage() {
 
       {showWiki && <WikiPage onClose={() => setShowWiki(false)} />}
 
+      {newVersion && dismissed !== newVersion.id && sendPush && sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!` }) && null}
       {newVersion && dismissed !== newVersion.id && (
         <VersionBanner
           version={newVersion}

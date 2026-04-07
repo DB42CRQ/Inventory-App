@@ -13,7 +13,7 @@ async function trackHistory({ itemId, householdId, profileId, from, to, source =
   })
 }
 
-export function useInventory(householdId, profileId) {
+export function useInventory(householdId, profileId, sendPush) {
   const [items,      setItems]      = useState([])
   const [categories, setCategories] = useState([])
   const [loading,    setLoading]    = useState(true)
@@ -80,10 +80,17 @@ export function useInventory(householdId, profileId) {
       .update({ quantity: safeQty })
       .eq('id', itemId)
     if (error) {
-      // Bei Fehler zurücksetzen
       setItems(prev => prev.map(i => i.id === itemId ? { ...i, quantity: oldItem?.quantity ?? i.quantity } : i))
     } else if (oldItem) {
       trackHistory({ itemId, householdId, profileId, from: oldItem.quantity, to: safeQty, source: 'manual' })
+      // Push wenn Artikel jetzt niedrig ist
+      const updatedItem = items.find(i => i.id === itemId)
+      if (updatedItem && updatedItem.min_quantity != null && safeQty <= updatedItem.min_quantity) {
+        sendPush?.({
+          title: '⚠️ Niedriger Bestand',
+          body: `${updatedItem.name}: noch ${safeQty} ${updatedItem.unit}`,
+        })
+      }
     }
     return { error }
   }
