@@ -1,55 +1,56 @@
 import { useEffect, useRef, useState } from 'react'
-import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library'
+import { BrowserMultiFormatReader, NotFoundException, ChecksumException, FormatException } from '@zxing/library'
 
 export default function BarcodeScanner({ onResult, onClose }) {
-  const videoRef  = useRef(null)
-  const readerRef = useRef(null)
+  const videoRef    = useRef(null)
+  const streamRef   = useRef(null)
+  const intervalRef = useRef(null)
+  const readerRef   = useRef(null)
+  const doneRef     = useRef(false)
   const [error, setError] = useState('')
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    const reader = new BrowserMultiFormatReader()
-    readerRef.current = reader
+    readerRef.current = new BrowserMultiFormatReader()
 
-    // Direkt mit facingMode environment starten (Rückkamera auf Mobile)
-    const constraints = {
-      video: {
-        facingMode: { ideal: 'environment' },
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-      }
-    }
+    navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }
+    }).then(stream => {
+      streamRef.current = stream
+      videoRef.current.srcObject = stream
+      videoRef.current.play()
+      setReady(true)
 
-    navigator.mediaDevices.getUserMedia(constraints)
-      .then(stream => {
-        videoRef.current.srcObject = stream
-        videoRef.current.play()
-        setReady(true)
-
-        reader.decodeFromStream(stream, videoRef.current, (result, err) => {
+      // Polling: alle 300ms einen Frame dekodieren
+      intervalRef.current = setInterval(() => {
+        if (doneRef.current) return
+        try {
+          const result = readerRef.current.decodeFromVideoElement(videoRef.current)
           if (result) {
-            // Stream stoppen
-            stream.getTracks().forEach(t => t.stop())
+            doneRef.current = true
+            cleanup()
             onResult(result.getText())
           }
-          if (err && !(err instanceof NotFoundException)) {
-            console.warn('Scan error:', err)
+        } catch (e) {
+          // NotFoundException, ChecksumException, FormatException sind normal
+          if (!(e instanceof NotFoundException) &&
+              !(e instanceof ChecksumException) &&
+              !(e instanceof FormatException)) {
+            console.warn('Scan error:', e)
           }
-        })
-      })
-      .catch(err => {
-        console.error('Camera error:', err)
-        setError('Kamera konnte nicht gestartet werden. Bitte Berechtigung prüfen.')
-      })
-
-    return () => {
-      try {
-        reader.reset()
-        if (videoRef.current?.srcObject) {
-          videoRef.current.srcObject.getTracks().forEach(t => t.stop())
         }
-      } catch {}
+      }, 300)
+    }).catch(err => {
+      console.error('Camera error:', err)
+      setError('Kamera konnte nicht gestartet werden.')
+    })
+
+    function cleanup() {
+      clearInterval(intervalRef.current)
+      streamRef.current?.getTracks().forEach(t => t.stop())
     }
+
+    return cleanup
   }, [])
 
   return (
@@ -64,8 +65,7 @@ export default function BarcodeScanner({ onResult, onClose }) {
       </div>
 
       <div className="flex-1 relative overflow-hidden">
-        <video ref={videoRef} className="w-full h-full object-cover"
-          playsInline muted autoPlay />
+        <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-64 h-40 relative">
@@ -83,9 +83,7 @@ export default function BarcodeScanner({ onResult, onClose }) {
 
         {error && (
           <div className="absolute bottom-8 left-4 right-4 bg-red-500/90 text-white
-            rounded-xl px-4 py-3 text-sm text-center">
-            {error}
-          </div>
+            rounded-xl px-4 py-3 text-sm text-center">{error}</div>
         )}
       </div>
 
