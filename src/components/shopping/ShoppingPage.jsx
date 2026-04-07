@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 import { useShoppingList } from '../../hooks/useShoppingList'
+import { useAuth } from '../../hooks/useAuth'
 import { useInventory } from '../../hooks/useInventory'
 import { Spinner, Button } from '../ui'
 import BarcodeScanner from './BarcodeScanner'
@@ -83,6 +84,7 @@ function ShoppingItem({ item, onCheck, onUncheck, onRemove, t, lang }) {
 
 export default function ShoppingPage({ onClose, household }) {
   const { t, lang } = useTranslation()
+  const { user } = useAuth()
   const { unchecked, checked, loading, addItem, addLowItems,
           checkItem, uncheckItem, removeItem, clearChecked } = useShoppingList(household?.id)
   const { items: inventoryItems, lowItems, categories } = useInventory(household?.id)
@@ -328,6 +330,7 @@ export default function ShoppingPage({ onClose, household }) {
             await supabase.from('item_history').insert({
               item_id:       inventoryItem.id,
               household_id:  household.id,
+              profile_id:    user?.id ?? null,
               quantity_from: inventoryItem.quantity,
               quantity_to:   newQty,
               source:        'barcode',
