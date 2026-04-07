@@ -5,44 +5,67 @@ export default function BarcodeScanner({ onResult, onClose }) {
   const videoRef    = useRef(null)
   const streamRef   = useRef(null)
   const intervalRef = useRef(null)
-  const readerRef   = useRef(null)
   const doneRef     = useRef(false)
   const [error, setError] = useState('')
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    readerRef.current = new BrowserMultiFormatReader()
+    const useNative = 'BarcodeDetector' in window
 
     navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }
+      video: {
+        facingMode: { ideal: 'environment' },
+        width:  { ideal: 1280 },
+        height: { ideal: 720 },
+      }
     }).then(stream => {
       streamRef.current = stream
       videoRef.current.srcObject = stream
-      videoRef.current.play()
-      setReady(true)
 
-      // Polling: alle 300ms einen Frame dekodieren
-      intervalRef.current = setInterval(() => {
-        if (doneRef.current) return
-        try {
-          const result = readerRef.current.decodeFromVideoElement(videoRef.current)
-          if (result) {
-            doneRef.current = true
-            cleanup()
-            onResult(result.getText())
-          }
-        } catch (e) {
-          // NotFoundException, ChecksumException, FormatException sind normal
-          if (!(e instanceof NotFoundException) &&
-              !(e instanceof ChecksumException) &&
-              !(e instanceof FormatException)) {
-            console.warn('Scan error:', e)
-          }
+      videoRef.current.onloadedmetadata = () => {
+        videoRef.current.play()
+        setReady(true)
+
+        if (useNative) {
+          // Native BarcodeDetector (Chrome Android)
+          const detector = new window.BarcodeDetector({
+            formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code']
+          })
+          intervalRef.current = setInterval(async () => {
+            if (doneRef.current || videoRef.current?.readyState < 2) return
+            try {
+              const barcodes = await detector.detect(videoRef.current)
+              if (barcodes.length > 0) {
+                doneRef.current = true
+                cleanup()
+                onResult(barcodes[0].rawValue)
+              }
+            } catch {}
+          }, 200)
+        } else {
+          // @zxing Fallback (Laptop / Firefox)
+          const reader = new BrowserMultiFormatReader()
+          intervalRef.current = setInterval(() => {
+            if (doneRef.current || videoRef.current?.readyState < 2) return
+            try {
+              const result = reader.decodeFromVideoElement(videoRef.current)
+              if (result) {
+                doneRef.current = true
+                cleanup()
+                onResult(result.getText())
+              }
+            } catch (e) {
+              if (!(e instanceof NotFoundException) &&
+                  !(e instanceof ChecksumException) &&
+                  !(e instanceof FormatException)) {
+                console.warn('zxing error:', e)
+              }
+            }
+          }, 200)
         }
-      }, 300)
-    }).catch(err => {
-      console.error('Camera error:', err)
-      setError('Kamera konnte nicht gestartet werden.')
+      }
+    }).catch(() => {
+      setError('Kamera konnte nicht gestartet werden. Bitte Berechtigung prüfen.')
     })
 
     function cleanup() {
