@@ -319,8 +319,11 @@ export default function ShoppingPage({ onClose, household }) {
           result={scanResult}
           t={t}
           onClose={() => setScanResult(null)}
-          onConfirmCheck={async (item, qty) => {
-            await handleCheck(item, qty)
+          onConfirmCheck={async (inventoryItem, qty) => {
+            // Direkt Bestand aktualisieren (kein Einkaufslisten-Eintrag nötig)
+            const { supabase } = await import('../../lib/supabase')
+            const newQty = inventoryItem.quantity + Number(qty)
+            await supabase.from('items').update({ quantity: newQty }).eq('id', inventoryItem.id)
             setScanResult(null)
           }}
           onAddNew={() => {

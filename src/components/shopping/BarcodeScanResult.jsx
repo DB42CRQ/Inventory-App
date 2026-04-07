@@ -39,7 +39,7 @@ export default function BarcodeScanResult({ result, onConfirmCheck, onAddNew, on
 
           <div className="flex gap-2">
             <Button variant="secondary" className="flex-1" onClick={onClose}>{t.cancel}</Button>
-            <Button className="flex-1" onClick={() => onConfirmCheck(result.matchedItem, qty)}>
+            <Button className="flex-1" onClick={() => onConfirmCheck(result.matchedItem, Number(qty))}>
               ✓ {t.shoppingConfirm ?? 'Gekauft'}
             </Button>
           </div>
