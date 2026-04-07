@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { useHousehold } from '../../hooks/useHousehold'
 import { useInventory } from '../../hooks/useInventory'
@@ -24,6 +24,8 @@ export default function InventoryPage() {
   const { profile, signOut }                                = useAuth()
   const { household, households, members, switchHousehold } = useHousehold()
   const { t, lang, setLang }                               = useTranslation()
+  const { supported: pushSupported, subscribed: pushSubscribed, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe, sendPush } = usePushNotifications(profile, household)
+
   const {
     items, categories, loading, lowItems,
     addItem, updateQuantity, updateItem, deleteItem,
@@ -31,7 +33,6 @@ export default function InventoryPage() {
   } = useInventory(household?.id, profile?.id, sendPush)
 
   const { isDeveloper } = useDeveloper()
-  const { supported: pushSupported, subscribed: pushSubscribed, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe, sendPush } = usePushNotifications(profile, household)
   const { versions, hasNew, newVersion, markAsSeen, createVersion, publishVersion, updateDraftNotes, deleteVersion } = useVersions()
 
   const [tab,          setTab]          = useState('inventory')
@@ -49,6 +50,13 @@ export default function InventoryPage() {
   const [dismissed,    setDismissed]    = useState(null)
   const [search,       setSearch]       = useState('')
   const [filterCat,    setFilterCat]    = useState('all')
+
+  // Push bei neuer Version
+  useEffect(() => {
+    if (newVersion && dismissed !== newVersion.id && pushSubscribed) {
+      sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!` })
+    }
+  }, [newVersion?.id])
 
   const catMap = Object.fromEntries(categories.map(c => [c.id, c]))
 
@@ -347,7 +355,6 @@ export default function InventoryPage() {
 
       {showWiki && <WikiPage onClose={() => setShowWiki(false)} />}
 
-      {newVersion && dismissed !== newVersion.id && sendPush && sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!` }) && null}
       {newVersion && dismissed !== newVersion.id && (
         <VersionBanner
           version={newVersion}
