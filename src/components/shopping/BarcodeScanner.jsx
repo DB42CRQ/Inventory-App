@@ -4,43 +4,51 @@ import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library'
 export default function BarcodeScanner({ onResult, onClose }) {
   const videoRef  = useRef(null)
   const readerRef = useRef(null)
-  const [error,   setError]   = useState('')
-  const [ready,   setReady]   = useState(false)
+  const [error, setError] = useState('')
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     const reader = new BrowserMultiFormatReader()
     readerRef.current = reader
 
-    reader.listVideoInputDevices().then(devices => {
-      if (!devices || devices.length === 0) {
-        setError('Keine Kamera gefunden.')
-        return
+    // Direkt mit facingMode environment starten (Rückkamera auf Mobile)
+    const constraints = {
+      video: {
+        facingMode: { ideal: 'environment' },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
       }
+    }
 
-      // Bevorzuge Rückkamera
-      const backCamera = devices.find(d =>
-        d.label.toLowerCase().includes('back') ||
-        d.label.toLowerCase().includes('rear') ||
-        d.label.toLowerCase().includes('environment')
-      )
-      const deviceId = backCamera?.deviceId || devices[devices.length - 1].deviceId
+    navigator.mediaDevices.getUserMedia(constraints)
+      .then(stream => {
+        videoRef.current.srcObject = stream
+        videoRef.current.play()
+        setReady(true)
 
-      setReady(true)
-
-      reader.decodeFromVideoDevice(deviceId, videoRef.current, (result, err) => {
-        if (result) {
-          onResult(result.getText())
-        }
-        if (err && !(err instanceof NotFoundException)) {
-          // NotFoundException ist normal wenn noch kein Barcode im Bild
-        }
+        reader.decodeFromStream(stream, videoRef.current, (result, err) => {
+          if (result) {
+            // Stream stoppen
+            stream.getTracks().forEach(t => t.stop())
+            onResult(result.getText())
+          }
+          if (err && !(err instanceof NotFoundException)) {
+            console.warn('Scan error:', err)
+          }
+        })
       })
-    }).catch(() => {
-      setError('Kamera konnte nicht gestartet werden. Bitte Kamera-Berechtigung prüfen.')
-    })
+      .catch(err => {
+        console.error('Camera error:', err)
+        setError('Kamera konnte nicht gestartet werden. Bitte Berechtigung prüfen.')
+      })
 
     return () => {
-      try { reader.reset() } catch {}
+      try {
+        reader.reset()
+        if (videoRef.current?.srcObject) {
+          videoRef.current.srcObject.getTracks().forEach(t => t.stop())
+        }
+      } catch {}
     }
   }, [])
 
@@ -56,9 +64,9 @@ export default function BarcodeScanner({ onResult, onClose }) {
       </div>
 
       <div className="flex-1 relative overflow-hidden">
-        <video ref={videoRef} className="w-full h-full object-cover" />
+        <video ref={videoRef} className="w-full h-full object-cover"
+          playsInline muted autoPlay />
 
-        {/* Fadenkreuz */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-64 h-40 relative">
             <div className="absolute inset-0 border border-white/30 rounded-2xl" />
