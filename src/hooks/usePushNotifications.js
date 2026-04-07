@@ -1,6 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useAuth } from './useAuth'
-import { useHousehold } from './useHousehold'
 
 const VAPID_PUBLIC_KEY = 'BEjDj9BHY5W21YwIp3mzXE-gn-7AHz12uBdzq0bJGN7SAMKEdiuZa_dZeddjVYgdXDoPCAS1CnFulu0qsW6kO6Q'
 
@@ -11,23 +9,25 @@ function urlBase64ToUint8Array(base64String) {
   return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)))
 }
 
-export function usePushNotifications() {
-  const { user } = useAuth()
-  const { household } = useHousehold()
-  const [permission, setPermission] = useState(Notification.permission)
-  const [subscribed, setSubscribed] = useState(false)
+export function usePushNotifications(user, household) {
+  const [permission,  setPermission]  = useState(() => typeof Notification !== 'undefined' ? Notification.permission : 'default')
+  const [subscribed,  setSubscribed]  = useState(false)
 
-  const supported = 'serviceWorker' in navigator && 'PushManager' in window
+  const supported = typeof window !== 'undefined' &&
+    'serviceWorker' in navigator &&
+    'PushManager' in window
 
   useEffect(() => {
     if (!supported || !user || !household) return
     checkSubscription()
-  }, [user, household])
+  }, [user?.id, household?.id])
 
   async function checkSubscription() {
-    const reg = await navigator.serviceWorker.ready
-    const sub = await reg.pushManager.getSubscription()
-    setSubscribed(!!sub)
+    try {
+      const reg = await navigator.serviceWorker.ready
+      const sub = await reg.pushManager.getSubscription()
+      setSubscribed(!!sub)
+    } catch {}
   }
 
   async function subscribe() {
@@ -40,7 +40,6 @@ export function usePushNotifications() {
       })
       setPermission('granted')
       setSubscribed(true)
-
       await fetch('/api/push-subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -52,16 +51,18 @@ export function usePushNotifications() {
       })
       return true
     } catch {
-      setPermission(Notification.permission)
+      setPermission(typeof Notification !== 'undefined' ? Notification.permission : 'default')
       return false
     }
   }
 
   async function unsubscribe() {
-    const reg = await navigator.serviceWorker.ready
-    const sub = await reg.pushManager.getSubscription()
-    if (sub) await sub.unsubscribe()
-    setSubscribed(false)
+    try {
+      const reg = await navigator.serviceWorker.ready
+      const sub = await reg.pushManager.getSubscription()
+      if (sub) await sub.unsubscribe()
+      setSubscribed(false)
+    } catch {}
   }
 
   async function sendPush({ title, body, excludeSelf = true }) {

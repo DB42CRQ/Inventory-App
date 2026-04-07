@@ -31,7 +31,7 @@ export default function InventoryPage() {
   } = useInventory(household?.id, profile?.id, sendPush)
 
   const { isDeveloper } = useDeveloper()
-  const { supported: pushSupported, subscribed: pushSubscribed, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe, sendPush } = usePushNotifications()
+  const { supported: pushSupported, subscribed: pushSubscribed, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe, sendPush } = usePushNotifications(profile, household)
   const { versions, hasNew, newVersion, markAsSeen, createVersion, publishVersion, updateDraftNotes, deleteVersion } = useVersions()
 
   const [tab,          setTab]          = useState('inventory')
