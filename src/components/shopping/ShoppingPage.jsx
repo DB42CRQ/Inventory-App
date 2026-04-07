@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 import { useShoppingList } from '../../hooks/useShoppingList'
 import { useAuth } from '../../hooks/useAuth'
+import { supabase } from '../../lib/supabase'
 import { useInventory } from '../../hooks/useInventory'
 import { Spinner, Button } from '../ui'
 import BarcodeScanner from './BarcodeScanner'
@@ -324,7 +325,6 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
           lang={lang}
           onClose={() => setScanResult(null)}
           onConfirmCheck={async (inventoryItem, qty) => {
-            const { supabase } = await import('../../lib/supabase')
             const newQty = inventoryItem.quantity + Number(qty)
             await supabase.from('items').update({ quantity: newQty }).eq('id', inventoryItem.id)
             await supabase.from('item_history').insert({
