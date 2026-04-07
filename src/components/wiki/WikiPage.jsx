@@ -81,7 +81,9 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: 'Mit "+ Aus Inventar" kannst du einzelne Artikel suchen und hinzufügen.' },
         { type: 'step', n: 4, text: 'Tippe einen Artikel an um ihn abzuhaken — gib die gekaufte Menge ein und bestätige. Der Bestand im Inventar wird sofort aktualisiert.' },
         { type: 'step', n: 5, text: 'Abgehakte Artikel erscheinen durchgestrichen unten. Mit "🗑 Leeren" kannst du erledigte oder alle Artikel löschen.' },
+        { type: 'step', n: 6, text: 'Mit dem 📷-Button oben rechts kannst du einen Barcode scannen — der Artikel wird automatisch im Inventar gesucht und der Bestand direkt aktualisiert.' },
         { type: 'tip', text: 'Die Einkaufsliste ist für alle Haushaltsmitglieder geteilt — Änderungen sind in Echtzeit sichtbar.' },
+        { type: 'tip', text: 'Der Barcode-Scanner funktioniert am besten mit Chrome auf Android. Wird ein Artikel nicht erkannt, kannst du ihn direkt neu anlegen.' },
       ]
     },
     {
@@ -179,7 +181,9 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: '"+ From inventory" lets you search and add individual items.' },
         { type: 'step', n: 4, text: 'Tap an item to check it off — enter the purchased quantity and confirm. The inventory stock is updated immediately.' },
         { type: 'step', n: 5, text: 'Checked items appear crossed out at the bottom. Use "🗑 Clear" to delete done or all items.' },
+        { type: 'step', n: 6, text: 'Use the 📷 button in the top right to scan a barcode — the item is automatically matched against your inventory and the stock is updated directly.' },
         { type: 'tip', text: 'The shopping list is shared with all household members — changes are visible in real time.' },
+        { type: 'tip', text: 'The barcode scanner works best with Chrome on Android. If an item is not recognized, you can add it as a new item directly.' },
       ]
     },
     {
@@ -277,7 +281,9 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: '"+ Del inventario" te permite buscar y añadir artículos individuales.' },
         { type: 'step', n: 4, text: 'Toca un artículo para marcarlo — introduce la cantidad comprada y confirma. El stock del inventario se actualiza inmediatamente.' },
         { type: 'step', n: 5, text: 'Los artículos marcados aparecen tachados abajo. Con "🗑 Vaciar" puedes eliminar los completados o todos.' },
+        { type: 'step', n: 6, text: 'Usa el botón 📷 arriba a la derecha para escanear un código de barras — el artículo se busca automáticamente en tu inventario y el stock se actualiza directamente.' },
         { type: 'tip', text: 'La lista de compras es compartida por todos los miembros del hogar — los cambios son visibles en tiempo real.' },
+        { type: 'tip', text: 'El escáner funciona mejor con Chrome en Android. Si no se reconoce un artículo, puedes añadirlo directamente.' },
       ]
     },
     {
