@@ -41,7 +41,8 @@ function CheckModal({ item, onConfirm, onCancel, t }) {
   )
 }
 
-function ShoppingItem({ item, onCheck, onUncheck, onRemove, t }) {
+function ShoppingItem({ item, onCheck, onUncheck, onRemove, t, lang }) {
+  const tr = (unit) => unit === 'Stück' ? (lang === 'en' ? 'piece' : lang === 'es' ? 'pieza' : 'Stück') : unit
   const [showModal, setShowModal] = useState(false)
   return (
     <>
@@ -60,8 +61,8 @@ function ShoppingItem({ item, onCheck, onUncheck, onRemove, t }) {
           </p>
           <p className="text-xs text-gray-400">
             {item.checked
-              ? `${item.quantity} ${item.unit} ${t.shoppingPurchased ?? 'gekauft'}`
-              : `${item.quantity} ${item.unit}`}
+              ? `${item.quantity} ${tr(item.unit)} ${t.shoppingPurchased ?? 'gekauft'}`
+              : `${item.quantity} ${tr(item.unit)}`}
             {item.profiles?.display_name && ` · ${item.profiles.display_name}`}
           </p>
         </div>
@@ -279,7 +280,7 @@ export default function ShoppingPage({ onClose, household }) {
           ) : (
             <div className="flex flex-col gap-2">
               {unchecked.map(item => (
-                <ShoppingItem key={item.id} item={item} t={t}
+                <ShoppingItem key={item.id} item={item} t={t} lang={lang}
                   onCheck={handleCheck} onUncheck={handleUncheck} onRemove={removeItem} />
               ))}
               {checked.length > 0 && (
@@ -318,6 +319,7 @@ export default function ShoppingPage({ onClose, household }) {
         <BarcodeScanResult
           result={scanResult}
           t={t}
+          lang={lang}
           onClose={() => setScanResult(null)}
           onConfirmCheck={async (inventoryItem, qty) => {
             const { supabase } = await import('../../lib/supabase')

@@ -5,6 +5,7 @@ import { Badge } from '../ui'
 
 export function ItemCard({ item, category, onUpdateQty, onDelete, onEdit }) {
   const { t, lang } = useTranslation()
+  const tr = (unit) => unit === 'Stück' ? (lang === 'en' ? 'piece' : lang === 'es' ? 'pieza' : 'Stück') : unit
 
   function getCatName(cat) {
     if (!cat) return ''
@@ -35,7 +36,7 @@ export function ItemCard({ item, category, onUpdateQty, onDelete, onEdit }) {
             </Badge>
           )}
           {item.min_quantity > 0 && (
-            <span className="text-xs text-gray-400">{t.minQty} {item.min_quantity} {item.unit}</span>
+            <span className="text-xs text-gray-400">{t.minQty} {item.min_quantity} {tr(item.unit)}</span>
           )}
         </div>
       </div>
@@ -57,7 +58,7 @@ export function ItemCard({ item, category, onUpdateQty, onDelete, onEdit }) {
           <button onClick={() => setEditing(true)}
             className="min-w-[3rem] text-center font-semibold text-gray-900 hover:text-primary-600 transition-colors">
             {item.quantity}
-            <span className="text-xs font-normal text-gray-400 ml-0.5">{item.unit}</span>
+            <span className="text-xs font-normal text-gray-400 ml-0.5">{tr(item.unit)}</span>
           </button>
         )}
         <button onClick={() => onUpdateQty(item.id, item.quantity + 1)}

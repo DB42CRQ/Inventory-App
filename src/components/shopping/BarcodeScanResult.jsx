@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Button } from '../ui'
 
-export default function BarcodeScanResult({ result, onConfirmCheck, onAddNew, onClose, t }) {
+export default function BarcodeScanResult({ result, onConfirmCheck, onAddNew, onClose, t, lang }) {
+  const tr = (unit) => unit === 'Stück' ? (lang === 'en' ? 'piece' : lang === 'es' ? 'pieza' : 'Stück') : unit
   const [qty,     setQty]     = useState(result.matchedItem?.quantity ?? 1)
   const [success, setSuccess] = useState(false)
 
@@ -19,7 +20,7 @@ export default function BarcodeScanResult({ result, onConfirmCheck, onAddNew, on
           <div className="text-4xl mb-3">✅</div>
           <p className="font-semibold text-gray-900">{t.barcodeUpdated ?? 'Bestand aktualisiert!'}</p>
           <p className="text-sm text-gray-500 mt-1">
-            {result.matchedItem.name} +{qty} {result.matchedItem.unit}
+            {result.matchedItem.name} +{qty} {tr(result.matchedItem.unit)}
           </p>
         </div>
       </div>
@@ -55,7 +56,7 @@ export default function BarcodeScanResult({ result, onConfirmCheck, onAddNew, on
             <button onClick={() => setQty(q => Number(q) + 1)}
               className="w-9 h-9 rounded-xl bg-primary-100 text-primary-700 font-bold
                 hover:bg-primary-200 flex items-center justify-center text-lg shrink-0">+</button>
-            <span className="text-sm text-gray-500 shrink-0">{result.matchedItem.unit}</span>
+            <span className="text-sm text-gray-500 shrink-0">{tr(result.matchedItem.unit)}</span>
           </div>
 
           <div className="flex gap-2">
