@@ -2,7 +2,29 @@ import { useState } from 'react'
 import { Button } from '../ui'
 
 export default function BarcodeScanResult({ result, onConfirmCheck, onAddNew, onClose, t }) {
-  const [qty, setQty] = useState(result.matchedItem?.quantity ?? 1)
+  const [qty,     setQty]     = useState(result.matchedItem?.quantity ?? 1)
+  const [success, setSuccess] = useState(false)
+
+  async function handleConfirm() {
+    await onConfirmCheck(result.matchedItem, Number(qty))
+    setSuccess(true)
+    setTimeout(onClose, 1800)
+  }
+
+  if (success) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center">
+          <div className="text-4xl mb-3">✅</div>
+          <p className="font-semibold text-gray-900">{t.barcodeUpdated ?? 'Bestand aktualisiert!'}</p>
+          <p className="text-sm text-gray-500 mt-1">
+            {result.matchedItem.name} +{qty} {result.matchedItem.unit}
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   // Match gefunden
   if (result.matchedItem) {
@@ -12,10 +34,9 @@ export default function BarcodeScanResult({ result, onConfirmCheck, onAddNew, on
         <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
         <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
           onClick={e => e.stopPropagation()}>
-
           <div className="flex items-center gap-2 mb-1">
             <span className="text-2xl">✅</span>
-            <h3 className="font-semibold text-gray-900">{t.barcodMatchFound ?? 'Artikel gefunden!'}</h3>
+            <h3 className="font-semibold text-gray-900">{t.barcodeMatchFound ?? 'Artikel gefunden!'}</h3>
           </div>
           <p className="text-sm text-gray-500 mb-1">{result.productName}</p>
           <p className="text-xs text-gray-400 mb-4">→ {result.matchedItem.name}</p>
@@ -39,7 +60,7 @@ export default function BarcodeScanResult({ result, onConfirmCheck, onAddNew, on
 
           <div className="flex gap-2">
             <Button variant="secondary" className="flex-1" onClick={onClose}>{t.cancel}</Button>
-            <Button className="flex-1" onClick={() => onConfirmCheck(result.matchedItem, Number(qty))}>
+            <Button className="flex-1" onClick={handleConfirm}>
               ✓ {t.shoppingConfirm ?? 'Gekauft'}
             </Button>
           </div>
@@ -55,7 +76,6 @@ export default function BarcodeScanResult({ result, onConfirmCheck, onAddNew, on
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
         onClick={e => e.stopPropagation()}>
-
         <div className="flex items-center gap-2 mb-1">
           <span className="text-2xl">🔍</span>
           <h3 className="font-semibold text-gray-900">{t.barcodeNoMatch ?? 'Nicht im Inventar'}</h3>
@@ -67,7 +87,6 @@ export default function BarcodeScanResult({ result, onConfirmCheck, onAddNew, on
         <p className="text-sm text-gray-500 mb-5">
           {t.barcodeNoMatchHint ?? 'Dieser Artikel ist nicht in deinem Inventar. Möchtest du ihn hinzufügen?'}
         </p>
-
         <div className="flex gap-2">
           <Button variant="secondary" className="flex-1" onClick={onClose}>{t.cancel}</Button>
           <Button className="flex-1" onClick={() => onAddNew(result.productName)}>

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from '../../i18n/useTranslation'
 import { BrowserMultiFormatReader, NotFoundException, ChecksumException, FormatException } from '@zxing/library'
 
 export default function BarcodeScanner({ onResult, onClose }) {
+  const { t } = useTranslation()
   const videoRef    = useRef(null)
   const streamRef   = useRef(null)
   const intervalRef = useRef(null)
@@ -83,7 +85,7 @@ export default function BarcodeScanner({ onResult, onClose }) {
           className="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center text-xl">
           ×
         </button>
-        <p className="text-white text-sm font-medium">Barcode scannen</p>
+        <p className="text-white text-sm font-medium">{t.barcodeScanTitle ?? 'Barcode scannen'}</p>
         <div className="w-9" />
       </div>
 
@@ -112,7 +114,7 @@ export default function BarcodeScanner({ onResult, onClose }) {
 
       <div className="px-4 py-4 text-center shrink-0">
         <p className="text-white/60 text-xs">
-          {ready ? 'Halte den Barcode in den Rahmen' : 'Kamera wird gestartet…'}
+          {ready ? (t.barcodeCameraHint ?? 'Halte den Barcode in den Rahmen') : (t.barcodeCameraStarting ?? 'Kamera wird gestartet…')}
         </p>
       </div>
     </div>
