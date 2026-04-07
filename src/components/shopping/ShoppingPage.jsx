@@ -37,33 +37,7 @@ function CheckModal({ item, onConfirm, onCancel, t }) {
           </Button>
         </div>
       </div>
-    {showScanner && <BarcodeScanner onResult={handleScan} onClose={() => setShowScanner(false)} />}
-
-    {scanLoading && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-        <div className="bg-white rounded-2xl px-6 py-4 flex items-center gap-3">
-          <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm font-medium text-gray-700">{t.barcodeSearching ?? 'Suche Produkt…'}</span>
-        </div>
-      </div>
-    )}
-
-    {scanResult && (
-      <BarcodeScanResult
-        result={scanResult}
-        t={t}
-        onClose={() => setScanResult(null)}
-        onConfirmCheck={async (item, qty) => {
-          await handleCheck(item, qty)
-          setScanResult(null)
-        }}
-        onAddNew={(name) => {
-          setScanResult(null)
-          setShowAdd(true)
-        }}
-      />
-    )}
-  </div>
+    </div>
   )
 }
 
@@ -119,7 +93,6 @@ export default function ShoppingPage({ onClose, household }) {
   const [showScanner,  setShowScanner]  = useState(false)
   const [scanResult,   setScanResult]   = useState(null)
   const [scanLoading,  setScanLoading]  = useState(false)
-  const [filterCat,    setFilterCat]    = useState('all')
 
   const getCatName = (cat) => !cat ? '' :
     lang === 'en' ? (cat.name_en || cat.name) :
@@ -158,7 +131,6 @@ export default function ShoppingPage({ onClose, household }) {
   }
 
   async function handleClearAll() {
-    // Remove all items (checked and unchecked)
     const allIds = [...unchecked, ...checked].map(i => i.id)
     for (const id of allIds) await removeItem(id)
     setConfirmClear(false)
@@ -173,7 +145,6 @@ export default function ShoppingPage({ onClose, household }) {
     i.name.toLowerCase().includes(search.toLowerCase())
   )
 
-  // Kategorien mit niedrigen Artikeln
   const lowCats = categories.filter(cat =>
     lowItems.some(i => i.category_id === cat.id)
   )
@@ -198,7 +169,6 @@ export default function ShoppingPage({ onClose, household }) {
 
       {/* Actions */}
       <div className="bg-white border-b border-gray-100 px-4 py-2 flex flex-wrap gap-2">
-        {/* Niedrige Bestände */}
         {lowItems.length > 0 && (
           <div className="flex flex-col gap-1.5 w-full">
             <button onClick={() => handleAddLow('all')}
@@ -223,7 +193,6 @@ export default function ShoppingPage({ onClose, household }) {
         )}
 
         <div className="flex gap-2 ml-auto">
-          {/* Aus Inventar */}
           <button onClick={() => setShowAdd(s => !s)}
             className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-medium
               transition-all ${showAdd
@@ -232,7 +201,6 @@ export default function ShoppingPage({ onClose, household }) {
             + {t.shoppingAddFromInventory ?? 'Aus Inventar'}
           </button>
 
-          {/* Löschen Menü */}
           {(unchecked.length > 0 || checked.length > 0) && (
             confirmClear ? (
               <div className="flex items-center gap-1 bg-red-50 border border-red-200 rounded-xl px-2 py-1">
@@ -261,7 +229,6 @@ export default function ShoppingPage({ onClose, household }) {
         </div>
       </div>
 
-      {/* Feedback */}
       {addedMsg && (
         <div className="mx-4 mt-3 bg-green-50 border border-green-200 rounded-xl px-3 py-2
           text-sm text-green-700 text-center">
@@ -269,7 +236,6 @@ export default function ShoppingPage({ onClose, household }) {
         </div>
       )}
 
-      {/* Inventar-Suche */}
       {showAdd && (
         <div className="bg-white border-b border-gray-100 px-4 py-3">
           <input type="search" placeholder={t.searchPlaceholder}
@@ -302,7 +268,6 @@ export default function ShoppingPage({ onClose, household }) {
         </div>
       )}
 
-      {/* Liste */}
       <main className="flex-1 overflow-y-auto max-w-2xl w-full mx-auto px-4 py-4 pb-8">
         {loading ? <Spinner /> : (
           unchecked.length === 0 && checked.length === 0 ? (
@@ -332,6 +297,38 @@ export default function ShoppingPage({ onClose, household }) {
           )
         )}
       </main>
+
+      {/* Scanner */}
+      {showScanner && (
+        <BarcodeScanner onResult={handleScan} onClose={() => setShowScanner(false)} />
+      )}
+
+      {/* Loading */}
+      {scanLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl px-6 py-4 flex items-center gap-3">
+            <div className="w-5 h-5 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+            <span className="text-sm font-medium text-gray-700">{t.barcodeSearching ?? 'Suche Produkt…'}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Scan Result */}
+      {scanResult && (
+        <BarcodeScanResult
+          result={scanResult}
+          t={t}
+          onClose={() => setScanResult(null)}
+          onConfirmCheck={async (item, qty) => {
+            await handleCheck(item, qty)
+            setScanResult(null)
+          }}
+          onAddNew={() => {
+            setScanResult(null)
+            setShowAdd(true)
+          }}
+        />
+      )}
     </div>
   )
 }
