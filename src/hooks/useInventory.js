@@ -73,11 +73,16 @@ export function useInventory(householdId, profileId) {
   async function updateQuantity(itemId, newQty) {
     const oldItem = items.find(i => i.id === itemId)
     const safeQty = Math.max(0, newQty)
+    // Sofort lokal updaten für flüssige UI
+    setItems(prev => prev.map(i => i.id === itemId ? { ...i, quantity: safeQty } : i))
     const { error } = await supabase
       .from('items')
       .update({ quantity: safeQty })
       .eq('id', itemId)
-    if (!error && oldItem) {
+    if (error) {
+      // Bei Fehler zurücksetzen
+      setItems(prev => prev.map(i => i.id === itemId ? { ...i, quantity: oldItem?.quantity ?? i.quantity } : i))
+    } else if (oldItem) {
       trackHistory({ itemId, householdId, profileId, from: oldItem.quantity, to: safeQty, source: 'manual' })
     }
     return { error }
