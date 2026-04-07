@@ -115,9 +115,11 @@ const WIKI_CONTENT = {
     {
       title: '📲 App installieren',
       content: [
-        { type: 'step', n: 1, text: 'Öffne ⚙️ Einstellungen — dort findest du eine Installationsanleitung für dein Gerät.' },
-        { type: 'step', n: 2, text: 'iPhone: Öffne inventory42.com in Safari → Teilen → "Zum Home-Bildschirm".' },
-        { type: 'step', n: 3, text: 'Android: Öffne in Chrome → Drei Punkte → "Zum Startbildschirm hinzufügen".' },
+        { type: 'step', n: 1, text: 'Öffne ⚙️ Einstellungen — dort findest du eine smarte Installationsanleitung die deinen Browser erkennt.' },
+        { type: 'step', n: 2, text: 'iPhone mit Safari: Tippe auf das Teilen-Symbol ⬆️ → "Zum Home-Bildschirm" → "Hinzufügen".' },
+        { type: 'step', n: 3, text: 'iPhone mit WhatsApp-Link: Tippe auf ··· unten rechts → "In Safari öffnen" → dann wie oben installieren.' },
+        { type: 'step', n: 4, text: 'Android mit Chrome: Tippe auf die drei Punkte ⋮ → "Zum Startbildschirm hinzufügen" → "Hinzufügen".' },
+        { type: 'tip', text: 'Wichtig für iPhone: Die Installation funktioniert nur über Safari — nicht über den WhatsApp-, Instagram- oder Chrome-Browser.' },
         { type: 'tip', text: 'Als installierte App startet Inventory42 schneller und fühlt sich wie eine native App an.' },
       ]
     },
@@ -315,9 +317,11 @@ const WIKI_CONTENT = {
     {
       title: '📲 Instalar la app',
       content: [
-        { type: 'step', n: 1, text: 'Abre ⚙️ Ajustes — encontrarás instrucciones de instalación para tu dispositivo.' },
-        { type: 'step', n: 2, text: 'iPhone: Abre inventory42.com en Safari → Compartir → "Añadir a inicio".' },
-        { type: 'step', n: 3, text: 'Android: Abre en Chrome → Tres puntos → "Añadir a pantalla de inicio".' },
+        { type: 'step', n: 1, text: 'Abre ⚙️ Ajustes — encontrarás una guía de instalación inteligente que detecta tu navegador.' },
+        { type: 'step', n: 2, text: 'iPhone con Safari: Toca el icono de compartir ⬆️ → "Añadir a inicio" → "Añadir".' },
+        { type: 'step', n: 3, text: 'iPhone con enlace de WhatsApp: Toca ··· abajo a la derecha → "Abrir en Safari" → luego instala como arriba.' },
+        { type: 'step', n: 4, text: 'Android con Chrome: Toca los tres puntos ⋮ → "Añadir a pantalla de inicio" → "Añadir".' },
+        { type: 'tip', text: 'Importante para iPhone: La instalación solo funciona desde Safari — no desde WhatsApp, Instagram o Chrome.' },
         { type: 'tip', text: 'Como app instalada, Inventory42 arranca más rápido y se siente como una app nativa.' },
       ]
     },
