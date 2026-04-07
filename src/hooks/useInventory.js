@@ -84,8 +84,10 @@ export function useInventory(householdId, profileId, sendPush) {
     } else if (oldItem) {
       trackHistory({ itemId, householdId, profileId, from: oldItem.quantity, to: safeQty, source: 'manual' })
       // Push wenn Artikel jetzt niedrig ist
+      console.log('sendPush available:', !!sendPush, 'safeQty:', safeQty)
       const updatedItem = items.find(i => i.id === itemId)
       if (updatedItem && updatedItem.min_quantity != null && safeQty <= updatedItem.min_quantity) {
+        console.log('Sending push for low stock:', updatedItem?.name)
         sendPush?.({
           title: '⚠️ Niedriger Bestand',
           body: `${updatedItem.name}: noch ${safeQty} ${updatedItem.unit}`,
