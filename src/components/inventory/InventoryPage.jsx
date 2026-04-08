@@ -314,6 +314,7 @@ export default function InventoryPage() {
           </div>
           {/* Push Notifications */}
           {pushSupported && (
+            <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl">
               <div className="flex items-center gap-3">
                 <span className="text-xl">🔔</span>
@@ -327,6 +328,13 @@ export default function InventoryPage() {
                 <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all
                   ${pushSubscribed ? 'left-5' : 'left-0.5'}`} />
               </button>
+            </div>
+            {pushSubscribed && (
+              <button onClick={() => sendPush({ title: '🔔 Test', body: 'Push funktioniert!', excludeSelf: false })}
+                className="text-xs text-primary-500 hover:text-primary-700 text-center py-1">
+                Test-Notification senden
+              </button>
+            )}
             </div>
           )}
 
