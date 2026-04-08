@@ -18,7 +18,6 @@ export default async function handler(req, res) {
   const { household_id, profile_id, title, body, url } = req.body
   if (!household_id || !title) return res.status(400).json({ error: 'Missing params' })
 
-  // Alle Subscriptions des Haushalts holen (außer dem Auslöser selbst)
   let query = supabase
     .from('push_subscriptions')
     .select('subscription, profile_id')
@@ -26,20 +25,26 @@ export default async function handler(req, res) {
 
   if (profile_id) query = query.neq('profile_id', profile_id)
 
-  const { data: subs } = await query
+  const { data: subs, error: dbError } = await query
+  console.log('Subscriptions found:', subs?.length, 'DB error:', dbError)
 
-  if (!subs || subs.length === 0) return res.status(200).json({ sent: 0 })
+  if (!subs || subs.length === 0) {
+    console.log('No subscriptions to send to')
+    return res.status(200).json({ sent: 0 })
+  }
 
   const payload = JSON.stringify({ title, body, url: url || '/' })
   let sent = 0
 
   for (const sub of subs) {
     try {
-      await webpush.sendNotification(sub.subscription, payload)
+      console.log('Sending to profile:', sub.profile_id)
+      const result = await webpush.sendNotification(sub.subscription, payload)
+      console.log('Push result:', result.statusCode)
       sent++
     } catch (err) {
+      console.error('Push error:', err.statusCode, err.body)
       if (err.statusCode === 410 || err.statusCode === 404) {
-        // Abgelaufene Subscription löschen
         await supabase.from('push_subscriptions')
           .delete()
           .eq('profile_id', sub.profile_id)
@@ -48,5 +53,6 @@ export default async function handler(req, res) {
     }
   }
 
+  console.log('Total sent:', sent)
   return res.status(200).json({ sent })
 }
