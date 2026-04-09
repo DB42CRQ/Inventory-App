@@ -51,15 +51,11 @@ export default function InventoryPage() {
   const [search,       setSearch]       = useState('')
   const [filterCat,    setFilterCat]    = useState('all')
 
-  // Push bei neuer Version — nur einmal pro Version und nur wenn User sie noch nicht gesehen hat
+  // Push bei neuer Version
   useEffect(() => {
-    if (!newVersion || !pushSubscribed) return
-    if (dismissed === newVersion.id) return
-    const pushedKey = `pushed_version_${newVersion.id}`
-    if (sessionStorage.getItem(pushedKey)) return
-    sessionStorage.setItem(pushedKey, '1')
-    sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!` })
-  }, [newVersion?.id, pushSubscribed])
+    if (!newVersion || !pushSubscribed || dismissed === newVersion.id) return
+    sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!`, excludeSelf: false })
+  }, [newVersion?.id])
 
   const catMap = Object.fromEntries(categories.map(c => [c.id, c]))
 
