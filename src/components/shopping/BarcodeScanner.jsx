@@ -16,7 +16,19 @@ export default function BarcodeScanner({ onResult, onClose }) {
 
   useEffect(() => {
     startCamera()
-    return cleanup
+
+    // iOS PWA: Stream neu starten wenn App wieder aktiv
+    function handleVisibility() {
+      if (!document.hidden && videoRef.current && streamRef.current) {
+        videoRef.current.play().catch(() => {})
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility)
+      cleanup()
+    }
   }, [])
 
   async function startCamera() {
@@ -110,7 +122,8 @@ export default function BarcodeScanner({ onResult, onClose }) {
       </div>
 
       <div className="flex-1 relative overflow-hidden">
-        <video ref={videoRef} className="w-full h-full object-cover"
+        <video ref={videoRef}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
           playsInline muted autoPlay />
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
