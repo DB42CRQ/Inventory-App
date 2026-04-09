@@ -11,77 +11,97 @@ export default function BarcodeScanner({ onResult, onClose }) {
   const [error, setError] = useState('')
   const [ready, setReady] = useState(false)
 
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+  const useNative = !isIOS && 'BarcodeDetector' in window
+
   useEffect(() => {
-    const useNative = 'BarcodeDetector' in window
-
-    navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: 'environment' },
-        width:  { ideal: 1280 },
-        height: { ideal: 720 },
-      }
-    }).then(stream => {
-      streamRef.current = stream
-      videoRef.current.srcObject = stream
-
-      videoRef.current.onloadedmetadata = () => {
-        videoRef.current.play()
-        setReady(true)
-
-        if (useNative) {
-          // Native BarcodeDetector (Chrome Android)
-          const detector = new window.BarcodeDetector({
-            formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code']
-          })
-          intervalRef.current = setInterval(async () => {
-            if (doneRef.current || videoRef.current?.readyState < 2) return
-            try {
-              const barcodes = await detector.detect(videoRef.current)
-              if (barcodes.length > 0) {
-                doneRef.current = true
-                cleanup()
-                onResult(barcodes[0].rawValue)
-              }
-            } catch {}
-          }, 200)
-        } else {
-          // @zxing Fallback (Laptop / Firefox)
-          const reader = new BrowserMultiFormatReader()
-          intervalRef.current = setInterval(() => {
-            if (doneRef.current || videoRef.current?.readyState < 2) return
-            try {
-              const result = reader.decodeFromVideoElement(videoRef.current)
-              if (result) {
-                doneRef.current = true
-                cleanup()
-                onResult(result.getText())
-              }
-            } catch (e) {
-              if (!(e instanceof NotFoundException) &&
-                  !(e instanceof ChecksumException) &&
-                  !(e instanceof FormatException)) {
-                console.warn('zxing error:', e)
-              }
-            }
-          }, 200)
-        }
-      }
-    }).catch(() => {
-      setError('Kamera konnte nicht gestartet werden. Bitte Berechtigung prüfen.')
-    })
-
-    function cleanup() {
-      clearInterval(intervalRef.current)
-      streamRef.current?.getTracks().forEach(t => t.stop())
-    }
-
+    startCamera()
     return cleanup
   }, [])
+
+  async function startCamera() {
+    // iOS braucht exakte constraints ohne ideal
+    const constraints = isIOS
+      ? { video: { facingMode: 'environment' } }
+      : { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      streamRef.current = stream
+      const video = videoRef.current
+      video.srcObject = stream
+      video.setAttribute('playsinline', true)
+      video.setAttribute('autoplay', true)
+      video.setAttribute('muted', true)
+      await video.play()
+      setReady(true)
+      startScanning()
+    } catch (err) {
+      // Fallback: ohne facingMode
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true })
+        streamRef.current = stream
+        const video = videoRef.current
+        video.srcObject = stream
+        video.setAttribute('playsinline', true)
+        await video.play()
+        setReady(true)
+        startScanning()
+      } catch {
+        setError(t.barcodeCameraError ?? 'Kamera konnte nicht gestartet werden.')
+      }
+    }
+  }
+
+  function startScanning() {
+    if (useNative) {
+      const detector = new window.BarcodeDetector({
+        formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code']
+      })
+      intervalRef.current = setInterval(async () => {
+        if (doneRef.current || !videoRef.current || videoRef.current.readyState < 2) return
+        try {
+          const barcodes = await detector.detect(videoRef.current)
+          if (barcodes.length > 0) {
+            doneRef.current = true
+            cleanup()
+            onResult(barcodes[0].rawValue)
+          }
+        } catch {}
+      }, 200)
+    } else {
+      const reader = new BrowserMultiFormatReader()
+      intervalRef.current = setInterval(() => {
+        if (doneRef.current || !videoRef.current || videoRef.current.readyState < 2) return
+        try {
+          const result = reader.decodeFromVideoElement(videoRef.current)
+          if (result) {
+            doneRef.current = true
+            cleanup()
+            onResult(result.getText())
+          }
+        } catch (e) {
+          if (!(e instanceof NotFoundException) &&
+              !(e instanceof ChecksumException) &&
+              !(e instanceof FormatException)) {
+            console.warn('scan error:', e)
+          }
+        }
+      }, 200)
+    }
+  }
+
+  function cleanup() {
+    clearInterval(intervalRef.current)
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop())
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black flex flex-col">
       <div className="flex items-center justify-between px-4 py-3 shrink-0">
-        <button onClick={onClose}
+        <button onClick={() => { cleanup(); onClose() }}
           className="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center text-xl">
           ×
         </button>
@@ -91,10 +111,7 @@ export default function BarcodeScanner({ onResult, onClose }) {
 
       <div className="flex-1 relative overflow-hidden">
         <video ref={videoRef} className="w-full h-full object-cover"
-          playsInline muted autoPlay
-          style={{ WebkitPlaysinline: true }}
-          onPause={() => videoRef.current?.play()}
-          onSuspend={() => videoRef.current?.play()} />
+          playsInline muted autoPlay />
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-64 h-40 relative">
