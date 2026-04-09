@@ -62,6 +62,14 @@ export function usePushNotifications(user, household) {
       const sub = await reg.pushManager.getSubscription()
       if (sub) await sub.unsubscribe()
       setSubscribed(false)
+      // DB-Eintrag löschen
+      if (user && household) {
+        await fetch('/api/push-subscribe', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profile_id: user.id, household_id: household.id }),
+        })
+      }
     } catch {}
   }
 
