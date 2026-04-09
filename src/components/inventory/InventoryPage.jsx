@@ -281,8 +281,7 @@ export default function InventoryPage() {
               hover:bg-gray-100 transition-all text-left">
             <span className="text-xl">🔔</span>
             <span className="text-sm font-medium text-gray-700">{t.notifTitle ?? 'Benachrichtigungen'}</span>
-            {pushSubscribed && <span className="ml-auto w-2 h-2 bg-primary-500 rounded-full" />}
-            <span className={`${pushSubscribed ? '' : 'ml-auto'} text-gray-400`}>›</span>
+            <span className="ml-auto text-gray-400">›</span>
           </button>
 
           <button onClick={() => { setShowSettings(false); setShowFeedbackModal(true) }}
