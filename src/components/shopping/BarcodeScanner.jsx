@@ -33,6 +33,20 @@ export default function BarcodeScanner({ onResult, onClose }) {
       await video.play()
       setReady(true)
 
+      // iOS: AudioContext Workaround — verhindert dass iOS den Video-Stream pausiert
+      if (isIOS) {
+        try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext
+          const audioCtx = new AudioContext()
+          const oscillator = audioCtx.createOscillator()
+          const gainNode = audioCtx.createGain()
+          gainNode.gain.value = 0 // Stumm aber aktiv
+          oscillator.connect(gainNode)
+          gainNode.connect(audioCtx.destination)
+          oscillator.start()
+        } catch {}
+      }
+
       // iOS: requestAnimationFrame keepalive
       if (isIOS) {
         function keepAlive() {
