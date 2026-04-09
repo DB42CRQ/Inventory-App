@@ -79,6 +79,15 @@ export function useShoppingList(householdId, sendPush) {
         added_by:     user.id,
       }))
     )
+    if (!error) {
+      const names = toAdd.map(i => i.name).join(', ')
+      sendPush?.({
+        title: '🛒 Einkaufsliste',
+        body: names,
+        category: 'shopping_list',
+        meta: { name: names },
+      })
+    }
     return { error, count: toAdd.length }
   }
 
