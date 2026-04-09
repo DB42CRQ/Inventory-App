@@ -42,7 +42,7 @@ export default function NotificationSettings({ onClose, pushSupported, pushSubsc
   }
 
   async function handleTest() {
-    await sendPush({ title: '🔔 Test', body: t.notifTestBody ?? 'Push-Benachrichtigungen funktionieren!', excludeSelf: false })
+    await sendPush({ title: '🔔 Test', body: t.notifTestBody ?? 'Push-Benachrichtigungen funktionieren!', excludeSelf: false, category: 'test' })
     setTestSent(true)
     setTimeout(() => setTestSent(false), 3000)
   }

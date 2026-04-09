@@ -56,7 +56,7 @@ export default function InventoryPage() {
   // Push bei neuer Version
   useEffect(() => {
     if (!newVersion || !pushSubscribed || dismissed === newVersion.id) return
-    sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!`, excludeSelf: false, category: 'new_version' })
+    sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!`, excludeSelf: false, category: 'new_version', meta: { version: newVersion.version } })
   }, [newVersion?.id])
 
   const catMap = Object.fromEntries(categories.map(c => [c.id, c]))

@@ -47,6 +47,7 @@ export function useShoppingList(householdId, sendPush) {
       title: '🛒 Einkaufsliste',
       body: `${name} wurde zur Einkaufsliste hinzugefügt`,
       category: 'shopping_list',
+      meta: { name },
     })
     // Prüfen ob Artikel schon auf der Liste
     const exists = items.find(i => i.item_id === item_id && !i.checked)

@@ -90,6 +90,7 @@ export function useInventory(householdId, profileId, sendPush) {
           title: '⚠️ Niedriger Bestand',
           body: `${updatedItem.name}: noch ${safeQty} ${updatedItem.unit}`,
           category: 'low_stock',
+          meta: { name: updatedItem.name, qty: safeQty, unit: updatedItem.unit },
         })
       }
     }
