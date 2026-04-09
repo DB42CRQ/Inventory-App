@@ -318,16 +318,6 @@ export default function InventoryPage() {
               ))}
             </div>
           </div>
-          {/* Benachrichtigungen */}
-          <button onClick={() => { setShowSettings(false); setShowNotifSettings(true) }}
-            className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl
-              hover:bg-gray-100 transition-all text-left">
-            <span className="text-xl">🔔</span>
-            <span className="text-sm font-medium text-gray-700">{t.notifTitle ?? 'Benachrichtigungen'}</span>
-            {pushSubscribed && <span className="ml-auto w-2 h-2 bg-primary-500 rounded-full" />}
-            <span className={`${pushSubscribed ? '' : 'ml-auto'} text-gray-400`}>›</span>
-          </button>
-
           <InstallSection />
           <Button variant="danger" onClick={signOut} className="w-full">{t.signOutBtn}</Button>
         </div>
