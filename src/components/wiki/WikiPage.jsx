@@ -134,6 +134,17 @@ const WIKI_CONTENT = {
       ]
     },
     {
+      title: '🔔 Benachrichtigungen',
+      content: [
+        { type: 'step', n: 1, text: 'Öffne ⚙️ Einstellungen → Benachrichtigungen um Push-Benachrichtigungen zu verwalten.' },
+        { type: 'step', n: 2, text: 'Aktiviere den Hauptschalter — der Browser fragt einmalig nach der Berechtigung.' },
+        { type: 'step', n: 3, text: 'Wähle für welche Ereignisse du Benachrichtigungen erhalten möchtest: niedriger Bestand, Einkaufsliste oder neue Version.' },
+        { type: 'tip', text: 'Benachrichtigungen sind pro Gerät gespeichert — du kannst auf jedem Gerät eigene Einstellungen vornehmen.' },
+        { type: 'tip', text: 'iOS: Die App muss als PWA installiert sein (Zum Home-Bildschirm hinzufügen) damit Push-Benachrichtigungen funktionieren.' },
+        { type: 'tip', text: 'Android: Chrome wird empfohlen. Die Benachrichtigungen kommen auch wenn die App geschlossen ist.' },
+      ]
+    },
+    {
       title: '🚀 Versionen & Updates',
       content: [
         { type: 'step', n: 1, text: 'Tippe auf 🚀 oben rechts um die Versionshistorie zu sehen.' },
@@ -231,6 +242,17 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: 'For bugs, you can optionally attach a screenshot.' },
         { type: 'step', n: 4, text: 'Via "View my suggestions" you can see the status of your submissions.' },
         { type: 'tip', text: 'When status is "Deployed", the related version is shown.' },
+      ]
+    },
+    {
+      title: '🔔 Notifications',
+      content: [
+        { type: 'step', n: 1, text: 'Open ⚙️ Settings → Notifications to manage push notifications.' },
+        { type: 'step', n: 2, text: 'Enable the main toggle — the browser will ask for permission once.' },
+        { type: 'step', n: 3, text: 'Choose which events you want to be notified about: low stock, shopping list or new version.' },
+        { type: 'tip', text: 'Notifications are saved per device — you can set individual preferences on each device.' },
+        { type: 'tip', text: 'iOS: The app must be installed as a PWA (Add to Home Screen) for push notifications to work.' },
+        { type: 'tip', text: 'Android: Chrome is recommended. Notifications arrive even when the app is closed.' },
       ]
     },
     {
@@ -333,6 +355,17 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: 'Para errores, puedes adjuntar opcionalmente una captura de pantalla.' },
         { type: 'step', n: 4, text: 'Con "Ver mis sugerencias" puedes ver el estado de tus envíos.' },
         { type: 'tip', text: 'Cuando el estado es "Implementado", se muestra la versión correspondiente.' },
+      ]
+    },
+    {
+      title: '🔔 Notificaciones',
+      content: [
+        { type: 'step', n: 1, text: 'Abre ⚙️ Ajustes → Notificaciones para gestionar las notificaciones push.' },
+        { type: 'step', n: 2, text: 'Activa el interruptor principal — el navegador pedirá permiso una vez.' },
+        { type: 'step', n: 3, text: 'Elige para qué eventos quieres recibir notificaciones: stock bajo, lista de compras o nueva versión.' },
+        { type: 'tip', text: 'Las notificaciones se guardan por dispositivo — puedes configurar preferencias individuales en cada dispositivo.' },
+        { type: 'tip', text: 'iOS: La app debe estar instalada como PWA (Añadir a inicio) para que funcionen las notificaciones push.' },
+        { type: 'tip', text: 'Android: Se recomienda Chrome. Las notificaciones llegan aunque la app esté cerrada.' },
       ]
     },
     {
