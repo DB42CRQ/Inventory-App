@@ -34,6 +34,9 @@ export default defineConfig({
           }
         ]
       },
+      strategies: 'injectManifest',
+      srcDir: 'public',
+      filename: 'sw.js',
       workbox: {
         // App-Shell (JS, CSS, HTML) → Cache First
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
