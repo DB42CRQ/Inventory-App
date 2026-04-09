@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
 
-export function useVersions() {
+export function useVersions(sendPush) {
   const { user } = useAuth()
   const [versions,   setVersions]   = useState([])
   const [newVersion, setNewVersion] = useState(null)
@@ -67,13 +67,21 @@ export function useVersions() {
   async function publishVersion(id) {
     const { error } = await supabase.from('versions').update({ is_draft: false }).eq('id', id)
     if (!error) {
-      setVersions(prev => prev.map(v => v.id === id ? { ...v, is_draft: false } : v))
-      // Banner prüfen
       const updated = versions.map(v => v.id === id ? { ...v, is_draft: false } : v)
+      setVersions(updated)
       const published = updated.filter(v => !v.is_draft)
       if (published.length > 0) {
         const alreadySeen = published[0].version_views?.some(v => v.profile_id === user.id)
         setNewVersion(alreadySeen ? null : published[0])
+        // Push an alle Haushaltsmitglieder
+        const v = published[0]
+        sendPush?.({
+          title: '🚀 Neues Update',
+          body: `Version ${v.version} ist verfügbar!`,
+          excludeSelf: false,
+          category: 'new_version',
+          meta: { version: v.version },
+        })
       }
     }
     return { error }

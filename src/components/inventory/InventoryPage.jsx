@@ -34,7 +34,7 @@ export default function InventoryPage() {
   } = useInventory(household?.id, profile?.id, sendPush)
 
   const { isDeveloper } = useDeveloper()
-  const { versions, hasNew, newVersion, markAsSeen, createVersion, publishVersion, updateDraftNotes, deleteVersion } = useVersions()
+  const { versions, hasNew, newVersion, markAsSeen, createVersion, publishVersion, updateDraftNotes, deleteVersion } = useVersions(sendPush)
 
   const [tab,          setTab]          = useState('inventory')
   const [showAdd,      setShowAdd]      = useState(false)
@@ -52,14 +52,6 @@ export default function InventoryPage() {
   const [dismissed,    setDismissed]    = useState(null)
   const [search,       setSearch]       = useState('')
   const [filterCat,    setFilterCat]    = useState('all')
-
-  // Push bei neuer Version
-  useEffect(() => {
-    console.log('[version push] newVersion:', newVersion?.id, 'pushSubscribed:', pushSubscribed, 'dismissed:', dismissed)
-    if (!newVersion || !pushSubscribed || dismissed === newVersion.id) return
-    console.log('[version push] sending push for version:', newVersion.version)
-    sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!`, excludeSelf: false, category: 'new_version', meta: { version: newVersion.version } })
-  }, [newVersion?.id])
 
   const catMap = Object.fromEntries(categories.map(c => [c.id, c]))
 
