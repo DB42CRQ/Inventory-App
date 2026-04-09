@@ -55,7 +55,9 @@ export default function InventoryPage() {
 
   // Push bei neuer Version
   useEffect(() => {
+    console.log('[version push] newVersion:', newVersion?.id, 'pushSubscribed:', pushSubscribed, 'dismissed:', dismissed)
     if (!newVersion || !pushSubscribed || dismissed === newVersion.id) return
+    console.log('[version push] sending push for version:', newVersion.version)
     sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!`, excludeSelf: false, category: 'new_version', meta: { version: newVersion.version } })
   }, [newVersion?.id])
 
