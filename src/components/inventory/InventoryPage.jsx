@@ -17,6 +17,7 @@ import { useVersions } from '../../hooks/useVersions'
 import { useDeveloper } from '../../hooks/useDeveloper'
 import { FeedbackButton } from '../ui/FeedbackButton'
 import { usePushNotifications } from '../../hooks/usePushNotifications'
+import NotificationSettings from '../ui/NotificationSettings'
 import ShoppingPage from '../shopping/ShoppingPage'
 import { InstallSection } from '../ui/InstallBanner'
 
@@ -46,6 +47,7 @@ export default function InventoryPage() {
   const [showWiki,     setShowWiki]     = useState(false)
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
   const [showMembers,      setShowMembers]      = useState(false)
+  const [showNotifSettings, setShowNotifSettings] = useState(false)
   const [showShopping, setShowShopping] = useState(false)
   const [dismissed,    setDismissed]    = useState(null)
   const [search,       setSearch]       = useState('')
@@ -54,7 +56,8 @@ export default function InventoryPage() {
   // Push bei neuer Version
   useEffect(() => {
     if (!newVersion || !pushSubscribed || dismissed === newVersion.id) return
-    sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!`, excludeSelf: false })
+    const notifPrefs = JSON.parse(localStorage.getItem('notif_prefs') || '{}')
+    if (notifPrefs.new_version !== false) sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!`, excludeSelf: false })
   }, [newVersion?.id])
 
   const catMap = Object.fromEntries(categories.map(c => [c.id, c]))
@@ -311,31 +314,15 @@ export default function InventoryPage() {
               ))}
             </div>
           </div>
-          {/* Push Notifications */}
-          {pushSupported && (
-            <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl">
-              <div className="flex items-center gap-3">
-                <span className="text-xl">🔔</span>
-                <span className="text-sm font-medium text-gray-700">
-                  {t.pushNotifications ?? 'Benachrichtigungen'}
-                </span>
-              </div>
-              <button onClick={() => pushSubscribed ? pushUnsubscribe() : pushSubscribe()}
-                className={`w-11 h-6 rounded-full transition-all relative
-                  ${pushSubscribed ? 'bg-primary-500' : 'bg-gray-200'}`}>
-                <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all
-                  ${pushSubscribed ? 'left-5' : 'left-0.5'}`} />
-              </button>
-            </div>
-            {pushSubscribed && (
-              <button onClick={() => sendPush({ title: '🔔 Test', body: 'Push funktioniert!', excludeSelf: false })}
-                className="text-xs text-primary-500 hover:text-primary-700 text-center py-1">
-                Test-Notification senden
-              </button>
-            )}
-            </div>
-          )}
+          {/* Benachrichtigungen */}
+          <button onClick={() => { setShowSettings(false); setShowNotifSettings(true) }}
+            className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl
+              hover:bg-gray-100 transition-all text-left">
+            <span className="text-xl">🔔</span>
+            <span className="text-sm font-medium text-gray-700">{t.notifTitle ?? 'Benachrichtigungen'}</span>
+            {pushSubscribed && <span className="ml-auto w-2 h-2 bg-primary-500 rounded-full" />}
+            <span className={`${pushSubscribed ? '' : 'ml-auto'} text-gray-400`}>›</span>
+          </button>
 
           <InstallSection />
           <Button variant="danger" onClick={signOut} className="w-full">{t.signOutBtn}</Button>
@@ -343,6 +330,17 @@ export default function InventoryPage() {
       </Modal>
 
       {showShopping && <ShoppingPage onClose={() => setShowShopping(false)} household={household} sendPush={sendPush} />}
+
+      {showNotifSettings && (
+        <NotificationSettings
+          onClose={() => setShowNotifSettings(false)}
+          pushSupported={pushSupported}
+          pushSubscribed={pushSubscribed}
+          subscribe={pushSubscribe}
+          unsubscribe={pushUnsubscribe}
+          sendPush={sendPush}
+        />
+      )}
 
       {showMembers && (
         <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">

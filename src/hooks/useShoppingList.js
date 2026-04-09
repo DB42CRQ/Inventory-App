@@ -43,7 +43,11 @@ export function useShoppingList(householdId, sendPush) {
   }
 
   async function addItem({ name, quantity, unit, item_id }) {
-    sendPush?.({
+    const notifPrefs = JSON.parse(localStorage.getItem('notif_prefs') || '{}')
+    if (notifPrefs.shopping_list !== false) sendPush?.({
+      title: '🛒 Einkaufsliste',
+      body: `${name} wurde zur Einkaufsliste hinzugefügt`,
+    })
       title: '🛒 Einkaufsliste',
       body: `${name} wurde zur Einkaufsliste hinzugefügt`,
     })
