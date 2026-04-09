@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
 
 export function useVersions(sendPush) {
   const { user } = useAuth()
+  const sendPushRef = useRef(sendPush)
+  useEffect(() => { sendPushRef.current = sendPush }, [sendPush])
   const [versions,   setVersions]   = useState([])
   const [newVersion, setNewVersion] = useState(null)
   const [loading,    setLoading]    = useState(true)
@@ -75,7 +77,7 @@ export function useVersions(sendPush) {
         setNewVersion(alreadySeen ? null : published[0])
         // Push an alle Haushaltsmitglieder
         const v = published[0]
-        sendPush?.({
+        sendPushRef.current?.({
           title: '🚀 Neues Update',
           body: `Version ${v.version} ist verfügbar!`,
           excludeSelf: false,
