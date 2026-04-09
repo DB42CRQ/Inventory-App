@@ -35,11 +35,22 @@ export default function BarcodeScanner({ onResult, onClose }) {
         d.label.toLowerCase().includes('environment')
       )
 
-      const constraints = backCamera
-        ? { video: { deviceId: { exact: backCamera.deviceId } } }
-        : { video: { facingMode: 'environment' } }
-
-      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      // iOS: zuerst ohne facingMode versuchen, dann mit
+      let stream
+      if (isIOS) {
+        if (backCamera) {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { deviceId: { exact: backCamera.deviceId } }
+          })
+        } else {
+          // Alle Kameras durchprobieren bis eine stabil läuft
+          stream = await navigator.mediaDevices.getUserMedia({ video: true })
+        }
+      } else {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+        })
+      }
       streamRef.current = stream
       videoRef.current.srcObject = stream
       await videoRef.current.play()
