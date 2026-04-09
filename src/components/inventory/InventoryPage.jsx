@@ -56,8 +56,7 @@ export default function InventoryPage() {
   // Push bei neuer Version
   useEffect(() => {
     if (!newVersion || !pushSubscribed || dismissed === newVersion.id) return
-    const notifPrefs = JSON.parse(localStorage.getItem('notif_prefs') || '{}')
-    if (notifPrefs.new_version !== false) sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!`, excludeSelf: false })
+    sendPush({ title: '🚀 Neues Update', body: `Version ${newVersion.version} ist verfügbar!`, excludeSelf: false, category: 'new_version' })
   }, [newVersion?.id])
 
   const catMap = Object.fromEntries(categories.map(c => [c.id, c]))

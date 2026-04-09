@@ -65,7 +65,7 @@ export function usePushNotifications(user, household) {
     } catch {}
   }
 
-  async function sendPush({ title, body, excludeSelf = true }) {
+  async function sendPush({ title, body, excludeSelf = true, category = null }) {
     if (!household) return
     await fetch('/api/push-send', {
       method: 'POST',
@@ -76,6 +76,7 @@ export function usePushNotifications(user, household) {
         title,
         body,
         url: '/',
+        category,
       }),
     })
   }

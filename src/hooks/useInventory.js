@@ -84,12 +84,12 @@ export function useInventory(householdId, profileId, sendPush) {
     } else if (oldItem) {
       trackHistory({ itemId, householdId, profileId, from: oldItem.quantity, to: safeQty, source: 'manual' })
       // Push wenn Artikel jetzt niedrig ist
-      const notifPrefs = JSON.parse(localStorage.getItem('notif_prefs') || '{}')
       const updatedItem = items.find(i => i.id === itemId)
-      if (updatedItem && updatedItem.min_quantity != null && safeQty <= updatedItem.min_quantity && notifPrefs.low_stock !== false) {
+      if (updatedItem && updatedItem.min_quantity != null && safeQty <= updatedItem.min_quantity) {
         sendPush?.({
           title: '⚠️ Niedriger Bestand',
           body: `${updatedItem.name}: noch ${safeQty} ${updatedItem.unit}`,
+          category: 'low_stock',
         })
       }
     }

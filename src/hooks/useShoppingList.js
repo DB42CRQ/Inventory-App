@@ -43,10 +43,10 @@ export function useShoppingList(householdId, sendPush) {
   }
 
   async function addItem({ name, quantity, unit, item_id }) {
-    const notifPrefs = JSON.parse(localStorage.getItem('notif_prefs') || '{}')
-    if (notifPrefs.shopping_list !== false) sendPush?.({
+    sendPush?.({
       title: '🛒 Einkaufsliste',
       body: `${name} wurde zur Einkaufsliste hinzugefügt`,
+      category: 'shopping_list',
     })
     // Prüfen ob Artikel schon auf der Liste
     const exists = items.find(i => i.item_id === item_id && !i.checked)

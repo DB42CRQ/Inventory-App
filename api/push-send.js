@@ -15,35 +15,33 @@ const supabase = createClient(
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const { household_id, profile_id, title, body, url } = req.body
+  const { household_id, profile_id, title, body, url, category } = req.body
   if (!household_id || !title) return res.status(400).json({ error: 'Missing params' })
 
   let query = supabase
     .from('push_subscriptions')
-    .select('subscription, profile_id')
+    .select('subscription, profile_id, preferences')
     .eq('household_id', household_id)
 
   if (profile_id) query = query.neq('profile_id', profile_id)
 
   const { data: subs, error: dbError } = await query
-  console.log('Subscriptions found:', subs?.length, 'DB error:', dbError)
 
-  if (!subs || subs.length === 0) {
-    console.log('No subscriptions to send to')
-    return res.status(200).json({ sent: 0 })
-  }
+  if (!subs || subs.length === 0) return res.status(200).json({ sent: 0 })
 
   const payload = JSON.stringify({ title, body, url: url || '/' })
   let sent = 0
 
   for (const sub of subs) {
+    // Präferenzen prüfen
+    if (category && sub.preferences) {
+      if (sub.preferences[category] === false) continue
+    }
+
     try {
-      console.log('Sending to profile:', sub.profile_id)
-      const result = await webpush.sendNotification(sub.subscription, payload)
-      console.log('Push result:', result.statusCode)
+      await webpush.sendNotification(sub.subscription, payload)
       sent++
     } catch (err) {
-      console.error('Push error:', err.statusCode, err.body)
       if (err.statusCode === 410 || err.statusCode === 404) {
         await supabase.from('push_subscriptions')
           .delete()
@@ -53,6 +51,5 @@ export default async function handler(req, res) {
     }
   }
 
-  console.log('Total sent:', sent)
   return res.status(200).json({ sent })
 }

@@ -1,46 +1,43 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
+import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../hooks/useAuth'
+import { useHousehold } from '../../hooks/useHousehold'
 
 export default function NotificationSettings({ onClose, pushSupported, pushSubscribed, subscribe, unsubscribe, sendPush }) {
   const { t } = useTranslation()
-  const [prefs, setPrefs] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('notif_prefs') || '{}')
-    } catch { return {} }
-  })
+  const { user } = useAuth()
+  const { household } = useHousehold()
+  const [prefs, setPrefs] = useState({ low_stock: true, shopping_list: true, new_version: true })
+  const [saving, setSaving] = useState(false)
   const [testSent, setTestSent] = useState(false)
 
-  const CATEGORIES = [
-    {
-      key: 'low_stock',
-      icon: '⚠️',
-      title: t.notifLowStock ?? 'Niedriger Bestand',
-      desc:  t.notifLowStockDesc ?? 'Wenn ein Artikel unter die Mindestmenge fällt',
-      default: true,
-    },
-    {
-      key: 'shopping_list',
-      icon: '🛒',
-      title: t.notifShoppingList ?? 'Einkaufsliste',
-      desc:  t.notifShoppingListDesc ?? 'Wenn ein Haushaltsmitglied die Einkaufsliste ändert',
-      default: true,
-    },
-    {
-      key: 'new_version',
-      icon: '🚀',
-      title: t.notifNewVersion ?? 'Neue Version',
-      desc:  t.notifNewVersionDesc ?? 'Wenn ein neues Update veröffentlicht wird',
-      default: true,
-    },
-  ]
+  useEffect(() => {
+    if (!user || !household || !pushSubscribed) return
+    loadPrefs()
+  }, [user?.id, household?.id, pushSubscribed])
 
-  function isEnabled(key) {
-    return prefs[key] !== false // default true
+  async function loadPrefs() {
+    const { data } = await supabase
+      .from('push_subscriptions')
+      .select('preferences')
+      .eq('profile_id', user.id)
+      .eq('household_id', household.id)
+      .single()
+    if (data?.preferences) setPrefs(data.preferences)
   }
 
-  function toggle(key) {
-    const next = { ...prefs, [key]: !isEnabled(key) }
+  async function toggle(key) {
+    const next = { ...prefs, [key]: !prefs[key] }
     setPrefs(next)
+    setSaving(true)
+    await supabase
+      .from('push_subscriptions')
+      .update({ preferences: next })
+      .eq('profile_id', user.id)
+      .eq('household_id', household.id)
+    setSaving(false)
+    // Auch localStorage updaten für lokale Checks
     localStorage.setItem('notif_prefs', JSON.stringify(next))
   }
 
@@ -49,6 +46,27 @@ export default function NotificationSettings({ onClose, pushSupported, pushSubsc
     setTestSent(true)
     setTimeout(() => setTestSent(false), 3000)
   }
+
+  const CATEGORIES = [
+    {
+      key: 'low_stock',
+      icon: '⚠️',
+      title: t.notifLowStock ?? 'Niedriger Bestand',
+      desc:  t.notifLowStockDesc ?? 'Wenn ein Artikel unter die Mindestmenge fällt',
+    },
+    {
+      key: 'shopping_list',
+      icon: '🛒',
+      title: t.notifShoppingList ?? 'Einkaufsliste',
+      desc:  t.notifShoppingListDesc ?? 'Wenn ein Haushaltsmitglied die Einkaufsliste ändert',
+    },
+    {
+      key: 'new_version',
+      icon: '🚀',
+      title: t.notifNewVersion ?? 'Neue Version',
+      desc:  t.notifNewVersionDesc ?? 'Wenn ein neues Update veröffentlicht wird',
+    },
+  ]
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
@@ -59,6 +77,7 @@ export default function NotificationSettings({ onClose, pushSupported, pushSubsc
         <h1 className="font-bold text-gray-900 text-lg flex-1">
           🔔 {t.notifTitle ?? 'Benachrichtigungen'}
         </h1>
+        {saving && <span className="text-xs text-gray-400">{t.saving ?? 'Speichert…'}</span>}
       </header>
 
       <main className="flex-1 overflow-y-auto max-w-2xl w-full mx-auto px-4 py-4 flex flex-col gap-4">
@@ -106,9 +125,9 @@ export default function NotificationSettings({ onClose, pushSupported, pushSubsc
                 </div>
                 <button onClick={() => toggle(cat.key)}
                   className={`w-11 h-6 rounded-full transition-all relative shrink-0
-                    ${isEnabled(cat.key) ? 'bg-primary-500' : 'bg-gray-200'}`}>
+                    ${prefs[cat.key] ? 'bg-primary-500' : 'bg-gray-200'}`}>
                   <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all
-                    ${isEnabled(cat.key) ? 'left-5' : 'left-0.5'}`} />
+                    ${prefs[cat.key] ? 'left-5' : 'left-0.5'}`} />
                 </button>
               </div>
             ))}
