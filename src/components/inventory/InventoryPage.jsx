@@ -274,16 +274,21 @@ export default function InventoryPage() {
       {/* Einstellungen */}
       <Modal open={showSettings} onClose={() => setShowSettings(false)} title={t.settings}>
         <div className="flex flex-col gap-4">
-          <div className="bg-gray-50 rounded-xl p-3">
-            <p className="text-sm font-medium text-gray-800 mb-1">{household?.name}</p>
-            <p className="text-xs text-gray-400 break-all">{household?.id}</p>
-          </div>
-          <button onClick={() => { setShowSettings(false); setShowMembers(true) }}
+<button onClick={() => { setShowSettings(false); setShowMembers(true) }}
             className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl
               hover:bg-gray-100 transition-all text-left">
             <span className="text-xl">👥</span>
             <span className="text-sm font-medium text-gray-700">{t.members}</span>
             <span className="ml-auto text-gray-400">›</span>
+          </button>
+
+          <button onClick={() => { setShowSettings(false); setShowNotifSettings(true) }}
+            className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl
+              hover:bg-gray-100 transition-all text-left">
+            <span className="text-xl">🔔</span>
+            <span className="text-sm font-medium text-gray-700">{t.notifTitle ?? 'Benachrichtigungen'}</span>
+            {pushSubscribed && <span className="ml-auto w-2 h-2 bg-primary-500 rounded-full" />}
+            <span className={`${pushSubscribed ? '' : 'ml-auto'} text-gray-400`}>›</span>
           </button>
 
           <button onClick={() => { setShowSettings(false); setShowFeedbackModal(true) }}
