@@ -62,7 +62,20 @@ export function useVersions(sendPush) {
       notes_es: notes_es || null,
       is_draft
     })
-    if (!error) await fetchVersions()
+    if (!error) {
+      await fetchVersions()
+      // Push wenn direkt publiziert
+      if (!is_draft) {
+        console.log('[createVersion] sending push for version:', version)
+        sendPushRef.current?.({
+          title: '🚀 Neues Update',
+          body: `Version ${version} ist verfügbar!`,
+          excludeSelf: false,
+          category: 'new_version',
+          meta: { version },
+        })
+      }
+    }
     return { error }
   }
 
