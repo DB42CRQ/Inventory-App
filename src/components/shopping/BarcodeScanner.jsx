@@ -90,7 +90,11 @@ export default function BarcodeScanner({ onResult, onClose }) {
       </div>
 
       <div className="flex-1 relative overflow-hidden">
-        <video ref={videoRef} className="w-full h-full object-cover" playsInline muted />
+        <video ref={videoRef} className="w-full h-full object-cover"
+          playsInline muted autoPlay
+          style={{ WebkitPlaysinline: true }}
+          onPause={() => videoRef.current?.play()}
+          onSuspend={() => videoRef.current?.play()} />
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-64 h-40 relative">
