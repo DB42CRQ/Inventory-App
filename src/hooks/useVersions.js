@@ -67,6 +67,7 @@ export function useVersions(sendPush) {
   }
 
   async function publishVersion(id) {
+    console.log('[publishVersion] called, id:', id, 'sendPushRef:', !!sendPushRef.current)
     const { error } = await supabase.from('versions').update({ is_draft: false }).eq('id', id)
     if (!error) {
       const updated = versions.map(v => v.id === id ? { ...v, is_draft: false } : v)
@@ -77,6 +78,7 @@ export function useVersions(sendPush) {
         setNewVersion(alreadySeen ? null : published[0])
         // Push an alle Haushaltsmitglieder
         const v = published[0]
+        console.log('[publishVersion] calling sendPush for version:', v.version)
         sendPushRef.current?.({
           title: '🚀 Neues Update',
           body: `Version ${v.version} ist verfügbar!`,
