@@ -45,6 +45,17 @@ export default function BarcodeScanner({ onResult, onClose }) {
       await videoRef.current.play()
       setReady(true)
 
+      // iOS: aggressiver play() Keepalive
+      if (isIOS) {
+        const keepAlive = setInterval(() => {
+          const v = videoRef.current
+          if (!v || doneRef.current) { clearInterval(keepAlive); return }
+          if (v.paused || v.readyState < 3) {
+            v.play().catch(() => {})
+          }
+        }, 100)
+      }
+
       if (useNative) {
         const detector = new window.BarcodeDetector({
           formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code']
