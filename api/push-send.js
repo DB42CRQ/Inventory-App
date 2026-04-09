@@ -63,6 +63,7 @@ export default async function handler(req, res) {
   const { data: subs } = await query
   if (!subs || subs.length === 0) return res.status(200).json({ sent: 0 })
 
+  console.log(`[push-send] household=${household_id} category=${category} subs=${subs.length} excludeSelf=${!!profile_id}`)
   let sent = 0
 
   for (const sub of subs) {
@@ -97,8 +98,10 @@ export default async function handler(req, res) {
         body:  localBody,
         url:   url || '/',
       }))
+      console.log(`[push-send] ✓ sent to profile=${sub.profile_id} lang=${sub.profiles?.lang} title="${localTitle}"`)
       sent++
     } catch (err) {
+      console.error(`[push-send] ✗ error profile=${sub.profile_id} status=${err.statusCode}`, err.body)
       if (err.statusCode === 410 || err.statusCode === 404) {
         await supabase.from('push_subscriptions')
           .delete()
@@ -108,5 +111,6 @@ export default async function handler(req, res) {
     }
   }
 
+  console.log(`[push-send] done sent=${sent}`)
   return res.status(200).json({ sent })
 }

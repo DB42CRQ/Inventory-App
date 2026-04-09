@@ -12,6 +12,7 @@ export default async function handler(req, res) {
 
   // Unsubscribe
   if (action === 'unsubscribe') {
+    console.log(`[push-subscribe] unsubscribe profile=${profile_id} household=${household_id}`)
     if (!profile_id || !household_id) return res.status(400).json({ error: 'Missing params' })
     const { error } = await supabase.from('push_subscriptions')
       .delete()
