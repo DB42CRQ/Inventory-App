@@ -7,7 +7,9 @@ export default function BarcodeScanner({ onResult, onClose }) {
   const videoRef    = useRef(null)
   const streamRef   = useRef(null)
   const intervalRef = useRef(null)
+  const watchRef    = useRef(null)
   const doneRef     = useRef(false)
+  const lastTimeRef = useRef(0)
   const [error, setError] = useState('')
   const [ready, setReady] = useState(false)
 
@@ -16,47 +18,58 @@ export default function BarcodeScanner({ onResult, onClose }) {
 
   useEffect(() => {
     startCamera()
-
-    // iOS PWA: Stream neu starten wenn App wieder aktiv
-    function handleVisibility() {
-      if (!document.hidden && videoRef.current && streamRef.current) {
-        videoRef.current.play().catch(() => {})
-      }
-    }
-    document.addEventListener('visibilitychange', handleVisibility)
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibility)
-      cleanup()
-    }
+    return cleanup
   }, [])
 
   async function startCamera() {
-    // iOS braucht exakte constraints ohne ideal
-    const constraints = isIOS
-      ? { video: { facingMode: 'environment' } }
-      : { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } }
-
     try {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints)
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
+      })
       streamRef.current = stream
       const video = videoRef.current
       video.srcObject = stream
-      video.setAttribute('playsinline', true)
-      video.setAttribute('autoplay', true)
-      video.setAttribute('muted', true)
+      video.playsInline = true
+      video.muted = true
+
+      await new Promise((resolve, reject) => {
+        video.onloadedmetadata = resolve
+        video.onerror = reject
+        setTimeout(reject, 5000)
+      })
+
       await video.play()
       setReady(true)
       startScanning()
+
+      // iOS: Watchdog der den Stream überwacht und neu startet
+      if (isIOS) {
+        watchRef.current = setInterval(() => {
+          if (doneRef.current) return
+          const v = videoRef.current
+          if (!v) return
+          if (v.paused || v.ended) {
+            v.play().catch(() => {})
+          }
+          // Prüfe ob currentTime sich verändert (Stream läuft)
+          if (v.currentTime === lastTimeRef.current && !v.paused) {
+            // Stream hängt — neu starten
+            v.srcObject = streamRef.current
+            v.play().catch(() => {})
+          }
+          lastTimeRef.current = v.currentTime
+        }, 500)
+      }
     } catch (err) {
-      // Fallback: ohne facingMode
+      console.error('Camera error:', err)
+      // Fallback ohne facingMode
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true })
         streamRef.current = stream
-        const video = videoRef.current
-        video.srcObject = stream
-        video.setAttribute('playsinline', true)
-        await video.play()
+        videoRef.current.srcObject = stream
+        videoRef.current.playsInline = true
+        videoRef.current.muted = true
+        await videoRef.current.play()
         setReady(true)
         startScanning()
       } catch {
@@ -96,7 +109,7 @@ export default function BarcodeScanner({ onResult, onClose }) {
           if (!(e instanceof NotFoundException) &&
               !(e instanceof ChecksumException) &&
               !(e instanceof FormatException)) {
-            console.warn('scan error:', e)
+            // ignore
           }
         }
       }, 200)
@@ -105,6 +118,7 @@ export default function BarcodeScanner({ onResult, onClose }) {
 
   function cleanup() {
     clearInterval(intervalRef.current)
+    clearInterval(watchRef.current)
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(t => t.stop())
     }
@@ -123,8 +137,7 @@ export default function BarcodeScanner({ onResult, onClose }) {
 
       <div className="flex-1 relative overflow-hidden">
         <video ref={videoRef}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          playsInline muted autoPlay />
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
 
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-64 h-40 relative">
@@ -148,7 +161,9 @@ export default function BarcodeScanner({ onResult, onClose }) {
 
       <div className="px-4 py-4 text-center shrink-0">
         <p className="text-white/60 text-xs">
-          {ready ? (t.barcodeCameraHint ?? 'Halte den Barcode in den Rahmen') : (t.barcodeCameraStarting ?? 'Kamera wird gestartet…')}
+          {ready
+            ? (t.barcodeCameraHint ?? 'Halte den Barcode in den Rahmen')
+            : (t.barcodeCameraStarting ?? 'Kamera wird gestartet…')}
         </p>
       </div>
     </div>
