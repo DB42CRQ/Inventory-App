@@ -10,8 +10,6 @@ export default function NotificationSettings({ onClose, pushSupported, pushSubsc
   const { household } = useHousehold()
   const [prefs, setPrefs] = useState({ low_stock: true, shopping_list: true, new_version: true })
   const [saving, setSaving] = useState(false)
-  const [testSent, setTestSent] = useState(false)
-
   useEffect(() => {
     if (!user || !household || !pushSubscribed) return
     loadPrefs()
@@ -39,12 +37,6 @@ export default function NotificationSettings({ onClose, pushSupported, pushSubsc
     setSaving(false)
     // Auch localStorage updaten für lokale Checks
     localStorage.setItem('notif_prefs', JSON.stringify(next))
-  }
-
-  async function handleTest() {
-    await sendPush({ title: '🔔 Test', body: t.notifTestBody ?? 'Push-Benachrichtigungen funktionieren!', excludeSelf: false, category: 'test' })
-    setTestSent(true)
-    setTimeout(() => setTestSent(false), 3000)
   }
 
   const CATEGORIES = [
@@ -132,20 +124,6 @@ export default function NotificationSettings({ onClose, pushSupported, pushSubsc
               </div>
             ))}
           </div>
-        )}
-
-        {/* Test-Button */}
-        {pushSubscribed && (
-          <button onClick={handleTest}
-            className="w-full py-3 rounded-2xl border border-gray-200 bg-white text-sm
-              font-medium text-gray-700 hover:bg-gray-50 transition-all flex items-center
-              justify-center gap-2">
-            {testSent ? (
-              <><span>✅</span> {t.notifTestSent ?? 'Gesendet!'}</>
-            ) : (
-              <><span>🔔</span> {t.notifTest ?? 'Test-Benachrichtigung senden'}</>
-            )}
-          </button>
         )}
 
         {!pushSupported && (
