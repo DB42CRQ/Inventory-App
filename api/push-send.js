@@ -12,6 +12,15 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY
 )
 
+// Einheit übersetzen
+function translateUnit(unit, lang) {
+  if (unit === 'Stück') {
+    if (lang === 'en') return 'piece'
+    if (lang === 'es') return 'pieza'
+  }
+  return unit
+}
+
 // Texte pro Sprache
 const TEXTS = {
   de: {
@@ -80,7 +89,7 @@ export default async function handler(req, res) {
 
     if (category === 'low_stock' && meta) {
       localTitle = tx.low_stock_title
-      localBody = tx.low_stock_body(meta.name, meta.qty, meta.unit)
+      localBody = tx.low_stock_body(meta.name, meta.qty, translateUnit(meta.unit, lang))
     } else if (category === 'shopping_list' && meta) {
       localTitle = tx.shopping_title
       localBody = tx.shopping_body(meta.name)
