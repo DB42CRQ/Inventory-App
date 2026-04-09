@@ -65,9 +65,9 @@ export function usePushNotifications(user, household) {
       // DB-Eintrag löschen
       if (user && household) {
         await fetch('/api/push-subscribe', {
-          method: 'DELETE',
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ profile_id: user.id, household_id: household.id }),
+          body: JSON.stringify({ action: 'unsubscribe', profile_id: user.id, household_id: household.id }),
         })
       }
     } catch {}
