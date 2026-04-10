@@ -121,18 +121,18 @@ export default function BarcodeScanner({ onResult, onClose }) {
               {error}
             </div>
           )}
-          <button onClick={() => fileRef.current?.click()} disabled={scanning}
-            className="w-full py-4 rounded-2xl bg-primary-500 text-white font-semibold
-              text-lg flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95 transition-all">
+          <label className={`w-full py-4 rounded-2xl bg-primary-500 text-white font-semibold
+              text-lg flex items-center justify-center gap-3 active:scale-95 transition-all
+              ${scanning ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}>
             {scanning ? (
               <><span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               {t.barcodeScanning ?? 'Analysiere…'}</>
             ) : (
               <><span>📸</span> {t.barcodeTakePhoto ?? 'Foto aufnehmen'}</>
             )}
-          </button>
-          <input ref={fileRef} type="file" accept="image/*" capture="environment"
-            className="hidden" onChange={handleFile} />
+            <input type="file" accept="image/*" capture="environment"
+              className="hidden" onChange={handleFile} disabled={scanning} />
+          </label>
         </div>
       </div>
     )
