@@ -15,6 +15,7 @@ export default function BarcodeScanner({ onResult, onClose }) {
   const [error,    setError]    = useState('')
   const [ready,    setReady]    = useState(false)
   const [scanning, setScanning] = useState(false)
+  const [debugMsg, setDebugMsg] = useState('')
 
   useEffect(() => {
     if (!isIOS) {
@@ -75,6 +76,9 @@ export default function BarcodeScanner({ onResult, onClose }) {
   async function handleFile(e) {
     const file = e.target.files?.[0]
     if (!file) return
+    const dbg = `type:${file.type} size:${file.size} native:${useNative}`
+    setDebugMsg(dbg)
+    console.log('file:', dbg)
     setScanning(true)
     setError('')
     try {
@@ -95,7 +99,8 @@ export default function BarcodeScanner({ onResult, onClose }) {
         onClose(); onResult(result.getText()); return
       }
       throw new Error('not found')
-    } catch {
+    } catch (err) {
+      setDebugMsg(prev => prev + ' ERR:' + (err?.message || 'unknown'))
       setError(t.barcodeNotFound ?? 'Kein Barcode gefunden. Bitte erneut versuchen.')
       setScanning(false)
       if (fileRef.current) fileRef.current.value = ''
@@ -116,6 +121,11 @@ export default function BarcodeScanner({ onResult, onClose }) {
           <p className="text-white text-center text-sm leading-relaxed opacity-80">
             {t.barcodeIosHint ?? 'Fotografiere den Barcode. Das Bild wird automatisch ausgewertet.'}
           </p>
+          {debugMsg && (
+            <div className="bg-gray-800 text-green-400 rounded-xl px-3 py-2 text-xs font-mono w-full break-all">
+              {debugMsg}
+            </div>
+          )}
           {error && (
             <div className="bg-red-500/90 text-white rounded-2xl px-4 py-3 text-sm text-center w-full">
               {error}
