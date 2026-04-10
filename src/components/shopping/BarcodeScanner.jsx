@@ -90,15 +90,20 @@ export default function BarcodeScanner({ onResult, onClose }) {
         const barcodes = await detector.detect(bitmap)
         if (barcodes.length > 0) { onClose(); onResult(barcodes[0].rawValue); return }
       } else {
-        // @zxing via Image element
+        // Bild auf max 1280px verkleinern für bessere Erkennung
+        const maxSize = 1280
+        const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height))
+        const w = Math.round(bitmap.width * scale)
+        const h = Math.round(bitmap.height * scale)
         const canvas = document.createElement('canvas')
-        canvas.width = bitmap.width
-        canvas.height = bitmap.height
-        canvas.getContext('2d').drawImage(bitmap, 0, 0)
-        const dataUrl = canvas.toDataURL('image/jpeg')
+        canvas.width = w
+        canvas.height = h
+        canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h)
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9)
         const img = new Image()
         img.src = dataUrl
         await new Promise(r => { img.onload = r })
+        setDebugMsg(prev => prev + ` scaled:${w}x${h}`)
         const reader = new BrowserMultiFormatReader()
         const result = await reader.decodeFromImageElement(img)
         onClose(); onResult(result.getText()); return
