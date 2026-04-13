@@ -138,6 +138,7 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
   const [confirmClear, setConfirmClear] = useState(false)
   const [showScanner,      setShowScanner]      = useState(false)
   const [scanMode,         setScanMode]         = useState(null) // 'barcode' | 'ai'
+  const [scanDebug,        setScanDebug]        = useState('')
   const [addToInventory,   setAddToInventory]   = useState(null) // { name, qty, unit }
   const [scanResult,   setScanResult]   = useState(null)
   const [scanLoading,  setScanLoading]  = useState(false)
@@ -163,7 +164,7 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
   }
 
   async function handleScan(barcodeOrResult) {
-    console.log('[handleScan] input:', typeof barcodeOrResult, barcodeOrResult)
+    setScanDebug(JSON.stringify(barcodeOrResult).slice(0, 100))
     setShowScanner(false)
     setScanLoading(true)
     let result
@@ -389,7 +390,19 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
             <div className="flex flex-col gap-3">
               <button onClick={() => { setScanMode('barcode'); setShowScanner(true) }}
                 className="flex items-center gap-4 px-4 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all text-left">
-                <span className="text-xl font-black tracking-tighter text-gray-800 font-mono">▌▌▌▌▐▌▌▐▌</span>
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="1" y="4" width="2" height="24" fill="#1f2937"/>
+                  <rect x="4" y="4" width="1" height="24" fill="#1f2937"/>
+                  <rect x="6" y="4" width="3" height="24" fill="#1f2937"/>
+                  <rect x="10" y="4" width="1" height="24" fill="#1f2937"/>
+                  <rect x="12" y="4" width="2" height="24" fill="#1f2937"/>
+                  <rect x="15" y="4" width="1" height="24" fill="#1f2937"/>
+                  <rect x="17" y="4" width="3" height="24" fill="#1f2937"/>
+                  <rect x="21" y="4" width="1" height="24" fill="#1f2937"/>
+                  <rect x="23" y="4" width="2" height="24" fill="#1f2937"/>
+                  <rect x="26" y="4" width="1" height="24" fill="#1f2937"/>
+                  <rect x="28" y="4" width="3" height="24" fill="#1f2937"/>
+                </svg>
                 <div>
                   <p className="text-sm font-medium text-gray-900">{t.scanModeBarcode ?? 'Barcode scannen'}</p>
                   <p className="text-xs text-gray-400">{t.scanModeBarcodeHint ?? 'Scanne den EAN-Barcode des Produkts'}</p>
