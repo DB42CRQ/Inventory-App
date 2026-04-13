@@ -117,8 +117,9 @@ export default function BarcodeScanner({ onResult, onClose, inventoryItems = [],
       setDebugMsg(dbg + ` scaled:${w}x${h} product:${data.productName} match:${data.matchedItem} err:${data.error}`)
       if (data.error) throw new Error(data.error)
       if (!data.productName || data.productName === 'none') throw new Error('not found')
-      onClose()
+      // onResult first, then onClose to avoid unmount crash
       onResult({ productName: data.productName, matchedItemName: data.matchedItem })
+      onClose()
     } catch (err) {
       setDebugMsg(prev => prev + ' ERR:' + (err?.message || 'unknown'))
       setError(t.barcodeNotFound ?? 'Kein Barcode gefunden. Bitte erneut versuchen.')
