@@ -5,7 +5,7 @@ import { BrowserMultiFormatReader, NotFoundException, ChecksumException, FormatE
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
 const useNative = 'BarcodeDetector' in window
 
-export default function BarcodeScanner({ onResult, onClose }) {
+export default function BarcodeScanner({ onResult, onClose, inventoryItems = [] }) {
   const { t } = useTranslation()
   const videoRef    = useRef(null)
   const streamRef   = useRef(null)
@@ -103,19 +103,20 @@ export default function BarcodeScanner({ onResult, onClose }) {
       canvas.getContext('2d').drawImage(img, 0, 0, w, h)
       setDebugMsg(dbg + ` scaled:${w}x${h}`)
 
-      // Anthropic API via Vercel Function
+      // Anthropic API: Produktname + Match direkt
       setDebugMsg(dbg + ` scaled:${w}x${h} calling AI...`)
       const base64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1]
       const response = await fetch('/api/scan-barcode', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: base64 })
+        body: JSON.stringify({ image: base64, inventoryItems })
       })
       const data = await response.json()
-      const barcode = data.barcode?.trim()
-      setDebugMsg(dbg + ` scaled:${w}x${h} ai:${barcode}`)
-      if (barcode && barcode !== 'none' && /^[0-9]+$/.test(barcode)) {
-        onClose(); onResult(barcode); return
+      setDebugMsg(dbg + ` scaled:${w}x${h} product:${data.productName} match:${data.matchedItem}`)
+      if (data.productName) {
+        onClose()
+        onResult({ productName: data.productName, matchedItemName: data.matchedItem })
+        return
       }
       throw new Error('not found')
     } catch (err) {

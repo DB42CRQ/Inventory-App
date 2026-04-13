@@ -160,10 +160,26 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
     }
   }
 
-  async function handleScan(barcode) {
+  async function handleScan(barcodeOrResult) {
     setShowScanner(false)
     setScanLoading(true)
-    const result = await processBarcode(barcode, inventoryItems)
+    let result
+    if (typeof barcodeOrResult === 'object' && barcodeOrResult.productName) {
+      // iOS: productName + matchedItemName direkt von AI
+      const matchedItem = barcodeOrResult.matchedItemName
+        ? inventoryItems.find(i => i.name.toLowerCase() === barcodeOrResult.matchedItemName.toLowerCase())
+          || inventoryItems.find(i => i.name.toLowerCase().includes(barcodeOrResult.matchedItemName.toLowerCase()))
+          || null
+        : null
+      result = {
+        barcode: null,
+        productName: barcodeOrResult.productName,
+        matchedItem,
+      }
+    } else {
+      // Android/Desktop: Barcode → OpenFoodFacts
+      result = await processBarcode(barcodeOrResult, inventoryItems)
+    }
     setScanLoading(false)
     setScanResult(result)
   }
@@ -359,7 +375,7 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
 
       {/* Scanner */}
       {showScanner && (
-        <BarcodeScanner onResult={handleScan} onClose={() => setShowScanner(false)} />
+        <BarcodeScanner onResult={handleScan} onClose={() => setShowScanner(false)} inventoryItems={inventoryItems} />
       )}
 
       {/* Loading */}
