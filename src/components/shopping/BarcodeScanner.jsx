@@ -11,7 +11,6 @@ export default function BarcodeScanner({ onResult, onClose }) {
   const streamRef   = useRef(null)
   const intervalRef = useRef(null)
   const doneRef     = useRef(false)
-  const fileRef     = useRef(null)
   const [error,    setError]    = useState('')
   const [ready,    setReady]    = useState(false)
   const [scanning, setScanning] = useState(false)
@@ -77,43 +76,62 @@ export default function BarcodeScanner({ onResult, onClose }) {
     const file = e.target.files?.[0]
     if (!file) return
     const dbg = `type:${file.type} size:${file.size} native:${useNative}`
-    setDebugMsg(dbg)
-    console.log('file:', dbg)
+    setDebugMsg(dbg + ' loading...')
     setScanning(true)
     setError('')
     try {
-      const bitmap = await createImageBitmap(file)
-      if (useNative) {
-        const detector = new window.BarcodeDetector({
-          formats: ['ean_13', 'ean_8', 'upc_a', 'upc_e', 'code_128', 'code_39', 'qr_code']
+      // FileReader statt createImageBitmap (iOS-kompatibler)
+      const dataUrl = await new Promise((res, rej) => {
+        const reader = new FileReader()
+        reader.onload = ev => res(ev.target.result)
+        reader.onerror = rej
+        reader.readAsDataURL(file)
+      })
+      const img = new Image()
+      img.src = dataUrl
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej })
+      setDebugMsg(dbg + ` img(${img.width}x${img.height})`)
+
+      // Auf max 1280px skalieren
+      const maxSize = 1280
+      const scale = Math.min(1, maxSize / Math.max(img.width, img.height))
+      const w = Math.round(img.width * scale)
+      const h = Math.round(img.height * scale)
+      const canvas = document.createElement('canvas')
+      canvas.width = w
+      canvas.height = h
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+      setDebugMsg(dbg + ` scaled:${w}x${h}`)
+
+      // Anthropic API als Standard für iOS
+      setDebugMsg(dbg + ` scaled:${w}x${h} calling AI...`)
+      const base64 = canvas.toDataURL('image/jpeg', 0.9).split(',')[1]
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 100,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: base64 } },
+              { type: 'text', text: 'What is the barcode number in this image? Reply with ONLY the number, nothing else. If there is no barcode, reply with "none".' }
+            ]
+          }]
         })
-        const barcodes = await detector.detect(bitmap)
-        if (barcodes.length > 0) { onClose(); onResult(barcodes[0].rawValue); return }
-      } else {
-        // Bild auf max 1280px verkleinern für bessere Erkennung
-        const maxSize = 1280
-        const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height))
-        const w = Math.round(bitmap.width * scale)
-        const h = Math.round(bitmap.height * scale)
-        const canvas = document.createElement('canvas')
-        canvas.width = w
-        canvas.height = h
-        canvas.getContext('2d').drawImage(bitmap, 0, 0, w, h)
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.9)
-        const img = new Image()
-        img.src = dataUrl
-        await new Promise(r => { img.onload = r })
-        setDebugMsg(prev => prev + ` scaled:${w}x${h}`)
-        const reader = new BrowserMultiFormatReader()
-        const result = await reader.decodeFromImageElement(img)
-        onClose(); onResult(result.getText()); return
+      })
+      const data = await response.json()
+      const barcode = data.content?.[0]?.text?.trim()
+      setDebugMsg(dbg + ` scaled:${w}x${h} ai:${barcode}`)
+      if (barcode && barcode !== 'none' && /^[0-9]+$/.test(barcode)) {
+        onClose(); onResult(barcode); return
       }
       throw new Error('not found')
     } catch (err) {
       setDebugMsg(prev => prev + ' ERR:' + (err?.message || 'unknown'))
       setError(t.barcodeNotFound ?? 'Kein Barcode gefunden. Bitte erneut versuchen.')
       setScanning(false)
-      if (fileRef.current) fileRef.current.value = ''
     }
   }
 
