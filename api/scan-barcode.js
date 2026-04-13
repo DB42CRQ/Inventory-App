@@ -23,6 +23,7 @@ export default async function handler(req, res) {
     const barcode = response.content[0]?.text?.trim()
     return res.status(200).json({ barcode })
   } catch (err) {
+    console.error('[scan-barcode] error:', err.message)
     return res.status(500).json({ error: err.message })
   }
 }
