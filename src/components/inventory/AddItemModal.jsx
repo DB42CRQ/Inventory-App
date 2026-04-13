@@ -4,7 +4,7 @@ import { Modal, Input, Button } from '../ui'
 
 const UNITS = ['Stück', 'g', 'kg', 'ml', 'l', 'Packung', 'Flasche', 'Dose', 'Beutel']
 
-export function AddItemModal({ open, onClose, categories, onAdd }) {
+export function AddItemModal({ open, onClose, categories, onAdd, prefill }) {
   const { t, lang } = useTranslation()
   const getCatName = (c) => lang === 'en' ? (c.name_en || c.name) : lang === 'es' ? (c.name_es || c.name) : (c.name_de || c.name)
   const [form, setForm] = useState({ name: '', quantity: '1', unit: 'Stück', category_id: '', min_quantity: '0' })

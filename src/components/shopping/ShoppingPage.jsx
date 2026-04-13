@@ -6,11 +6,52 @@ import { supabase } from '../../lib/supabase'
 import { useInventory } from '../../hooks/useInventory'
 import { Spinner, Button } from '../ui'
 import BarcodeScanner from './BarcodeScanner'
+import { AddItemModal } from '../inventory/AddItemModal'
 import BarcodeScanResult from './BarcodeScanResult'
 import { processBarcode } from '../../hooks/useBarcodeScanner'
 
 function CheckModal({ item, onConfirm, onCancel, t }) {
   const [qty, setQty] = useState(item.quantity)
+  const [step, setStep] = useState('qty') // 'qty' | 'inventory'
+  const isNonInventory = !item.item_id
+
+  function handleConfirm() {
+    if (isNonInventory) {
+      setStep('inventory')
+    } else {
+      onConfirm(qty, false)
+    }
+  }
+
+  if (step === 'inventory') {
+    return (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+        onClick={onCancel}>
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+        <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
+          onClick={e => e.stopPropagation()}>
+          <div className="text-2xl mb-2 text-center">📦</div>
+          <h3 className="font-semibold text-gray-900 mb-1 text-center">
+            {t.shoppingAddToInventory ?? 'Zum Inventar hinzufügen?'}
+          </h3>
+          <p className="text-sm text-gray-500 text-center mb-5">
+            {t.shoppingAddToInventoryHint ?? `Möchtest du "${item.name}" dauerhaft ins Inventar aufnehmen?`}
+          </p>
+          <div className="flex gap-2">
+            <button onClick={() => onConfirm(qty, false)}
+              className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+              {t.no ?? 'Nein'}
+            </button>
+            <button onClick={() => onConfirm(qty, true)}
+              className="flex-1 px-4 py-2.5 rounded-xl bg-primary-500 text-white text-sm font-medium hover:bg-primary-600">
+              {t.yes ?? 'Ja'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
       onClick={onCancel}>
@@ -34,7 +75,7 @@ function CheckModal({ item, onConfirm, onCancel, t }) {
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" className="flex-1" onClick={onCancel}>{t.cancel}</Button>
-          <Button className="flex-1" onClick={() => onConfirm(qty)}>
+          <Button className="flex-1" onClick={handleConfirm}>
             ✓ {t.shoppingConfirm ?? 'Gekauft'}
           </Button>
         </div>
@@ -43,7 +84,7 @@ function CheckModal({ item, onConfirm, onCancel, t }) {
   )
 }
 
-function ShoppingItem({ item, onCheck, onUncheck, onRemove, t, lang }) {
+function ShoppingItem({ item, onCheck, onUncheck, onRemove, onAddToInventory, t, lang }) {
   const tr = (unit) => unit === 'Stück' ? (lang === 'en' ? 'piece' : lang === 'es' ? 'pieza' : 'Stück') : unit
   const [showModal, setShowModal] = useState(false)
   return (
@@ -77,7 +118,7 @@ function ShoppingItem({ item, onCheck, onUncheck, onRemove, t, lang }) {
       {showModal && (
         <CheckModal item={item} t={t}
           onCancel={() => setShowModal(false)}
-          onConfirm={(qty) => { onCheck(item, qty); setShowModal(false) }} />
+          onConfirm={(qty, addToInv) => { onCheck(item, qty); if (addToInv) onAddToInventory?.(item.name, qty, item.unit); setShowModal(false) }} />
       )}
     </>
   )
@@ -88,13 +129,14 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
   const { user } = useAuth()
   const { unchecked, checked, loading, addItem, addLowItems,
           checkItem, uncheckItem, removeItem, clearChecked } = useShoppingList(household?.id, sendPush)
-  const { items: inventoryItems, lowItems, categories } = useInventory(household?.id)
+  const { items: inventoryItems, lowItems, categories, addItem: addInventoryItem } = useInventory(household?.id)
 
   const [showAdd,      setShowAdd]      = useState(false)
   const [search,       setSearch]       = useState('')
   const [addedMsg,     setAddedMsg]     = useState('')
   const [confirmClear, setConfirmClear] = useState(false)
-  const [showScanner,  setShowScanner]  = useState(false)
+  const [showScanner,      setShowScanner]      = useState(false)
+  const [addToInventory,   setAddToInventory]   = useState(null) // { name, qty, unit }
   const [scanResult,   setScanResult]   = useState(null)
   const [scanLoading,  setScanLoading]  = useState(false)
 
@@ -128,6 +170,10 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
 
   async function handleCheck(item, qty) {
     await checkItem(item.id, qty, item.item_id)
+  }
+
+  function handleAddToInventory(name, qty, unit) {
+    setAddToInventory({ name, qty, unit })
   }
 
   async function handleUncheck(item) {
@@ -248,6 +294,15 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
               focus:outline-none focus:ring-2 focus:ring-primary-500" />
           {search && (
             <div className="mt-2 flex flex-col gap-1 max-h-48 overflow-y-auto">
+              {search && !filteredInventory.find(i => i.name.toLowerCase() === search.toLowerCase()) && (
+                <button
+                  onClick={() => addItem({ name: search.trim(), quantity: 1, unit: 'Stück', item_id: null })}
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl text-left text-sm
+                    hover:bg-green-50 hover:text-green-700 transition-all border border-dashed border-gray-200">
+                  <span className="text-green-500">+</span>
+                  <span className="flex-1">{t.shoppingAddFree ?? 'Hinzufügen:'} <strong>{search.trim()}</strong></span>
+                </button>
+              )}
               {filteredInventory.length === 0 ? (
                 <p className="text-sm text-gray-400 text-center py-2">{t.noItemsFound}</p>
               ) : filteredInventory.map(item => {
@@ -284,7 +339,7 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
             <div className="flex flex-col gap-2">
               {unchecked.map(item => (
                 <ShoppingItem key={item.id} item={item} t={t} lang={lang}
-                  onCheck={handleCheck} onUncheck={handleUncheck} onRemove={removeItem} />
+                  onCheck={handleCheck} onUncheck={handleUncheck} onRemove={removeItem} onAddToInventory={handleAddToInventory} />
               ))}
               {checked.length > 0 && (
                 <>
@@ -317,7 +372,21 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
         </div>
       )}
 
-      {/* Scan Result */}
+      {/* Add to Inventory Modal */}
+    {addToInventory && (
+      <AddItemModal
+        open={!!addToInventory}
+        onClose={() => setAddToInventory(null)}
+        categories={categories}
+        onAdd={async (item) => {
+          await addInventoryItem(item)
+          setAddToInventory(null)
+        }}
+        prefill={addToInventory}
+      />
+    )}
+
+    {/* Scan Result */}
       {scanResult && (
         <BarcodeScanResult
           result={scanResult}
