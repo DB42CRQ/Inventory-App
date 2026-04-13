@@ -3,6 +3,7 @@ import { useTranslation } from '../../i18n/useTranslation'
 import { useShoppingList } from '../../hooks/useShoppingList'
 import { useAuth } from '../../hooks/useAuth'
 import { supabase } from '../../lib/supabase'
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
 import { useInventory } from '../../hooks/useInventory'
 import { Spinner, Button } from '../ui'
 import BarcodeScanner from './BarcodeScanner'
@@ -136,6 +137,7 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
   const [addedMsg,     setAddedMsg]     = useState('')
   const [confirmClear, setConfirmClear] = useState(false)
   const [showScanner,      setShowScanner]      = useState(false)
+  const [scanMode,         setScanMode]         = useState(null) // 'barcode' | 'ai'
   const [addToInventory,   setAddToInventory]   = useState(null) // { name, qty, unit }
   const [scanResult,   setScanResult]   = useState(null)
   const [scanLoading,  setScanLoading]  = useState(false)
@@ -225,7 +227,7 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
         <h1 className="font-bold text-gray-900 text-lg flex-1">
           🛒 {t.shoppingTitle ?? 'Einkaufsliste'}
         </h1>
-        <button onClick={() => setShowScanner(true)}
+        <button onClick={() => { if (isIOS) { setScanMode('ai'); setShowScanner(true) } else setScanMode('picker') }}
           className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
             flex items-center justify-center text-lg">
           📷
@@ -374,8 +376,39 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
       </main>
 
       {/* Scanner */}
+      {/* Android: Scan-Modus wählen */}
+      {scanMode === 'picker' && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+          onClick={() => setScanMode(null)}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6"
+            onClick={e => e.stopPropagation()}>
+            <h3 className="font-semibold text-gray-900 mb-1">{t.scanChooseMode ?? 'Wie möchtest du scannen?'}</h3>
+            <p className="text-sm text-gray-400 mb-5">{t.scanChooseModeHint ?? 'Wähle eine Methode zum Hinzufügen'}</p>
+            <div className="flex flex-col gap-3">
+              <button onClick={() => { setScanMode('barcode'); setShowScanner(true) }}
+                className="flex items-center gap-4 px-4 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all text-left">
+                <span className="text-2xl">barcode_scanner</span>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{t.scanModeBarcode ?? 'Barcode scannen'}</p>
+                  <p className="text-xs text-gray-400">{t.scanModeBarcodeHint ?? 'Scanne den EAN-Barcode des Produkts'}</p>
+                </div>
+              </button>
+              <button onClick={() => { setScanMode('ai'); setShowScanner(true) }}
+                className="flex items-center gap-4 px-4 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all text-left">
+                <span className="text-2xl">🤖</span>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{t.scanModeAI ?? 'KI-Produkterkennung'}</p>
+                  <p className="text-xs text-gray-400">{t.scanModeAIHint ?? 'Fotografiere das Produkt, KI erkennt es automatisch'}</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showScanner && (
-        <BarcodeScanner onResult={handleScan} onClose={() => setShowScanner(false)} inventoryItems={inventoryItems} />
+        <BarcodeScanner onResult={handleScan} onClose={() => { setShowScanner(false); setScanMode(null) }} inventoryItems={inventoryItems} scanMode={scanMode} />
       )}
 
       {/* Loading */}

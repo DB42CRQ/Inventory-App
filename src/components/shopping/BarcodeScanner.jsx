@@ -5,7 +5,7 @@ import { BrowserMultiFormatReader, NotFoundException, ChecksumException, FormatE
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
 const useNative = 'BarcodeDetector' in window
 
-export default function BarcodeScanner({ onResult, onClose, inventoryItems = [] }) {
+export default function BarcodeScanner({ onResult, onClose, inventoryItems = [], scanMode = 'barcode' }) {
   const { t } = useTranslation()
   const videoRef    = useRef(null)
   const streamRef   = useRef(null)
@@ -16,8 +16,10 @@ export default function BarcodeScanner({ onResult, onClose, inventoryItems = [] 
   const [scanning, setScanning] = useState(false)
   const [debugMsg, setDebugMsg] = useState('')
 
+  const useAI = isIOS || scanMode === 'ai'
+
   useEffect(() => {
-    if (!isIOS) {
+    if (!useAI) {
       startCamera()
       return cleanup
     }
@@ -126,7 +128,7 @@ export default function BarcodeScanner({ onResult, onClose, inventoryItems = [] 
     }
   }
 
-  if (isIOS) {
+  if (useAI) {
     return (
       <div className="fixed inset-0 z-50 bg-black flex flex-col">
         <div className="flex items-center justify-between px-4 py-3 shrink-0">
