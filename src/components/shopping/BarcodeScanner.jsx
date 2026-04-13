@@ -134,7 +134,7 @@ export default function BarcodeScanner({ onResult, onClose, inventoryItems = [],
         <div className="flex items-center justify-between px-4 py-3 shrink-0">
           <button onClick={onClose}
             className="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center text-xl">×</button>
-          <p className="text-white text-sm font-medium">{t.barcodeScanTitle ?? 'Barcode scannen'}</p>
+          <p className="text-white text-sm font-medium">{t.scanModeAI ?? 'KI-Produkterkennung'}</p>
           <div className="w-9" />
         </div>
         <div className="flex-1 flex flex-col items-center justify-center gap-6 px-8">
