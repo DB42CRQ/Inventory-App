@@ -160,7 +160,7 @@ export default function BarcodeScanner({ onResult, onClose, inventoryItems = [],
             ) : (
               <><span>📸</span> {t.barcodeTakePhoto ?? 'Foto aufnehmen'}</>
             )}
-            <input type="file" accept="image/*" capture="environment"
+            <input type="file" accept="image/*"
               className="hidden" onChange={handleFile} disabled={scanning} />
           </label>
         </div>
