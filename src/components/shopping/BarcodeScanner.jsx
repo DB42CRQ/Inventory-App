@@ -114,13 +114,11 @@ export default function BarcodeScanner({ onResult, onClose, inventoryItems = [],
         body: JSON.stringify({ image: base64, inventoryItems })
       })
       const data = await response.json()
-      setDebugMsg(dbg + ` scaled:${w}x${h} product:${data.productName} match:${data.matchedItem}`)
-      if (data.productName) {
-        onClose()
-        onResult({ productName: data.productName, matchedItemName: data.matchedItem })
-        return
-      }
-      throw new Error('not found')
+      setDebugMsg(dbg + ` scaled:${w}x${h} product:${data.productName} match:${data.matchedItem} err:${data.error}`)
+      if (data.error) throw new Error(data.error)
+      if (!data.productName || data.productName === 'none') throw new Error('not found')
+      onClose()
+      onResult({ productName: data.productName, matchedItemName: data.matchedItem })
     } catch (err) {
       setDebugMsg(prev => prev + ' ERR:' + (err?.message || 'unknown'))
       setError(t.barcodeNotFound ?? 'Kein Barcode gefunden. Bitte erneut versuchen.')
