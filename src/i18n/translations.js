@@ -234,7 +234,7 @@ export const translations = {
     barcodeNoMatchHint: 'Dieser Artikel ist nicht in deinem Inventar. Möchtest du ihn hinzufügen?',
     barcodeSearching: 'Suche Produkt…',
     barcodeScanTitle: 'Barcode scannen',
-    barcodeIosHint: 'Fotografiere den Barcode mit der Kamera. Das Bild wird automatisch ausgewertet.',
+    barcodeIosHint: 'Fotografiere das Produkt — die KI erkennt es automatisch und sucht den passenden Artikel in deinem Inventar.',
     barcodeTakePhoto: 'Foto aufnehmen',
     barcodeScanning: 'Analysiere…',
     barcodeNotFound: 'Kein Barcode gefunden. Bitte erneut versuchen.',

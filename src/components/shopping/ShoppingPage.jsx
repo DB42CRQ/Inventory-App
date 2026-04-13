@@ -163,6 +163,7 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
   }
 
   async function handleScan(barcodeOrResult) {
+    console.log('[handleScan] input:', typeof barcodeOrResult, barcodeOrResult)
     setShowScanner(false)
     setScanLoading(true)
     let result
@@ -388,7 +389,7 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
             <div className="flex flex-col gap-3">
               <button onClick={() => { setScanMode('barcode'); setShowScanner(true) }}
                 className="flex items-center gap-4 px-4 py-3 rounded-2xl border border-gray-200 hover:bg-gray-50 transition-all text-left">
-                <span className="text-2xl">📊</span>
+                <span className="text-xl font-black tracking-tighter text-gray-800 font-mono">▌▌▌▌▐▌▌▐▌</span>
                 <div>
                   <p className="text-sm font-medium text-gray-900">{t.scanModeBarcode ?? 'Barcode scannen'}</p>
                   <p className="text-xs text-gray-400">{t.scanModeBarcodeHint ?? 'Scanne den EAN-Barcode des Produkts'}</p>
