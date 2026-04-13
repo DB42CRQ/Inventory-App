@@ -78,8 +78,9 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Tippe auf das 🛒-Symbol oben rechts um die Einkaufsliste zu öffnen.' },
         { type: 'step', n: 2, text: 'Mit "⚠️ Alle niedrigen" werden alle Artikel mit niedrigem Bestand auf einmal hinzugefügt. Mit dem Dropdown darunter nur eine bestimmte Kategorie.' },
-        { type: 'step', n: 3, text: 'Mit "+ Aus Inventar" kannst du einzelne Artikel suchen und hinzufügen.' },
+        { type: 'step', n: 3, text: 'Mit "+ Aus Inventar" kannst du Artikel aus dem Inventar suchen und hinzufügen. Wenn ein Artikel nicht im Inventar ist, erscheint ein grüner "+ Hinzufügen" Button — damit landet er direkt auf der Liste.' },
         { type: 'step', n: 4, text: 'Tippe einen Artikel an um ihn abzuhaken — gib die gekaufte Menge ein und bestätige. Der Bestand im Inventar wird sofort aktualisiert.' },
+        { type: 'step', n: 5, text: 'Bei Einmalkäufen (nicht im Inventar) wird nach dem Abhaken gefragt ob der Artikel dauerhaft ins Inventar aufgenommen werden soll.' },
         { type: 'step', n: 5, text: 'Abgehakte Artikel erscheinen durchgestrichen unten. Mit "🗑 Leeren" kannst du erledigte oder alle Artikel löschen.' },
         { type: 'step', n: 6, text: 'Mit dem 📷-Button oben rechts kannst du einen Barcode scannen — der Artikel wird automatisch im Inventar gesucht und der Bestand direkt aktualisiert.' },
         { type: 'tip', text: 'Die Einkaufsliste ist für alle Haushaltsmitglieder geteilt — Änderungen sind in Echtzeit sichtbar.' },
@@ -191,8 +192,9 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Tap the 🛒 icon in the top right to open the shopping list.' },
         { type: 'step', n: 2, text: '"⚠️ All low stock" adds all low-stock items at once. Use the dropdown below to add only a specific category.' },
-        { type: 'step', n: 3, text: '"+ From inventory" lets you search and add individual items.' },
+        { type: 'step', n: 3, text: '"+ From inventory" lets you search and add items. If an item is not in your inventory, a green "+ Add" button appears — this adds it directly to the list.' },
         { type: 'step', n: 4, text: 'Tap an item to check it off — enter the purchased quantity and confirm. The inventory stock is updated immediately.' },
+        { type: 'step', n: 5, text: 'For one-time purchases (not in inventory), you will be asked after checking off whether to permanently add the item to your inventory.' },
         { type: 'step', n: 5, text: 'Checked items appear crossed out at the bottom. Use "🗑 Clear" to delete done or all items.' },
         { type: 'step', n: 6, text: 'Use the 📷 button in the top right to scan a barcode — the item is automatically matched against your inventory and the stock is updated directly.' },
         { type: 'tip', text: 'The shopping list is shared with all household members — changes are visible in real time.' },
@@ -302,8 +304,9 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Toca el icono 🛒 arriba a la derecha para abrir la lista de compras.' },
         { type: 'step', n: 2, text: '"⚠️ Todos los bajos" añade todos los artículos con stock bajo de una vez. Usa el desplegable para añadir solo una categoría.' },
-        { type: 'step', n: 3, text: '"+ Del inventario" te permite buscar y añadir artículos individuales.' },
+        { type: 'step', n: 3, text: '"+ Del inventario" te permite buscar y añadir artículos. Si un artículo no está en tu inventario, aparece un botón verde "+ Añadir" — esto lo añade directamente a la lista.' },
         { type: 'step', n: 4, text: 'Toca un artículo para marcarlo — introduce la cantidad comprada y confirma. El stock del inventario se actualiza inmediatamente.' },
+        { type: 'step', n: 5, text: 'Para compras únicas (no en el inventario), después de marcar se preguntará si deseas añadir el artículo permanentemente al inventario.' },
         { type: 'step', n: 5, text: 'Los artículos marcados aparecen tachados abajo. Con "🗑 Vaciar" puedes eliminar los completados o todos.' },
         { type: 'step', n: 6, text: 'Usa el botón 📷 arriba a la derecha para escanear un código de barras — el artículo se busca automáticamente en tu inventario y el stock se actualiza directamente.' },
         { type: 'tip', text: 'La lista de compras es compartida por todos los miembros del hogar — los cambios son visibles en tiempo real.' },
