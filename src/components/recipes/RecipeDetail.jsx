@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 import { Button } from '../ui'
 import AddRecipeModal from './AddRecipeModal'
+import { ImagePickerModal } from './AddRecipeModal'
 
 export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inventoryItems, addToShoppingList, uploadImage, categories }) {
   const { t, lang } = useTranslation()
@@ -17,8 +18,9 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
     if (lang === 'es' && ing.name_es) return ing.name_es
     return ing.name_de || ing.name || ''
   }
-  const [confirm,   setConfirm]   = useState(false)
-  const [showEdit,   setShowEdit]   = useState(false)
+  const [confirm,      setConfirm]      = useState(false)
+  const [showEdit,     setShowEdit]     = useState(false)
+  const [showImgPicker, setShowImgPicker] = useState(false)
   const [adding,    setAdding]    = useState(false)
   const [added,     setAdded]     = useState(false)
 
@@ -73,9 +75,17 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
 
       <main className="flex-1 overflow-y-auto">
         {/* Bild */}
-        {recipe.image_url && (
-          <img src={recipe.image_url} alt={recipe.name} className="w-full h-52 object-cover" />
-        )}
+        <div className="relative">
+          {recipe.image_url
+            ? <img src={recipe.image_url} alt={recipe.name} className="w-full h-52 object-cover" />
+            : <div className="w-full h-36 bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center text-5xl">🍳</div>
+          }
+          <button onClick={() => setShowImgPicker(true)}
+            className="absolute bottom-2 right-2 px-3 py-1.5 rounded-xl bg-black/50 text-white
+              text-xs font-medium hover:bg-black/70 transition-all">
+            🖼️ {t.recipesChangeImage ?? 'Bild ändern'}
+          </button>
+        </div>
 
         <div className="px-4 py-4 flex flex-col gap-4">
           {/* Meta */}
@@ -147,6 +157,20 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
           </div>
         </div>
       </main>
+    {showImgPicker && (
+        <ImagePickerModal
+          recipeName={recipe.name}
+          currentImage={recipe.image_url}
+          onSelect={async (url) => {
+            await onUpdate({ ...recipe, image_url: url, ingredients: recipe.recipe_ingredients })
+            setShowImgPicker(false)
+          }}
+          onClose={() => setShowImgPicker(false)}
+          uploadImage={uploadImage}
+          t={t}
+        />
+      )}
+
     {showEdit && (
         <AddRecipeModal
           onClose={() => setShowEdit(false)}

@@ -21,7 +21,8 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
       : [{ name: '', quantity: '', unit: '' }]
   )
   const [newCat,     setNewCat]     = useState(false)
-  const [showCamera, setShowCamera] = useState(false)
+  const [showCamera,      setShowCamera]      = useState(false)
+  const [showImagePicker, setShowImagePicker] = useState(false)
   const videoRef    = useRef(null)
   const streamRef   = useRef(null)
 
@@ -148,8 +149,23 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
       } catch {}
     }
 
+    // Unsplash Bild holen wenn keins gesetzt
+    let image_url = form.image_url
+    if (!image_url && form.name) {
+      try {
+        const imgRes = await fetch('/api/recipe-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: form.name })
+        })
+        const imgData = await imgRes.json()
+        if (imgData.photos?.length > 0) image_url = imgData.photos[0].url
+      } catch {}
+    }
+
     await onSave({
       ...form,
+      image_url,
       category: category_de,
       category_de,
       category_en,
@@ -220,6 +236,29 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
 
         {/* Grunddaten */}
         <div className="bg-white rounded-2xl border border-gray-100 p-4 flex flex-col gap-3">
+          {/* Bild */}
+          <div className="flex gap-3 items-center">
+            <div className="w-20 h-20 rounded-xl overflow-hidden bg-gray-100 shrink-0 flex items-center justify-center">
+              {form.image_url
+                ? <img src={form.image_url} className="w-full h-full object-cover" alt="" />
+                : <span className="text-3xl">🍳</span>
+              }
+            </div>
+            <div className="flex flex-col gap-2 flex-1">
+              <button onClick={() => setShowImagePicker(true)}
+                className="w-full py-2 rounded-xl border border-dashed border-primary-300
+                  bg-primary-50 text-primary-600 text-sm font-medium hover:bg-primary-100 transition-all">
+                🖼️ {form.image_url ? (t.recipesChangeImage ?? 'Bild ändern') : (t.recipesChooseImage ?? 'Bild wählen')}
+              </button>
+              {form.image_url && (
+                <button onClick={() => setForm(f => ({ ...f, image_url: '' }))}
+                  className="text-xs text-gray-400 hover:text-red-400 transition-all">
+                  {t.recipesRemoveImage ?? 'Bild entfernen'}
+                </button>
+              )}
+            </div>
+          </div>
+
           <Input label={t.recipesName ?? 'Name'} value={form.name}
             onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
 
@@ -312,6 +351,17 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
           </button>
         </div>
       </main>
+
+      {showImagePicker && (
+        <ImagePicker
+          recipeName={form.name}
+          currentImage={form.image_url}
+          onSelect={(url) => { setForm(f => ({ ...f, image_url: url })); setShowImagePicker(false) }}
+          onClose={() => setShowImagePicker(false)}
+          uploadImage={uploadImage}
+          t={t}
+        />
+      )}
 
       {showCamera && (
         <RecipeCamera
@@ -418,6 +468,102 @@ function RecipeCamera({ onCapture, onClose, t }) {
           📸 {t.barcodeTakePhoto ?? 'Foto aufnehmen'}
         </button>
       </div>
+    </div>
+  )
+}
+
+export function ImagePickerModal({ recipeName, currentImage, onSelect, onClose, uploadImage, t }) {
+  const [photos,    setPhotos]    = useState([])
+  const [loading,   setLoading]   = useState(false)
+  const [query,     setQuery]     = useState(recipeName || '')
+  const [searched,  setSearched]  = useState(false)
+
+  async function search() {
+    if (!query.trim()) return
+    setLoading(true)
+    try {
+      const res = await fetch('/api/recipe-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+      })
+      const data = await res.json()
+      setPhotos(data.photos ?? [])
+      setSearched(true)
+    } catch {}
+    setLoading(false)
+  }
+
+  async function handleUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setLoading(true)
+    const url = await uploadImage(file)
+    if (url) onSelect(url)
+    setLoading(false)
+  }
+
+  return (
+    <div className="fixed inset-0 z-[60] bg-gray-50 flex flex-col">
+      <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0">
+        <button onClick={onClose}
+          className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">←</button>
+        <h1 className="font-bold text-gray-900 text-lg flex-1">{t.recipesChooseImage ?? 'Bild wählen'}</h1>
+      </header>
+
+      <div className="px-4 py-3 bg-white border-b border-gray-100 shrink-0">
+        <div className="flex gap-2">
+          <input value={query} onChange={e => setQuery(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && search()}
+            placeholder={t.recipesImageSearch ?? 'Suchbegriff…'}
+            className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm
+              focus:outline-none focus:ring-2 focus:ring-primary-500" />
+          <button onClick={search} disabled={loading}
+            className="px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-medium disabled:opacity-50">
+            {loading ? '…' : '🔍'}
+          </button>
+        </div>
+        <label className="mt-2 flex items-center gap-2 text-sm text-primary-600 cursor-pointer">
+          <span>📁 {t.recipesUploadImage ?? 'Eigenes Bild hochladen'}</span>
+          <input type="file" accept="image/*" className="hidden" onChange={handleUpload} />
+        </label>
+      </div>
+
+      <main className="flex-1 overflow-y-auto px-4 py-4">
+        {!searched && !loading && (
+          <div className="flex items-center justify-center h-40 text-gray-400 text-sm">
+            {t.recipesImageHint ?? 'Suche nach einem Bild für dein Rezept'}
+          </div>
+        )}
+        {loading && (
+          <div className="flex items-center justify-center h-40">
+            <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+        {!loading && searched && photos.length === 0 && (
+          <p className="text-center text-gray-400 text-sm mt-8">{t.noItemsFound ?? 'Keine Ergebnisse'}</p>
+        )}
+        <div className="grid grid-cols-3 gap-2">
+          {photos.map((photo, i) => (
+            <button key={i} onClick={() => onSelect(photo.url)}
+              className={`relative rounded-xl overflow-hidden aspect-square
+                ${currentImage === photo.url ? 'ring-2 ring-primary-500' : ''}`}>
+              <img src={photo.thumb} alt="" className="w-full h-full object-cover" />
+              {currentImage === photo.url && (
+                <div className="absolute inset-0 bg-primary-500/20 flex items-center justify-center">
+                  <span className="text-white text-xl">✓</span>
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+        {photos.length > 0 && (
+          <p className="text-xs text-gray-400 text-center mt-4">
+            Fotos von <a href="https://unsplash.com" target="_blank" rel="noopener noreferrer"
+              className="underline">Unsplash</a>
+          </p>
+        )}
+      </main>
     </div>
   )
 }
