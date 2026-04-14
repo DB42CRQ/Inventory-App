@@ -26,12 +26,15 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
 
   // Check which ingredients are already in inventory
   function getInventoryMatch(ing) {
-    const lower = getIngName(ing).toLowerCase()
-    return inventoryItems?.find(item =>
-      item.name.toLowerCase() === lower ||
-      item.name.toLowerCase().includes(lower) ||
-      lower.includes(item.name.toLowerCase())
-    )
+    const ingLower = getIngName(ing).toLowerCase()
+    return inventoryItems?.find(item => {
+      const itemLower = item.name.toLowerCase()
+      // Exact match
+      if (itemLower === ingLower) return true
+      // Inventory name is contained in ingredient name (e.g. "Mehl" in "Weizenmehl")
+      if (ingLower.includes(itemLower) && itemLower.length > 3) return true
+      return false
+    })
   }
 
   const missing = recipe.recipe_ingredients?.filter(i => !getInventoryMatch(i)) ?? []
