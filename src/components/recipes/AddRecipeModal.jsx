@@ -1,10 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
 import { useTranslation } from '../../i18n/useTranslation'
 import { Button, Input } from '../ui'
 
 export default function AddRecipeModal({ onClose, onSave, uploadImage, categories, initialData }) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const [mode,       setMode]       = useState('manual') // 'manual' | 'photo' | 'url'
   const [loading,    setLoading]    = useState(false)
   const [error,      setError]      = useState('')
@@ -267,7 +267,12 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
                     className="w-0 flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm
                       focus:outline-none focus:ring-2 focus:ring-primary-500">
                     <option value="">—</option>
-                    {['g','kg','ml','l','EL','TL','Stück','Prise','Bund','Dose','Packung','Scheibe','Zehe','Becher'].map(u => (
+                    {(lang === 'en'
+                      ? ['g','kg','ml','l','tbsp','tsp','piece','pinch','bunch','can','pack','slice','clove','cup']
+                      : lang === 'es'
+                      ? ['g','kg','ml','l','cda','cdta','pieza','pizca','manojo','lata','paquete','rebanada','diente','taza']
+                      : ['g','kg','ml','l','EL','TL','Stück','Prise','Bund','Dose','Packung','Scheibe','Zehe','Becher']
+                    ).map(u => (
                       <option key={u} value={u}>{u}</option>
                     ))}
                   </select>
@@ -282,6 +287,112 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
           </button>
         </div>
       </main>
+
+      {showCamera && (
+        <RecipeCamera
+          onCapture={async (base64, blob) => {
+            setShowCamera(false)
+            setLoading(true)
+            setError('')
+            try {
+              const response = await fetch('/api/extract-recipe', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: base64 })
+              })
+              const data = await response.json()
+              if (data.error) throw new Error(data.error)
+              applyExtracted(data)
+              const file = new File([blob], 'recipe.jpg', { type: 'image/jpeg' })
+              const url = await uploadImage(file)
+              if (url) setForm(f => ({ ...f, image_url: url }))
+            } catch (err) {
+              setError(err.message)
+            }
+            setLoading(false)
+          }}
+          onClose={() => setShowCamera(false)}
+          t={t}
+        />
+      )}
+    </div>
+  )
+}
+
+function RecipeCamera({ onCapture, onClose, t }) {
+  const videoRef  = useRef(null)
+  const streamRef = useRef(null)
+  const [ready,   setReady]   = useState(false)
+  const [error,   setError]   = useState('')
+
+  useEffect(() => {
+    startCamera()
+    return () => streamRef.current?.getTracks().forEach(tr => tr.stop())
+  }, [])
+
+  async function startCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' } }
+      })
+      streamRef.current = stream
+      videoRef.current.srcObject = stream
+      videoRef.current.playsInline = true
+      videoRef.current.muted = true
+      await videoRef.current.play()
+      setReady(true)
+    } catch {
+      setError(t.barcodeCameraError ?? 'Kamera konnte nicht gestartet werden.')
+    }
+  }
+
+  async function takeSnapshot() {
+    const video = videoRef.current
+    const canvas = document.createElement('canvas')
+    canvas.width = video.videoWidth
+    canvas.height = video.videoHeight
+    canvas.getContext('2d').drawImage(video, 0, 0)
+    streamRef.current?.getTracks().forEach(tr => tr.stop())
+    canvas.toBlob(async blob => {
+      const base64 = await new Promise(res => {
+        const reader = new FileReader()
+        reader.onload = e => res(e.target.result.split(',')[1])
+        reader.readAsDataURL(blob)
+      })
+      onCapture(base64, blob)
+    }, 'image/jpeg', 0.9)
+  }
+
+  return (
+    <div className="fixed inset-0 z-[60] bg-black flex flex-col">
+      <div className="flex items-center justify-between px-4 py-3 shrink-0">
+        <button onClick={() => { streamRef.current?.getTracks().forEach(tr => tr.stop()); onClose() }}
+          className="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center text-xl">×</button>
+        <p className="text-white text-sm font-medium">{t.recipesFromPhoto ?? 'Foto aufnehmen'}</p>
+        <div className="w-9" />
+      </div>
+      <div className="flex-1 relative overflow-hidden">
+        <video ref={videoRef}
+          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          playsInline muted />
+        {!ready && !error && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p className="text-white/60 text-sm">{t.barcodeCameraStarting ?? 'Kamera wird gestartet…'}</p>
+          </div>
+        )}
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p className="text-red-400 text-sm text-center px-8">{error}</p>
+          </div>
+        )}
+      </div>
+      <div className="px-4 py-4 shrink-0">
+        <button onClick={takeSnapshot} disabled={!ready}
+          className="w-full py-4 rounded-2xl bg-primary-500 text-white font-semibold text-lg
+            flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95 transition-all">
+          📸 {t.barcodeTakePhoto ?? 'Foto aufnehmen'}
+        </button>
+      </div>
     </div>
   )
 }
