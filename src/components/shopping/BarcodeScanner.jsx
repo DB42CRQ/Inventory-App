@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
-import { BrowserMultiFormatReader, NotFoundException, ChecksumException, FormatException } from '@zxing/library'
 
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
 const useNative = 'BarcodeDetector' in window
@@ -194,16 +193,18 @@ export default function BarcodeScanner({ onResult, onClose, inventoryItems = [],
         } catch {}
       }, 300)
     } else {
-      const reader = new BrowserMultiFormatReader()
-      intervalRef.current = setInterval(() => {
-        if (doneRef.current || !videoRef.current || videoRef.current.readyState < 2) return
-        try {
-          const result = reader.decodeFromVideoElement(videoRef.current)
-          if (result) { doneRef.current = true; cleanup(); onResult(result.getText()) }
-        } catch (e) {
-          if (!(e instanceof NotFoundException) && !(e instanceof ChecksumException) && !(e instanceof FormatException)) {}
-        }
-      }, 300)
+      import('@zxing/library').then(({ BrowserMultiFormatReader, NotFoundException, ChecksumException, FormatException }) => {
+        const reader = new BrowserMultiFormatReader()
+        intervalRef.current = setInterval(() => {
+          if (doneRef.current || !videoRef.current || videoRef.current.readyState < 2) return
+          try {
+            const result = reader.decodeFromVideoElement(videoRef.current)
+            if (result) { doneRef.current = true; cleanup(); onResult(result.getText()) }
+          } catch (e) {
+            if (!(e instanceof NotFoundException) && !(e instanceof ChecksumException) && !(e instanceof FormatException)) {}
+          }
+        }, 300)
+      })
     }
   }
 
