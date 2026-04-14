@@ -34,7 +34,7 @@ export function useRecipes(householdId) {
 
     if (ingredients?.length > 0) {
       await supabase.from('recipe_ingredients').insert(
-        ingredients.map(i => ({ recipe_id: data.id, name: i.name, quantity: i.quantity || null, unit: i.unit || null, item_id: i.item_id || null }))
+        ingredients.map(i => ({ recipe_id: data.id, name: i.name, name_de: i.name_de || null, name_en: i.name_en || null, name_es: i.name_es || null, quantity: i.quantity || null, unit: i.unit || null, item_id: i.item_id || null }))
       )
     }
     await fetchRecipes()

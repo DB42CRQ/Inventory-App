@@ -11,13 +11,20 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
     if (lang === 'es' && r.category_es) return r.category_es
     return r.category_de || r.category || ''
   }
+
+  function getIngName(ing) {
+    if (lang === 'en' && ing.name_en) return ing.name_en
+    if (lang === 'es' && ing.name_es) return ing.name_es
+    return ing.name_de || ing.name || ''
+  }
   const [confirm,   setConfirm]   = useState(false)
   const [showEdit,   setShowEdit]   = useState(false)
   const [adding,    setAdding]    = useState(false)
   const [added,     setAdded]     = useState(false)
 
   // Check which ingredients are already in inventory
-  function getInventoryMatch(ingredientName) {
+  function getInventoryMatch(ing) {
+    const ingredientName = getIngName(ing)
     const lower = ingredientName.toLowerCase()
     return inventoryItems?.find(item =>
       item.name.toLowerCase() === lower ||
@@ -26,8 +33,8 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
     )
   }
 
-  const missing = recipe.recipe_ingredients?.filter(i => !getInventoryMatch(i.name)) ?? []
-  const available = recipe.recipe_ingredients?.filter(i => getInventoryMatch(i.name)) ?? []
+  const missing = recipe.recipe_ingredients?.filter(i => !getInventoryMatch(i)) ?? []
+  const available = recipe.recipe_ingredients?.filter(i => getInventoryMatch(i)) ?? []
 
   async function addMissingToList() {
     setAdding(true)
@@ -131,7 +138,7 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
                     ${match ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
                     {match ? '✓' : '○'}
                   </span>
-                  <span className="flex-1 text-sm text-gray-800">{ing.name}</span>
+                  <span className="flex-1 text-sm text-gray-800">{getIngName(ing)}</span>
                   <span className="text-sm text-gray-400">
                     {ing.quantity ? `${ing.quantity} ${ing.unit || ''}` : ing.unit || ''}
                   </span>

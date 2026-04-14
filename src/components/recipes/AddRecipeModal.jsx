@@ -107,6 +107,8 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
   async function handleSave() {
     if (!form.name.trim()) return
     setLoading(true)
+
+    // Kategorie übersetzen
     let category_de = form.category || null
     let category_en = null
     let category_es = null
@@ -123,13 +125,36 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
         category_es = data.es || null
       } catch {}
     }
+
+    // Zutaten übersetzen
+    const validIngredients = ingredients.filter(i => i.name.trim())
+    let translatedIngredients = validIngredients
+    if (validIngredients.length > 0) {
+      try {
+        const res = await fetch('/api/translate-ingredients', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ingredients: validIngredients.map(i => i.name) })
+        })
+        const data = await res.json()
+        if (data.translations) {
+          translatedIngredients = validIngredients.map((ing, i) => ({
+            ...ing,
+            name_de: data.translations[i]?.de || ing.name,
+            name_en: data.translations[i]?.en || null,
+            name_es: data.translations[i]?.es || null,
+          }))
+        }
+      } catch {}
+    }
+
     await onSave({
       ...form,
       category: category_de,
       category_de,
       category_en,
       category_es,
-      ingredients: ingredients.filter(i => i.name.trim()),
+      ingredients: translatedIngredients,
     })
     setLoading(false)
   }
