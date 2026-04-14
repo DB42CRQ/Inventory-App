@@ -24,6 +24,7 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
   const [adding,    setAdding]    = useState(false)
   const [added,     setAdded]     = useState(false)
 
+
   // Check which ingredients are already in inventory
   function getInventoryMatch(ing) {
     const ingLower = getIngName(ing).toLowerCase()
@@ -37,12 +38,31 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
     })
   }
 
-  const missing = recipe.recipe_ingredients?.filter(i => !getInventoryMatch(i)) ?? []
-  const available = recipe.recipe_ingredients?.filter(i => getInventoryMatch(i)) ?? []
+  // Initialize checkedOff based on inventory match
+  const [checkedOff, setCheckedOff] = useState(() => new Set(
+    (recipe.recipe_ingredients || [])
+      .filter(i => !!inventoryItems?.find(item => {
+        const ingLower = getIngName(i).toLowerCase()
+        const itemLower = item.name.toLowerCase()
+        return itemLower === ingLower || (ingLower.includes(itemLower) && itemLower.length > 3)
+      }))
+      .map(i => i.id)
+  ))
+
+  function toggleIngredient(id) {
+    setCheckedOff(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const toAdd = recipe.recipe_ingredients?.filter(i => !checkedOff.has(i.id)) ?? []
 
   async function addMissingToList() {
     setAdding(true)
-    for (const ing of missing) {
+    for (const ing of toAdd) {
       await addToShoppingList({
         name: ing.name,
         quantity: ing.quantity || 1,
@@ -112,7 +132,7 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
           </div>
 
           {/* Einkaufsliste Button */}
-          {missing.length > 0 && (
+          {toAdd.length > 0 && (
             <button onClick={addMissingToList} disabled={adding || added}
               className={`w-full py-3.5 rounded-2xl font-semibold text-sm transition-all
                 flex items-center justify-center gap-2
@@ -124,12 +144,12 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
               ) : added ? (
                 <>✅ {t.recipesAddedToList ?? 'Zur Einkaufsliste hinzugefügt!'}</>
               ) : (
-                <>🛒 {missing.length} {t.recipesMissingToList ?? 'fehlende Zutaten auf die Liste'}</>
+                <>🛒 {toAdd.length} {t.recipesMissingToList ?? 'Zutaten auf die Liste'}</>
               )}
             </button>
           )}
 
-          {missing.length === 0 && recipe.recipe_ingredients?.length > 0 && (
+          {toAdd.length === 0 && recipe.recipe_ingredients?.length > 0 && (
             <div className="bg-green-50 border border-green-100 rounded-2xl px-4 py-3 text-sm text-green-700 text-center">
               ✅ {t.recipesAllAvailable ?? 'Alle Zutaten sind im Inventar vorhanden!'}
             </div>
