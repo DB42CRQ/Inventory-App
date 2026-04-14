@@ -23,10 +23,11 @@ export function useRecipes(householdId) {
     setLoading(false)
   }
 
-  async function addRecipe({ name, category, image_url, source_url, servings, ingredients }) {
+  async function addRecipe({ name, category, category_de, category_en, category_es, image_url, source_url, servings, ingredients }) {
+    console.log('[addRecipe] category:', category, 'de:', category_de, 'en:', category_en, 'es:', category_es)
     const { data, error } = await supabase
       .from('recipes')
-      .insert({ household_id: householdId, name, category: category || null, image_url: image_url || null, source_url: source_url || null, servings: servings || 4, created_by: user.id })
+      .insert({ household_id: householdId, name, category: category || null, category_de: category_de || null, category_en: category_en || null, category_es: category_es || null, image_url: image_url || null, source_url: source_url || null, servings: servings || 4, created_by: user.id })
       .select()
       .single()
     if (error || !data) return { error }
@@ -40,8 +41,8 @@ export function useRecipes(householdId) {
     return { error: null, id: data.id }
   }
 
-  async function updateRecipe(id, { name, category, servings, ingredients }) {
-    await supabase.from('recipes').update({ name, category: category || null, servings }).eq('id', id)
+  async function updateRecipe(id, { name, category, category_de, category_en, category_es, servings, ingredients }) {
+    await supabase.from('recipes').update({ name, category: category || null, category_de: category_de || null, category_en: category_en || null, category_es: category_es || null, servings }).eq('id', id)
     if (ingredients) {
       await supabase.from('recipe_ingredients').delete().eq('recipe_id', id)
       if (ingredients.length > 0) {
