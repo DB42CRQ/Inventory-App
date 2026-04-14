@@ -92,20 +92,20 @@ export function useVersions(sendPush) {
     console.log('[publishVersion] called, id:', id, 'sendPushRef:', !!sendPushRef.current)
     const { error } = await supabase.from('versions').update({ is_draft: false }).eq('id', id)
     if (!error) {
-      const updated = versions.map(v => v.id === id ? { ...v, is_draft: false } : v)
-      setVersions(updated)
-      const justPublished = updated.find(v => v.id === id)
-      if (justPublished) {
-        const alreadySeen = justPublished.version_views?.some(v => v.profile_id === user.id)
-        setNewVersion(alreadySeen ? null : justPublished)
-        // Feedback auf published setzen + Push server-seitig
-        await fetch('/api/publish-feedback', {
+      await fetchVersions()
+      // Feedback auf published setzen + Push server-seitig (immer, unabhängig vom lokalen State)
+      try {
+        const res = await fetch('/api/publish-feedback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ version_id: id })
         })
-        console.log('[publishVersion] publish-feedback called')
+        console.log('[publishVersion] publish-feedback status:', res.status)
+      } catch (err) {
+        console.error('[publishVersion] publish-feedback error:', err.message)
       }
+    } else {
+      console.error('[publishVersion] supabase error:', error.message)
     }
     return { error }
   }
