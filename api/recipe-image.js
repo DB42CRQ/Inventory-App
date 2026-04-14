@@ -18,13 +18,13 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
           max_tokens: 50,
-          messages: [{ role: 'user', content: `Translate this recipe name to German for a photo search. Return ONLY the German translation, nothing else: "${query}"` }]
+          messages: [{ role: 'user', content: `Convert this recipe name to a short English search term (1-3 words) suitable for finding a food photo on Unsplash. Focus on the main ingredient or dish type. Return ONLY the English search term, nothing else: "${query}"` }]
         })
       })
       const tData = await translateRes.json()
       const translated = tData.content?.[0]?.text?.trim()
       if (translated) searchQuery = translated
-      console.log(`[recipe-image] original: "${query}" → translated: "${searchQuery}"`)
+      console.log(`[recipe-image] original: "${query}" → search term: "${searchQuery}"`)
     } catch (e) {
       console.log(`[recipe-image] translation failed: ${e.message}, using original: "${query}"`)
     }
