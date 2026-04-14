@@ -8,18 +8,20 @@ import { ItemCard } from './ItemCard'
 import { AddItemModal } from './AddItemModal'
 import { EditItemModal } from './EditItemModal'
 import { CategoryModal } from './CategoryModal'
+import { lazy, Suspense } from 'react'
 import { MembersPanel } from '../household/MembersPanel'
 import HouseholdSetup from '../household/HouseholdSetup'
-import { VersionModal } from '../versions/VersionModal'
-import WikiPage from '../wiki/WikiPage'
 import { VersionBanner } from '../versions/VersionBanner'
 import { useVersions } from '../../hooks/useVersions'
 import { useDeveloper } from '../../hooks/useDeveloper'
 import { FeedbackButton } from '../ui/FeedbackButton'
 import { usePushNotifications } from '../../hooks/usePushNotifications'
-import NotificationSettings from '../ui/NotificationSettings'
-import ShoppingPage from '../shopping/ShoppingPage'
 import { InstallSection } from '../ui/InstallBanner'
+
+const WikiPage            = lazy(() => import('../wiki/WikiPage'))
+const VersionModal        = lazy(() => import('../versions/VersionModal').then(m => ({ default: m.VersionModal })))
+const NotificationSettings = lazy(() => import('../ui/NotificationSettings'))
+const ShoppingPage        = lazy(() => import('../shopping/ShoppingPage'))
 
 export default function InventoryPage() {
   const { profile, signOut }                                = useAuth()
@@ -319,6 +321,7 @@ export default function InventoryPage() {
       {showShopping && <ShoppingPage onClose={() => setShowShopping(false)} household={household} sendPush={sendPush} />}
 
       {showNotifSettings && (
+        <Suspense fallback={null}>
         <NotificationSettings
           onClose={() => setShowNotifSettings(false)}
           pushSupported={pushSupported}
@@ -327,6 +330,7 @@ export default function InventoryPage() {
           unsubscribe={pushUnsubscribe}
           sendPush={sendPush}
         />
+        </Suspense>
       )}
 
       {showMembers && (
