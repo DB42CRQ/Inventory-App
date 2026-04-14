@@ -318,7 +318,7 @@ export default function InventoryPage() {
         </div>
       </Modal>
 
-      {showShopping && <ShoppingPage onClose={() => setShowShopping(false)} household={household} sendPush={sendPush} />}
+      {showShopping && <Suspense fallback={null}><ShoppingPage onClose={() => setShowShopping(false)} household={household} sendPush={sendPush} /></Suspense>}
 
       {showNotifSettings && (
         <Suspense fallback={null}>
@@ -349,7 +349,7 @@ export default function InventoryPage() {
 
       <FeedbackButton forceOpen={showFeedbackModal} onForceClose={() => setShowFeedbackModal(false)} />
 
-      {showWiki && <WikiPage onClose={() => setShowWiki(false)} />}
+      {showWiki && <Suspense fallback={null}><WikiPage onClose={() => setShowWiki(false)} /></Suspense>}
 
       {newVersion && dismissed !== newVersion.id && (
         <VersionBanner
@@ -359,6 +359,7 @@ export default function InventoryPage() {
         />
       )}
 
+      <Suspense fallback={null}>
       <VersionModal
         open={showVersions}
         onClose={() => setShowVersions(false)}
@@ -370,6 +371,7 @@ export default function InventoryPage() {
         updateDraftNotes={updateDraftNotes}
         deleteVersion={deleteVersion}
       />
+      </Suspense>
 
       <AddItemModal open={showAdd} onClose={() => setShowAdd(false)}
         categories={categories} onAdd={addItem} />
