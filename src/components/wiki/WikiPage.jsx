@@ -137,6 +137,21 @@ const WIKI_CONTENT = {
       ]
     },
     {
+      title: '🍳 Rezepte',
+      content: [
+        { type: 'step', n: 1, text: 'Tippe auf das 🍳-Symbol in der Navigation um die Rezepte zu öffnen.' },
+        { type: 'step', n: 2, text: 'Mit dem + Button oben rechts legst du ein neues Rezept an.' },
+        { type: 'step', n: 3, text: 'Rezepte importieren: Tippe auf "Foto" um ein Rezeptfoto aufzunehmen — die KI erkennt Name, Zutaten und Mengen automatisch. Oder gib eine URL ein (z.B. von chefkoch.de oder lecker.de) und tippe auf →.' },
+        { type: 'step', n: 4, text: 'Alternativ kannst du das Rezept manuell anlegen: Name, Kategorie, Portionen und Zutaten eingeben.' },
+        { type: 'step', n: 5, text: 'Beim Speichern wird automatisch ein passendes Bild von Unsplash gesucht, falls du keins gewählt hast. Du kannst das Bild auch selbst wählen oder hochladen.' },
+        { type: 'step', n: 6, text: 'Tippe auf ein Rezept um die Details zu sehen. Fehlende Zutaten werden markiert und können per Knopfdruck direkt auf die Einkaufsliste gesetzt werden.' },
+        { type: 'tip', text: 'Kategorien entstehen automatisch wenn du eine neue Kategorie beim Anlegen eingibst. Mit dem 🏷️ Button kannst du Kategorien umbenennen oder löschen.' },
+        { type: 'tip', text: 'Mit dem 🔍 Button kannst du nach Rezepten mit bestimmten Zutaten filtern — praktisch wenn du weißt was im Kühlschrank ist.' },
+        { type: 'tip', text: 'Mit dem ✏️ Button in der Detailansicht kannst du ein Rezept nachträglich bearbeiten.' },
+        { type: 'tip', text: 'Name, Kategorie und Zutaten werden automatisch in alle drei Sprachen übersetzt.' },
+      ]
+    },
+    {
       title: '🔔 Benachrichtigungen',
       content: [
         { type: 'step', n: 1, text: 'Öffne ⚙️ Einstellungen → Benachrichtigungen um Push-Benachrichtigungen zu verwalten.' },
@@ -246,6 +261,21 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: 'For bugs, you can optionally attach a screenshot.' },
         { type: 'step', n: 4, text: 'Via "View my suggestions" you can see the status of your submissions.' },
         { type: 'tip', text: 'When status is "Deployed", the related version is shown.' },
+      ]
+    },
+    {
+      title: '🍳 Recipes',
+      content: [
+        { type: 'step', n: 1, text: 'Tap the 🍳 icon in the navigation to open recipes.' },
+        { type: 'step', n: 2, text: 'Use the + button in the top right to add a new recipe.' },
+        { type: 'step', n: 3, text: 'Import recipes: tap "Photo" to take a photo of a recipe — the AI automatically recognizes the name, ingredients and quantities. Or enter a URL (e.g. from a recipe website) and tap →.' },
+        { type: 'step', n: 4, text: 'Alternatively, you can add the recipe manually: enter name, category, servings and ingredients.' },
+        { type: 'step', n: 5, text: 'When saving, a matching image from Unsplash is automatically fetched if you haven't chosen one. You can also choose or upload your own image.' },
+        { type: 'step', n: 6, text: 'Tap a recipe to see the details. Missing ingredients are highlighted and can be added to the shopping list with one tap.' },
+        { type: 'tip', text: 'Categories are created automatically when you enter a new category name. Use the 🏷️ button to rename or delete categories.' },
+        { type: 'tip', text: 'The 🔍 button lets you filter recipes by ingredient — useful when you know what's in the fridge.' },
+        { type: 'tip', text: 'Use the ✏️ button in the detail view to edit a recipe.' },
+        { type: 'tip', text: 'Name, category and ingredients are automatically translated into all three languages.' },
       ]
     },
     {
@@ -363,6 +393,21 @@ const WIKI_CONTENT = {
       ]
     },
     {
+      title: '🍳 Recetas',
+      content: [
+        { type: 'step', n: 1, text: 'Toca el icono 🍳 en la navegación para abrir las recetas.' },
+        { type: 'step', n: 2, text: 'Usa el botón + arriba a la derecha para añadir una nueva receta.' },
+        { type: 'step', n: 3, text: 'Importar recetas: toca "Foto" para fotografiar una receta — la IA reconoce automáticamente el nombre, ingredientes y cantidades. O introduce una URL y toca →.' },
+        { type: 'step', n: 4, text: 'Alternativamente puedes añadir la receta manualmente: introduce nombre, categoría, porciones e ingredientes.' },
+        { type: 'step', n: 5, text: 'Al guardar, se busca automáticamente una imagen de Unsplash si no has elegido ninguna. También puedes elegir o subir tu propia imagen.' },
+        { type: 'step', n: 6, text: 'Toca una receta para ver los detalles. Los ingredientes faltantes se marcan y se pueden añadir a la lista de compras con un toque.' },
+        { type: 'tip', text: 'Las categorías se crean automáticamente cuando introduces un nuevo nombre. Usa el botón 🏷️ para renombrar o eliminar categorías.' },
+        { type: 'tip', text: 'El botón 🔍 te permite filtrar recetas por ingrediente — útil cuando sabes lo que hay en el frigorífico.' },
+        { type: 'tip', text: 'Usa el botón ✏️ en la vista de detalle para editar una receta.' },
+        { type: 'tip', text: 'El nombre, categoría e ingredientes se traducen automáticamente a los tres idiomas.' },
+      ]
+    },
+    {
       title: '🔔 Notificaciones',
       content: [
         { type: 'step', n: 1, text: 'Abre ⚙️ Ajustes → Notificaciones para gestionar las notificaciones push.' },
@@ -392,7 +437,7 @@ export default function WikiPage({ onClose }) {
   return (
     <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
       {/* Header */}
-      <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0">
+      <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
         <button onClick={onClose}
           className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
             flex items-center justify-center text-gray-600 text-lg">
