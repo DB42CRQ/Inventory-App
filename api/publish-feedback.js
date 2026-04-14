@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   // 2. Version holen für Push-Text
   const { data: version, error: versionError } = await supabase
     .from('versions')
-    .select('version, household_id')
+    .select('version')
     .eq('id', version_id)
     .single()
 
