@@ -5,15 +5,103 @@ import { Button } from '../ui'
 import AddRecipeModal from './AddRecipeModal'
 import RecipeDetail from './RecipeDetail'
 
+
+function CategoryManager({ categories, recipes, onRename, onDelete, onClose, t }) {
+  const [editing, setEditing] = useState(null)
+  const [newName, setNewName] = useState('')
+  const [confirm, setConfirm] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  async function handleRename(cat) {
+    if (!newName.trim() || newName === cat) { setEditing(null); return }
+    setLoading(true)
+    await onRename(cat, newName.trim())
+    setEditing(null)
+    setLoading(false)
+  }
+
+  async function handleDelete(cat) {
+    setLoading(true)
+    await onDelete(cat)
+    setConfirm(null)
+    setLoading(false)
+  }
+
+  const count = (cat) => recipes.filter(r => r.category === cat).length
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+      onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm"
+        onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <h2 className="font-semibold text-gray-900">{t.recipesCatMgr ?? 'Kategorien verwalten'}</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">×</button>
+        </div>
+        <div className="px-5 py-4 flex flex-col gap-2 max-h-80 overflow-y-auto">
+          {categories.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-4">{t.recipesNoCats ?? 'Keine Kategorien'}</p>
+          ) : categories.map(cat => (
+            <div key={cat} className="flex items-center gap-2">
+              {editing === cat ? (
+                <div className="flex-1 flex gap-2">
+                  <input value={newName} onChange={e => setNewName(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && handleRename(cat)}
+                    autoFocus
+                    className="flex-1 rounded-xl border border-primary-300 px-3 py-2 text-sm
+                      focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                  <button onClick={() => handleRename(cat)} disabled={loading}
+                    className="px-3 py-2 rounded-xl bg-primary-500 text-white text-sm font-medium">✓</button>
+                  <button onClick={() => setEditing(null)}
+                    className="px-3 py-2 rounded-xl bg-gray-100 text-gray-600 text-sm">×</button>
+                </div>
+              ) : confirm === cat ? (
+                <div className="flex-1 flex items-center gap-2">
+                  <span className="flex-1 text-sm text-gray-700">{cat}</span>
+                  <span className="text-xs text-gray-400">{t.deleteConfirm ?? 'Löschen?'}</span>
+                  <button onClick={() => handleDelete(cat)} disabled={loading}
+                    className="text-xs text-red-500 font-medium">{t.yes ?? 'Ja'}</button>
+                  <button onClick={() => setConfirm(null)}
+                    className="text-xs text-gray-400">{t.no ?? 'Nein'}</button>
+                </div>
+              ) : (
+                <>
+                  <span className="flex-1 text-sm text-gray-800">{cat}</span>
+                  <span className="text-xs text-gray-400">{count(cat)}</span>
+                  <button onClick={() => { setEditing(cat); setNewName(cat) }}
+                    className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-500 text-sm flex items-center justify-center">✏️</button>
+                  <button onClick={() => setConfirm(cat)}
+                    className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-red-50 text-gray-400 hover:text-red-400 text-sm flex items-center justify-center">×</button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function RecipePage({ onClose, household, inventoryItems, addToShoppingList }) {
   const { t } = useTranslation()
   const { recipes, loading, addRecipe, updateRecipe, deleteRecipe, uploadImage } = useRecipes(household?.id)
   const [showAdd,   setShowAdd]   = useState(false)
   const [selected,  setSelected]  = useState(null)
-  const [filterCat, setFilterCat] = useState('')
+  const [filterCat,   setFilterCat]   = useState('')
+  const [showFilter,   setShowFilter]   = useState(false)
+  const [showCatMgr,   setShowCatMgr]   = useState(false)
+  const [filterIngr,   setFilterIngr]   = useState('')
 
   const categories = [...new Set(recipes.map(r => r.category).filter(Boolean))]
-  const filtered = filterCat ? recipes.filter(r => r.category === filterCat) : recipes
+  const filtered = recipes.filter(r => {
+    if (filterCat && r.category !== filterCat) return false
+    if (filterIngr) {
+      const lower = filterIngr.toLowerCase()
+      return r.recipe_ingredients?.some(i => i.name.toLowerCase().includes(lower))
+    }
+    return true
+  })
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
@@ -22,10 +110,30 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
           className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
             flex items-center justify-center text-gray-600 text-lg">←</button>
         <h1 className="font-bold text-gray-900 text-lg flex-1">🍳 {t.recipesTitle ?? 'Rezepte'}</h1>
+        <button onClick={() => setShowFilter(!showFilter)}
+          className={`w-9 h-9 rounded-xl transition-all flex items-center justify-center text-lg
+            ${filterIngr ? 'bg-primary-500 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}>
+          🔍
+        </button>
+        <button onClick={() => setShowCatMgr(true)}
+          className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
+            flex items-center justify-center text-lg">
+          🏷️
+        </button>
         <button onClick={() => setShowAdd(true)}
           className="w-9 h-9 rounded-xl bg-primary-500 hover:bg-primary-600 transition-all
             flex items-center justify-center text-white text-xl font-bold">+</button>
       </header>
+
+      {showFilter && (
+        <div className="bg-white border-b border-gray-100 px-4 py-2 shrink-0">
+          <input value={filterIngr} onChange={e => setFilterIngr(e.target.value)}
+            placeholder={t.recipesFilterIngr ?? 'Nach Zutat filtern…'}
+            autoFocus
+            className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm
+              focus:outline-none focus:ring-2 focus:ring-primary-500" />
+        </div>
+      )}
 
       {categories.length > 0 && (
         <div className="bg-white border-b border-gray-100 px-4 py-2 flex gap-2 overflow-x-auto shrink-0">
@@ -80,6 +188,25 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
           </div>
         )}
       </main>
+
+      {showCatMgr && (
+        <CategoryManager
+          categories={categories}
+          recipes={recipes}
+          onRename={async (oldCat, newCat) => {
+            for (const r of recipes.filter(r => r.category === oldCat)) {
+              await updateRecipe(r.id, { ...r, ingredients: r.recipe_ingredients, category: newCat })
+            }
+          }}
+          onDelete={async (cat) => {
+            for (const r of recipes.filter(r => r.category === cat)) {
+              await updateRecipe(r.id, { ...r, ingredients: r.recipe_ingredients, category: '' })
+            }
+          }}
+          onClose={() => setShowCatMgr(false)}
+          t={t}
+        />
+      )}
 
       {showAdd && (
         <AddRecipeModal
