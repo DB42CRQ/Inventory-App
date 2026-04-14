@@ -29,13 +29,15 @@ export default async function handler(req, res) {
   if (error) console.error(`[publish-feedback] feedback update error:`, error.message)
 
   // 2. Version holen für Push-Text
-  const { data: version } = await supabase
+  const { data: version, error: versionError } = await supabase
     .from('versions')
     .select('version, household_id')
     .eq('id', version_id)
     .single()
 
-  console.log(`[publish-feedback] version lookup result:`, version)
+  console.log(`[publish-feedback] SUPABASE_URL set:`, !!process.env.SUPABASE_URL)
+  console.log(`[publish-feedback] SERVICE_KEY set:`, !!process.env.SUPABASE_SERVICE_KEY)
+  console.log(`[publish-feedback] version lookup result:`, version, 'error:', versionError?.message)
   if (!version) {
     console.error(`[publish-feedback] version not found for id=${version_id}`)
     return res.status(200).json({ updated: true })
