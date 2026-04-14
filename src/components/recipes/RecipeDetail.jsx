@@ -182,7 +182,12 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
             })}
             <p className="text-xs text-gray-400 px-4 py-2 border-t border-gray-50">
               {t.recipesIngredientHint ?? 'Tippe zum An-/Abhaken'}
-            </p> (
+            </p>
+          </div>
+        </div>
+      </main>
+
+    {showImgPicker && (
         <ImagePickerModal
           recipeName={recipe.name}
           currentImage={recipe.image_url}
