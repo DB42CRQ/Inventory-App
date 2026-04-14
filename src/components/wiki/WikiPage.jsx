@@ -80,16 +80,13 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Tippe auf das 🛒-Symbol oben rechts um die Einkaufsliste zu öffnen.' },
         { type: 'step', n: 2, text: 'Mit "⚠️ Alle niedrigen" werden alle Artikel mit niedrigem Bestand auf einmal hinzugefügt. Mit dem Dropdown darunter nur eine bestimmte Kategorie.' },
-        { type: 'step', n: 3, text: 'Mit "+ Aus Inventar" kannst du Artikel aus dem Inventar suchen und hinzufügen. Wenn ein Artikel nicht im Inventar ist, erscheint ein grüner "+ Hinzufügen" Button — damit landet er direkt auf der Liste.' },
+        { type: 'step', n: 3, text: 'Mit "+ Aus Inventar" kannst du Artikel suchen und hinzufügen. Wenn ein Artikel nicht im Inventar ist, erscheint ein grüner "+ Hinzufügen" Button — damit landet er direkt auf der Liste.' },
         { type: 'step', n: 4, text: 'Tippe einen Artikel an um ihn abzuhaken — gib die gekaufte Menge ein und bestätige. Der Bestand im Inventar wird sofort aktualisiert.' },
-        { type: 'step', n: 5, text: 'Bei Einmalkäufen (nicht im Inventar) wird nach dem Abhaken gefragt ob der Artikel dauerhaft ins Inventar aufgenommen werden soll.' },
-        { type: 'tip-ios', text: 'Mit dem 📷 Button öffnet sich der Scanner. Fotografiere das Produkt — die KI erkennt es automatisch und sucht den passenden Artikel im Inventar.' },
-        { type: 'tip-android', text: 'Mit dem 📷 Button öffnet sich der Scanner. Wähle zwischen Barcode scannen (EAN-Code) oder KI-Produkterkennung (Foto des Produkts).' },
-        { type: 'step', n: 5, text: 'Abgehakte Artikel erscheinen durchgestrichen unten. Mit "🗑 Leeren" kannst du erledigte oder alle Artikel löschen.' },
-        { type: 'step', n: 6, text: 'Mit dem 📷-Button oben rechts kannst du einen Barcode scannen — der Artikel wird automatisch im Inventar gesucht und der Bestand direkt aktualisiert.' },
+        { type: 'step', n: 5, text: 'Bei Einmalkäufen wird nach dem Abhaken gefragt ob der Artikel dauerhaft ins Inventar aufgenommen werden soll.' },
+        { type: 'step', n: 6, text: 'Abgehakte Artikel erscheinen durchgestrichen unten. Mit "🗑 Leeren" kannst du erledigte oder alle Artikel löschen.' },
         { type: 'tip', text: 'Die Einkaufsliste ist für alle Haushaltsmitglieder geteilt — Änderungen sind in Echtzeit sichtbar.' },
-        { type: 'tip-android', text: 'Barcode scannen: Halte den EAN-Barcode in den Rahmen — der Artikel wird automatisch im Inventar gesucht.' },
-        { type: 'tip-android', text: 'KI-Produkterkennung: Fotografiere das Produkt — die KI erkennt es und sucht den passenden Artikel.' },
+        { type: 'tip-ios', text: 'Mit dem 📷 Button kannst du ein Foto eines Produkts aufnehmen — die KI erkennt es automatisch und sucht den passenden Artikel im Inventar.' },
+        { type: 'tip-android', text: 'Mit dem 📷 Button öffnet sich der Scanner. Wähle zwischen Barcode scannen (EAN-Code) für schnelle Erkennung oder KI-Produkterkennung (Foto) für unbekannte Produkte.' }, es und sucht den passenden Artikel.' },
         { type: 'tip', text: 'Wird ein Artikel nicht erkannt, kannst du ihn direkt als Einmalkauf hinzufügen.' },
       ]
     },
@@ -123,10 +120,9 @@ const WIKI_CONTENT = {
       title: '📲 App installieren',
       content: [
         { type: 'step', n: 1, text: 'Öffne ⚙️ Einstellungen — dort findest du eine smarte Installationsanleitung die deinen Browser erkennt.' },
-        { type: 'step', n: 2, text: 'iPhone mit Safari: Tippe auf das Teilen-Symbol ⬆️ → "Zum Home-Bildschirm" → "Hinzufügen".' },
-        { type: 'step', n: 3, text: 'iPhone mit WhatsApp-Link: Tippe auf ··· unten rechts → "In Safari öffnen" → dann wie oben installieren.' },
-        { type: 'step', n: 4, text: 'Android mit Chrome: Tippe auf die drei Punkte ⋮ → "Zum Startbildschirm hinzufügen" → "Hinzufügen".' },
-        { type: 'tip', text: 'Wichtig für iPhone: Die Installation funktioniert nur über Safari — nicht über den WhatsApp-, Instagram- oder Chrome-Browser.' },
+        { type: 'tip-ios', text: 'Tippe auf das Teilen-Symbol ⬆️ in Safari → "Zum Home-Bildschirm" → "Hinzufügen".' },
+        { type: 'tip-ios', text: 'Wichtig: Die Installation funktioniert nur über Safari — nicht über WhatsApp-, Instagram- oder Chrome-Browser. Falls du einen anderen Browser nutzt, öffne erst "In Safari öffnen".' },
+        { type: 'tip-android', text: 'Tippe in Chrome auf die drei Punkte ⋮ oben rechts → "Zum Startbildschirm hinzufügen" → "Hinzufügen".' },
         { type: 'tip', text: 'Als installierte App startet Inventory42 schneller und fühlt sich wie eine native App an.' },
       ]
     },
@@ -147,8 +143,8 @@ const WIKI_CONTENT = {
         { type: 'step', n: 2, text: 'Aktiviere den Hauptschalter — der Browser fragt einmalig nach der Berechtigung.' },
         { type: 'step', n: 3, text: 'Wähle für welche Ereignisse du Benachrichtigungen erhalten möchtest: niedriger Bestand, Einkaufsliste oder neue Version.' },
         { type: 'tip', text: 'Die Einstellungen (welche Kategorien aktiv sind) gelten pro Account — Änderungen wirken sich auf alle deine Geräte aus.' },
-        { type: 'tip', text: 'iOS: Die App muss als PWA installiert sein (Zum Home-Bildschirm hinzufügen) damit Push-Benachrichtigungen funktionieren.' },
-        { type: 'tip', text: 'Android: Chrome wird empfohlen. Die Benachrichtigungen kommen auch wenn die App geschlossen ist.' },
+        { type: 'tip-ios', text: 'Die App muss als PWA installiert sein (Zum Home-Bildschirm hinzufügen) damit Push-Benachrichtigungen funktionieren.' },
+        { type: 'tip-android', text: 'Chrome wird empfohlen. Die Benachrichtigungen kommen auch wenn die App geschlossen ist.' },
       ]
     },
     {
@@ -197,17 +193,14 @@ const WIKI_CONTENT = {
       title: '🛒 Shopping List',
       content: [
         { type: 'step', n: 1, text: 'Tap the 🛒 icon in the top right to open the shopping list.' },
-        { type: 'step', n: 2, text: '"⚠️ All low stock" adds all low-stock items at once. Use the dropdown below to add only a specific category.' },
+        { type: 'step', n: 2, text: '"⚠️ All low stock" adds all low-stock items at once. Use the dropdown to add only a specific category.' },
         { type: 'step', n: 3, text: '"+ From inventory" lets you search and add items. If an item is not in your inventory, a green "+ Add" button appears — this adds it directly to the list.' },
         { type: 'step', n: 4, text: 'Tap an item to check it off — enter the purchased quantity and confirm. The inventory stock is updated immediately.' },
-        { type: 'step', n: 5, text: 'For one-time purchases (not in inventory), you will be asked after checking off whether to permanently add the item to your inventory.' },
-        { type: 'tip-ios', text: 'The 📷 button opens the scanner. Take a photo of the product — the AI recognizes it and finds the matching item in your inventory.' },
-        { type: 'tip-android', text: 'The 📷 button opens the scanner. Choose between barcode scanning (EAN code) or AI product recognition (photo of the product).' },
-        { type: 'step', n: 5, text: 'Checked items appear crossed out at the bottom. Use "🗑 Clear" to delete done or all items.' },
-        { type: 'step', n: 6, text: 'Use the 📷 button in the top right to scan a barcode — the item is automatically matched against your inventory and the stock is updated directly.' },
+        { type: 'step', n: 5, text: 'For one-time purchases you will be asked after checking off whether to permanently add the item to your inventory.' },
+        { type: 'step', n: 6, text: 'Checked items appear crossed out at the bottom. Use "🗑 Clear" to delete done or all items.' },
         { type: 'tip', text: 'The shopping list is shared with all household members — changes are visible in real time.' },
-        { type: 'tip', text: 'The barcode scanner works best with Chrome on Android. If an item is not recognized, you can add it as a new item directly.' },
-      ]
+        { type: 'tip-ios', text: 'Use the 📷 button to take a photo of a product — the AI recognizes it automatically and finds the matching item in your inventory.' },
+        { type: 'tip-android', text: 'The 📷 button opens the scanner. Choose between barcode scanning (EAN code) for quick recognition or AI product recognition (photo) for unknown products.' },
     },
     {
       title: '👥 Members',
@@ -261,8 +254,8 @@ const WIKI_CONTENT = {
         { type: 'step', n: 2, text: 'Enable the main toggle — the browser will ask for permission once.' },
         { type: 'step', n: 3, text: 'Choose which events you want to be notified about: low stock, shopping list or new version.' },
         { type: 'tip', text: 'Settings (which categories are active) apply per account — changes affect all your devices.' },
-        { type: 'tip', text: 'iOS: The app must be installed as a PWA (Add to Home Screen) for push notifications to work.' },
-        { type: 'tip', text: 'Android: Chrome is recommended. Notifications arrive even when the app is closed.' },
+        { type: 'tip-ios', text: 'The app must be installed as a PWA (Add to Home Screen) for push notifications to work.' },
+        { type: 'tip-android', text: 'Chrome is recommended. Notifications arrive even when the app is closed.' },
       ]
     },
     {
@@ -314,14 +307,11 @@ const WIKI_CONTENT = {
         { type: 'step', n: 2, text: '"⚠️ Todos los bajos" añade todos los artículos con stock bajo de una vez. Usa el desplegable para añadir solo una categoría.' },
         { type: 'step', n: 3, text: '"+ Del inventario" te permite buscar y añadir artículos. Si un artículo no está en tu inventario, aparece un botón verde "+ Añadir" — esto lo añade directamente a la lista.' },
         { type: 'step', n: 4, text: 'Toca un artículo para marcarlo — introduce la cantidad comprada y confirma. El stock del inventario se actualiza inmediatamente.' },
-        { type: 'step', n: 5, text: 'Para compras únicas (no en el inventario), después de marcar se preguntará si deseas añadir el artículo permanentemente al inventario.' },
-        { type: 'tip-ios', text: 'El botón 📷 abre el escáner. Fotografía el producto — la IA lo reconoce y encuentra el artículo en tu inventario.' },
-        { type: 'tip-android', text: 'El botón 📷 abre el escáner. Elige entre escanear código de barras (código EAN) o reconocimiento IA (foto del producto).' },
-        { type: 'step', n: 5, text: 'Los artículos marcados aparecen tachados abajo. Con "🗑 Vaciar" puedes eliminar los completados o todos.' },
-        { type: 'step', n: 6, text: 'Usa el botón 📷 arriba a la derecha para escanear un código de barras — el artículo se busca automáticamente en tu inventario y el stock se actualiza directamente.' },
-        { type: 'tip', text: 'La lista de compras es compartida por todos los miembros del hogar — los cambios son visibles en tiempo real.' },
-        { type: 'tip', text: 'El escáner funciona mejor con Chrome en Android. Si no se reconoce un artículo, puedes añadirlo directamente.' },
-      ]
+        { type: 'step', n: 5, text: 'Para compras únicas se preguntará después de marcar si deseas añadir el artículo permanentemente al inventario.' },
+        { type: 'step', n: 6, text: 'Los artículos marcados aparecen tachados abajo. Usa "🗑 Vaciar" para eliminar los completados o todos.' },
+        { type: 'tip', text: 'La lista de compras es compartida con todos los miembros del hogar — los cambios son visibles en tiempo real.' },
+        { type: 'tip-ios', text: 'Con el botón 📷 puedes fotografiar un producto — la IA lo reconoce automáticamente y busca el artículo en tu inventario.' },
+        { type: 'tip-android', text: 'El botón 📷 abre el escáner. Elige entre escanear código de barras (código EAN) para reconocimiento rápido o reconocimiento IA (foto) para productos desconocidos.' },
     },
     {
       title: '👥 Miembros',
@@ -377,8 +367,8 @@ const WIKI_CONTENT = {
         { type: 'step', n: 2, text: 'Activa el interruptor principal — el navegador pedirá permiso una vez.' },
         { type: 'step', n: 3, text: 'Elige para qué eventos quieres recibir notificaciones: stock bajo, lista de compras o nueva versión.' },
         { type: 'tip', text: 'Los ajustes (qué categorías están activas) se aplican por cuenta — los cambios afectan a todos tus dispositivos.' },
-        { type: 'tip', text: 'iOS: La app debe estar instalada como PWA (Añadir a inicio) para que funcionen las notificaciones push.' },
-        { type: 'tip', text: 'Android: Se recomienda Chrome. Las notificaciones llegan aunque la app esté cerrada.' },
+        { type: 'tip-ios', text: 'La app debe estar instalada como PWA (Añadir a inicio) para que funcionen las notificaciones push.' },
+        { type: 'tip-android', text: 'Se recomienda Chrome. Las notificaciones llegan aunque la app esté cerrada.' },
       ]
     },
     {
