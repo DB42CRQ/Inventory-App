@@ -7,7 +7,7 @@ import { useTranslation } from '../../i18n/useTranslation'
 import { Spinner } from '../ui'
 import { supabase } from '../../lib/supabase'
 
-const STATUSES = ['submitted', 'reviewing', 'implementing', 'deployed', 'rejected']
+const STATUSES = ['submitted', 'reviewing', 'implementing', 'deployed', 'published', 'rejected']
 
 const STATUS_COLORS = {
   submitted:    { bg: '#e0e7ff', text: '#4338ca' },
@@ -54,6 +54,7 @@ export default function FeedbackPage({ onClose }) {
     reviewing:    t.statusReviewing    ?? 'In Prüfung',
     implementing: t.statusImplementing ?? 'In Umsetzung',
     deployed:     t.statusDeployed     ?? 'Deployed',
+    published:    t.statusPublished    ?? 'Veröffentlicht',
     rejected:     t.statusRejected     ?? 'Abgelehnt',
   }
 

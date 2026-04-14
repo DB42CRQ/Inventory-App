@@ -66,7 +66,20 @@ export function useVersions(sendPush) {
       await fetchVersions()
       // Push wenn direkt publiziert
       if (!is_draft) {
+        // Feedback mit dieser Version auf 'published' setzen
+        if (data?.id) {
+          await supabase.from('feedback')
+            .update({ status: 'published' })
+            .eq('version_id', data.id)
+            .eq('status', 'deployed')
+        }
         console.log('[createVersion] sending push for version:', version)
+        // Feedback mit dieser Version auf 'published' setzen
+        await supabase.from('feedback')
+          .update({ status: 'published' })
+          .eq('version_id', id)
+          .eq('status', 'deployed')
+
         sendPushRef.current?.({
           title: '🚀 Neues Update',
           body: `Version ${version} ist verfügbar!`,
@@ -92,6 +105,12 @@ export function useVersions(sendPush) {
         // Push an alle Haushaltsmitglieder
         const v = published[0]
         console.log('[publishVersion] calling sendPush for version:', v.version)
+        // Feedback mit dieser Version auf 'published' setzen
+        await supabase.from('feedback')
+          .update({ status: 'published' })
+          .eq('version_id', id)
+          .eq('status', 'deployed')
+
         sendPushRef.current?.({
           title: '🚀 Neues Update',
           body: `Version ${v.version} ist verfügbar!`,

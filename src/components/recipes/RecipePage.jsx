@@ -91,6 +91,18 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
     if (lang === 'es' && recipe.category_es) return recipe.category_es
     return recipe.category_de || recipe.category || ''
   }
+
+  function getIngName(ing) {
+    if (lang === 'en' && ing.name_en) return ing.name_en
+    if (lang === 'es' && ing.name_es) return ing.name_es
+    return ing.name_de || ing.name || ''
+  }
+
+  function getRecipeName(r) {
+    if (lang === 'en' && r.name_en) return r.name_en
+    if (lang === 'es' && r.name_es) return r.name_es
+    return r.name_de || r.name || ''
+  }
   const { recipes, loading, addRecipe, updateRecipe, deleteRecipe, uploadImage } = useRecipes(household?.id)
   const [showAdd,   setShowAdd]   = useState(false)
   const [selected,  setSelected]  = useState(null)
@@ -104,7 +116,10 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
     if (filterCat && getCatName(r) !== filterCat) return false
     if (filterIngr) {
       const lower = filterIngr.toLowerCase()
-      return r.recipe_ingredients?.some(i => i.name.toLowerCase().includes(lower))
+      // Search in recipe name
+      if (getRecipeName(r).toLowerCase().includes(lower)) return true
+      // Search in translated ingredient names
+      return r.recipe_ingredients?.some(i => getIngName(i).toLowerCase().includes(lower))
     }
     return true
   })
@@ -183,7 +198,7 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
                     flex items-center justify-center text-4xl">🍳</div>
                 )}
                 <div className="p-3">
-                  <p className="text-sm font-semibold text-gray-900 line-clamp-2">{recipe.name}</p>
+                  <p className="text-sm font-semibold text-gray-900 line-clamp-2">{getRecipeName(recipe)}</p>
                   {getCatName(recipe) && <p className="text-xs text-primary-500 mt-1">{getCatName(recipe)}</p>}
                   <p className="text-xs text-gray-400 mt-1">
                     {recipe.recipe_ingredients?.length ?? 0} {t.recipesIngredients ?? 'Zutaten'}

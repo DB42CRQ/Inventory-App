@@ -109,6 +109,20 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
     if (!form.name.trim()) return
     setLoading(true)
 
+    // Name übersetzen
+    let name_de = form.name, name_en = null, name_es = null
+    try {
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: form.name })
+      })
+      const data = await res.json()
+      name_de = data.de || form.name
+      name_en = data.en || null
+      name_es = data.es || null
+    } catch {}
+
     // Kategorie übersetzen
     let category_de = form.category || null
     let category_en = null
@@ -165,6 +179,10 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
 
     await onSave({
       ...form,
+      name: name_de,
+      name_de,
+      name_en,
+      name_es,
       image_url,
       category: category_de,
       category_de,
