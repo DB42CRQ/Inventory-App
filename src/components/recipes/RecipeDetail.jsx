@@ -24,8 +24,7 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
 
   // Check which ingredients are already in inventory
   function getInventoryMatch(ing) {
-    const ingredientName = getIngName(ing)
-    const lower = ingredientName.toLowerCase()
+    const lower = getIngName(ing).toLowerCase()
     return inventoryItems?.find(item =>
       item.name.toLowerCase() === lower ||
       item.name.toLowerCase().includes(lower) ||
