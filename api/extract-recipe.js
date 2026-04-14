@@ -15,18 +15,21 @@ export default async function handler(req, res) {
         { type: 'text', text: PROMPT }
       ]
     } else if (url) {
-      // Fetch the URL content first
-      const fetchRes = await fetch(url, {
-        headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'text/html' }
-      })
-      const html = await fetchRes.text()
-      // Strip HTML tags roughly
-      const stripped = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 8000)
-      userContent = `URL: ${url}\n\nPage content:\n${stripped}\n\n${PROMPT}`
+      // Use Claude with web_search to handle robots.txt blocked sites
+      userContent = `Please search for and extract the recipe from this URL: ${url}\n\n${PROMPT}`
     } else {
       userContent = `Recipe text:\n${text}\n\n${PROMPT}`
     }
 
+    const body = {
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 2000,
+      messages: [{ role: 'user', content: userContent }],
+    }
+    // Add web_search for URL extraction
+    if (url) {
+      body.tools = [{ type: 'web_search_20250305', name: 'web_search' }]
+    }
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -34,11 +37,7 @@ export default async function handler(req, res) {
         'x-api-key': process.env.ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
       },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 2000,
-        messages: [{ role: 'user', content: userContent }],
-      })
+      body: JSON.stringify(body)
     })
 
     const data = await response.json()
