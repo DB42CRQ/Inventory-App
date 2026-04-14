@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
 import { useTranslation } from '../../i18n/useTranslation'
 import { Button, Input } from '../ui'
 
@@ -20,6 +21,9 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
       : [{ name: '', quantity: '', unit: '' }]
   )
   const [newCat,     setNewCat]     = useState(false)
+  const [showCamera, setShowCamera] = useState(false)
+  const videoRef    = useRef(null)
+  const streamRef   = useRef(null)
 
   async function handlePhoto(e) {
     const file = e.target.files?.[0]
@@ -103,8 +107,28 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
   async function handleSave() {
     if (!form.name.trim()) return
     setLoading(true)
+    let category_de = form.category || null
+    let category_en = null
+    let category_es = null
+    if (form.category) {
+      try {
+        const res = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: form.category })
+        })
+        const data = await res.json()
+        category_de = data.de || form.category
+        category_en = data.en || null
+        category_es = data.es || null
+      } catch {}
+    }
     await onSave({
       ...form,
+      category: category_de,
+      category_de,
+      category_en,
+      category_es,
       ingredients: ingredients.filter(i => i.name.trim()),
     })
     setLoading(false)
@@ -128,13 +152,23 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
             {t.recipesImport ?? 'Rezept importieren (optional)'}
           </p>
           <div className="flex gap-2">
-            <label className="flex-1 py-2.5 rounded-xl border border-dashed border-primary-300
-              bg-primary-50 text-primary-600 text-sm font-medium text-center cursor-pointer
-              hover:bg-primary-100 transition-all flex items-center justify-center gap-2">
-              {loading ? <span className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" /> : '📷'}
-              {t.recipesFromPhoto ?? 'Foto'}
-              <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} disabled={loading} />
-            </label>
+            {isIOS ? (
+              <label className="flex-1 py-2.5 rounded-xl border border-dashed border-primary-300
+                bg-primary-50 text-primary-600 text-sm font-medium text-center cursor-pointer
+                hover:bg-primary-100 transition-all flex items-center justify-center gap-2">
+                {loading ? <span className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" /> : '📷'}
+                {t.recipesFromPhoto ?? 'Foto'}
+                <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} disabled={loading} />
+              </label>
+            ) : (
+              <button onClick={() => setShowCamera(true)} disabled={loading}
+                className="flex-1 py-2.5 rounded-xl border border-dashed border-primary-300
+                  bg-primary-50 text-primary-600 text-sm font-medium text-center
+                  hover:bg-primary-100 transition-all flex items-center justify-center gap-2">
+                {loading ? <span className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" /> : '📷'}
+                {t.recipesFromPhoto ?? 'Foto'}
+              </button>
+            )}
             <button onClick={() => setMode(mode === 'url' ? 'manual' : 'url')}
               className="flex-1 py-2.5 rounded-xl border border-dashed border-primary-300
                 bg-primary-50 text-primary-600 text-sm font-medium hover:bg-primary-100 transition-all">

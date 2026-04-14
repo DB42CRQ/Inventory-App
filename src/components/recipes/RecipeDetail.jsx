@@ -4,7 +4,13 @@ import { Button } from '../ui'
 import AddRecipeModal from './AddRecipeModal'
 
 export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inventoryItems, addToShoppingList, uploadImage, categories }) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
+
+  function getCatName(r) {
+    if (lang === 'en' && r.category_en) return r.category_en
+    if (lang === 'es' && r.category_es) return r.category_es
+    return r.category_de || r.category || ''
+  }
   const [confirm,   setConfirm]   = useState(false)
   const [showEdit,   setShowEdit]   = useState(false)
   const [adding,    setAdding]    = useState(false)
@@ -68,9 +74,9 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
         <div className="px-4 py-4 flex flex-col gap-4">
           {/* Meta */}
           <div className="flex items-center gap-3 flex-wrap">
-            {recipe.category && (
+            {getCatName(recipe) && (
               <span className="px-3 py-1 bg-primary-50 text-primary-600 rounded-full text-xs font-medium">
-                {recipe.category}
+                {getCatName(recipe)}
               </span>
             )}
             {recipe.servings && (

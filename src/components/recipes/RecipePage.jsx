@@ -75,50 +75,22 @@ function CategoryManager({ categories, recipes, onRename, onDelete, onClose, t }
               )}
             </div>
           ))}
-          {/* Neue Kategorie */}
-          <NewCategoryRow onAdd={async (name) => { await onRename('__new__' + name, name) }} t={t} />
         </div>
       </div>
     </div>
   )
 }
 
-function NewCategoryRow({ onAdd, t }) {
-  const [adding, setAdding] = useState(false)
-  const [name,   setName]   = useState('')
 
-  async function handleAdd() {
-    if (!name.trim()) return
-    await onAdd(name.trim())
-    setName('')
-    setAdding(false)
-  }
-
-  if (!adding) return (
-    <button onClick={() => setAdding(true)}
-      className="w-full py-2 rounded-xl border border-dashed border-gray-200
-        text-sm text-gray-500 hover:border-primary-300 hover:text-primary-600 transition-all">
-      + {t.recipesNewCategory ?? 'Neue Kategorie'}
-    </button>
-  )
-
-  return (
-    <div className="flex gap-2">
-      <input value={name} onChange={e => setName(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && handleAdd()}
-        autoFocus placeholder={t.recipesNewCategory ?? 'Neue Kategorie'}
-        className="flex-1 rounded-xl border border-primary-300 px-3 py-2 text-sm
-          focus:outline-none focus:ring-2 focus:ring-primary-500" />
-      <button onClick={handleAdd}
-        className="px-3 py-2 rounded-xl bg-primary-500 text-white text-sm font-medium">✓</button>
-      <button onClick={() => setAdding(false)}
-        className="px-3 py-2 rounded-xl bg-gray-100 text-gray-600 text-sm">×</button>
-    </div>
-  )
-}
 
 export default function RecipePage({ onClose, household, inventoryItems, addToShoppingList }) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
+
+  function getCatName(recipe) {
+    if (lang === 'en' && recipe.category_en) return recipe.category_en
+    if (lang === 'es' && recipe.category_es) return recipe.category_es
+    return recipe.category_de || recipe.category || ''
+  }
   const { recipes, loading, addRecipe, updateRecipe, deleteRecipe, uploadImage } = useRecipes(household?.id)
   const [showAdd,   setShowAdd]   = useState(false)
   const [selected,  setSelected]  = useState(null)
@@ -127,9 +99,9 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
   const [showCatMgr,   setShowCatMgr]   = useState(false)
   const [filterIngr,   setFilterIngr]   = useState('')
 
-  const categories = [...new Set(recipes.map(r => r.category).filter(Boolean))]
+  const categories = [...new Set(recipes.map(r => getCatName(r)).filter(Boolean))]
   const filtered = recipes.filter(r => {
-    if (filterCat && r.category !== filterCat) return false
+    if (filterCat && getCatName(r) !== filterCat) return false
     if (filterIngr) {
       const lower = filterIngr.toLowerCase()
       return r.recipe_ingredients?.some(i => i.name.toLowerCase().includes(lower))
@@ -212,7 +184,7 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
                 )}
                 <div className="p-3">
                   <p className="text-sm font-semibold text-gray-900 line-clamp-2">{recipe.name}</p>
-                  {recipe.category && <p className="text-xs text-primary-500 mt-1">{recipe.category}</p>}
+                  {getCatName(recipe) && <p className="text-xs text-primary-500 mt-1">{getCatName(recipe)}</p>}
                   <p className="text-xs text-gray-400 mt-1">
                     {recipe.recipe_ingredients?.length ?? 0} {t.recipesIngredients ?? 'Zutaten'}
                   </p>
@@ -228,14 +200,25 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
           categories={categories}
           recipes={recipes}
           onRename={async (oldCat, newCat) => {
-            if (oldCat.startsWith('__new__')) return // neue Kategorie - nichts umbenennen
-            for (const r of recipes.filter(r => r.category === oldCat)) {
-              await updateRecipe(r.id, { ...r, ingredients: r.recipe_ingredients, category: newCat })
+            // Translate new category name
+            let category_de = newCat, category_en = null, category_es = null
+            try {
+              const res = await fetch('/api/translate', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: newCat })
+              })
+              const data = await res.json()
+              category_de = data.de || newCat
+              category_en = data.en || null
+              category_es = data.es || null
+            } catch {}
+            for (const r of recipes.filter(r => getCatName(r) === oldCat)) {
+              await updateRecipe(r.id, { ...r, ingredients: r.recipe_ingredients, category: category_de, category_de, category_en, category_es })
             }
           }}
           onDelete={async (cat) => {
-            for (const r of recipes.filter(r => r.category === cat)) {
-              await updateRecipe(r.id, { ...r, ingredients: r.recipe_ingredients, category: '' })
+            for (const r of recipes.filter(r => getCatName(r) === cat)) {
+              await updateRecipe(r.id, { ...r, ingredients: r.recipe_ingredients, category: null, category_de: null, category_en: null, category_es: null })
             }
           }}
           onClose={() => setShowCatMgr(false)}
