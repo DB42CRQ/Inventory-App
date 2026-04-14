@@ -46,7 +46,7 @@ const WIKI_CONTENT = {
   de: [
     {
       title: '🏠 Haushalt einrichten',
-      defaultOpen: true,
+      defaultOpen: false,
       content: [
         { type: 'step', n: 1, text: 'Nach der Registrierung wirst du aufgefordert einen Haushalt zu erstellen oder einem beizutreten.' },
         { type: 'step', n: 2, text: 'Erstelle einen neuen Haushalt indem du einen Namen eingibst (z.B. "Wohnung Musterstraße").' },
@@ -160,7 +160,7 @@ const WIKI_CONTENT = {
   en: [
     {
       title: '🏠 Setting up a household',
-      defaultOpen: true,
+      defaultOpen: false,
       content: [
         { type: 'step', n: 1, text: 'After registration, you\'ll be prompted to create a household or join one.' },
         { type: 'step', n: 2, text: 'Create a new household by entering a name (e.g. "Main Street Apartment").' },
@@ -272,7 +272,7 @@ const WIKI_CONTENT = {
   es: [
     {
       title: '🏠 Configurar un hogar',
-      defaultOpen: true,
+      defaultOpen: false,
       content: [
         { type: 'step', n: 1, text: 'Tras el registro, se te pedirá que crees un hogar o te unas a uno.' },
         { type: 'step', n: 2, text: 'Crea un nuevo hogar introduciendo un nombre (p.ej. "Apartamento Calle Mayor").' },

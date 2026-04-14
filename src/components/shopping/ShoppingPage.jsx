@@ -268,7 +268,7 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
               transition-all ${showAdd
                 ? 'bg-primary-50 border-primary-200 text-primary-700'
                 : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
-            + {t.shoppingAddFromInventory ?? 'Aus Inventar'}
+            {t.shoppingAddFromInventory ?? '+ Hinzufügen'}
           </button>
 
           {(unchecked.length > 0 || checked.length > 0) && (
