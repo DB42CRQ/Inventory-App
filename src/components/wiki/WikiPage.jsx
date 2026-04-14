@@ -201,6 +201,7 @@ const WIKI_CONTENT = {
         { type: 'tip', text: 'The shopping list is shared with all household members — changes are visible in real time.' },
         { type: 'tip-ios', text: 'Use the 📷 button to take a photo of a product — the AI recognizes it automatically and finds the matching item in your inventory.' },
         { type: 'tip-android', text: 'The 📷 button opens the scanner. Choose between barcode scanning (EAN code) for quick recognition or AI product recognition (photo) for unknown products.' },
+      ]
     },
     {
       title: '👥 Members',
@@ -312,6 +313,7 @@ const WIKI_CONTENT = {
         { type: 'tip', text: 'La lista de compras es compartida con todos los miembros del hogar — los cambios son visibles en tiempo real.' },
         { type: 'tip-ios', text: 'Con el botón 📷 puedes fotografiar un producto — la IA lo reconoce automáticamente y busca el artículo en tu inventario.' },
         { type: 'tip-android', text: 'El botón 📷 abre el escáner. Elige entre escanear código de barras (código EAN) para reconocimiento rápido o reconocimiento IA (foto) para productos desconocidos.' },
+      ]
     },
     {
       title: '👥 Miembros',
