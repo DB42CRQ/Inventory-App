@@ -68,17 +68,13 @@ export function useVersions(sendPush) {
       if (!is_draft) {
         // Feedback mit dieser Version auf 'published' setzen
         if (data?.id) {
-          await supabase.from('feedback')
-            .update({ status: 'published' })
-            .eq('version_id', data.id)
-            .eq('status', 'deployed')
+          await fetch('/api/publish-feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ version_id: data.id })
+          })
         }
         console.log('[createVersion] sending push for version:', version)
-        // Feedback mit dieser Version auf 'published' setzen
-        await supabase.from('feedback')
-          .update({ status: 'published' })
-          .eq('version_id', id)
-          .eq('status', 'deployed')
 
         sendPushRef.current?.({
           title: '🚀 Neues Update',
@@ -98,26 +94,17 @@ export function useVersions(sendPush) {
     if (!error) {
       const updated = versions.map(v => v.id === id ? { ...v, is_draft: false } : v)
       setVersions(updated)
-      const published = updated.filter(v => !v.is_draft)
-      if (published.length > 0) {
-        const alreadySeen = published[0].version_views?.some(v => v.profile_id === user.id)
-        setNewVersion(alreadySeen ? null : published[0])
-        // Push an alle Haushaltsmitglieder
-        const v = published[0]
-        console.log('[publishVersion] calling sendPush for version:', v.version)
-        // Feedback mit dieser Version auf 'published' setzen
-        await supabase.from('feedback')
-          .update({ status: 'published' })
-          .eq('version_id', id)
-          .eq('status', 'deployed')
-
-        sendPushRef.current?.({
-          title: '🚀 Neues Update',
-          body: `Version ${v.version} ist verfügbar!`,
-          excludeSelf: false,
-          category: 'new_version',
-          meta: { version: v.version },
+      const justPublished = updated.find(v => v.id === id)
+      if (justPublished) {
+        const alreadySeen = justPublished.version_views?.some(v => v.profile_id === user.id)
+        setNewVersion(alreadySeen ? null : justPublished)
+        // Feedback auf published setzen + Push server-seitig
+        await fetch('/api/publish-feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ version_id: id })
         })
+        console.log('[publishVersion] publish-feedback called')
       }
     }
     return { error }
