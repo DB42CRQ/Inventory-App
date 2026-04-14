@@ -468,9 +468,9 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
               source:        'barcode',
             })
           }}
-          onAddNew={() => {
+          onAddNew={(productName) => {
             setScanResult(null)
-            setShowAdd(true)
+            setAddToInventory({ name: productName, qty: 1, unit: 'Stück' })
           }}
         />
       )}
