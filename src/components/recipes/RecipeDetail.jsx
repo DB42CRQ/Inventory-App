@@ -161,26 +161,28 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
               {t.recipesIngredients ?? 'Zutaten'}
             </p>
             {recipe.recipe_ingredients?.map((ing, i) => {
-              const match = getInventoryMatch(ing.name)
+              const isChecked = checkedOff.has(ing.id)
               return (
-                <div key={i}
-                  className={`flex items-center gap-3 px-4 py-3
-                    ${i < recipe.recipe_ingredients.length - 1 ? 'border-b border-gray-50' : ''}`}>
-                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0
-                    ${match ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
-                    {match ? '✓' : '○'}
+                <button key={ing.id || i} onClick={() => toggleIngredient(ing.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all
+                    ${i < recipe.recipe_ingredients.length - 1 ? 'border-b border-gray-50' : ''}
+                    hover:bg-gray-50 active:bg-gray-100`}>
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 transition-all
+                    ${isChecked ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
+                    {isChecked ? '✓' : '○'}
                   </span>
-                  <span className="flex-1 text-sm text-gray-800">{getIngName(ing)}</span>
-                  <span className="text-sm text-gray-400">
+                  <span className={`flex-1 text-sm transition-all ${isChecked ? 'text-gray-400 line-through' : 'text-gray-800'}`}>
+                    {getIngName(ing)}
+                  </span>
+                  <span className="text-sm text-gray-400 shrink-0">
                     {ing.quantity ? `${ing.quantity} ${ing.unit || ''}` : ing.unit || ''}
                   </span>
-                </div>
+                </button>
               )
             })}
-          </div>
-        </div>
-      </main>
-    {showImgPicker && (
+            <p className="text-xs text-gray-400 px-4 py-2 border-t border-gray-50">
+              {t.recipesIngredientHint ?? 'Tippe zum An-/Abhaken'}
+            </p> (
         <ImagePickerModal
           recipeName={recipe.name}
           currentImage={recipe.image_url}
