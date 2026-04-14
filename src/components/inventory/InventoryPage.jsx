@@ -129,15 +129,9 @@ export default function InventoryPage() {
 {lowItems.length > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center text-white text-[9px] font-bold">{lowItems.length}</span>}
           </button>
 
-          <button onClick={() => setShowVersions(true)}
+          <button onClick={() => setShowRecipes(true)}
             className="relative w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all flex items-center justify-center">
-            🚀
-            {hasNew && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full
-                flex items-center justify-center text-white text-[9px] font-bold">
-                N
-              </span>
-            )}
+            🍳
           </button>
 
           <button onClick={() => setShowSettings(true)}
