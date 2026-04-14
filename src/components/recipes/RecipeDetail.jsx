@@ -54,7 +54,7 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0">
+      <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
         <button onClick={onClose}
           className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">←</button>
         <h1 className="font-bold text-gray-900 text-lg flex-1 truncate">{recipe.name}</h1>

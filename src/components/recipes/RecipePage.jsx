@@ -111,7 +111,7 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0">
+      <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
         <button onClick={onClose}
           className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
             flex items-center justify-center text-gray-600 text-lg">←</button>
