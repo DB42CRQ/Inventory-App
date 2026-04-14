@@ -13,6 +13,7 @@ import { MembersPanel } from '../household/MembersPanel'
 import HouseholdSetup from '../household/HouseholdSetup'
 import { VersionBanner } from '../versions/VersionBanner'
 import { useVersions } from '../../hooks/useVersions'
+import { useShoppingList } from '../../hooks/useShoppingList'
 import { useDeveloper } from '../../hooks/useDeveloper'
 import { FeedbackButton } from '../ui/FeedbackButton'
 import { usePushNotifications } from '../../hooks/usePushNotifications'
@@ -22,6 +23,7 @@ const WikiPage            = lazy(() => import('../wiki/WikiPage'))
 const VersionModal        = lazy(() => import('../versions/VersionModal').then(m => ({ default: m.VersionModal })))
 const NotificationSettings = lazy(() => import('../ui/NotificationSettings'))
 const ShoppingPage        = lazy(() => import('../shopping/ShoppingPage'))
+const RecipePage          = lazy(() => import('../recipes/RecipePage'))
 
 export default function InventoryPage() {
   const { profile, signOut }                                = useAuth()
@@ -36,6 +38,7 @@ export default function InventoryPage() {
   } = useInventory(household?.id, profile?.id, sendPush)
 
   const { isDeveloper } = useDeveloper()
+  const { addItem: addShoppingItem } = useShoppingList(household?.id, sendPush)
   const { versions, hasNew, newVersion, markAsSeen, createVersion, publishVersion, updateDraftNotes, deleteVersion } = useVersions(sendPush)
 
   const [tab,          setTab]          = useState('inventory')
@@ -50,7 +53,8 @@ export default function InventoryPage() {
   const [showFeedbackModal, setShowFeedbackModal] = useState(false)
   const [showMembers,      setShowMembers]      = useState(false)
   const [showNotifSettings, setShowNotifSettings] = useState(false)
-  const [showShopping, setShowShopping] = useState(false)
+  const [showShopping,  setShowShopping]  = useState(false)
+  const [showRecipes,   setShowRecipes]   = useState(false)
   const [dismissed,    setDismissed]    = useState(null)
   const [search,       setSearch]       = useState('')
   const [filterCat,    setFilterCat]    = useState('all')
@@ -294,6 +298,15 @@ export default function InventoryPage() {
             <span className="ml-auto text-gray-400">›</span>
           </button>
 
+          <button onClick={() => { setShowSettings(false); setShowVersions(true) }}
+            className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl
+              hover:bg-gray-100 transition-all text-left relative">
+            <span className="text-xl">🚀</span>
+            <span className="text-sm font-medium text-gray-700">{t.versionsTitle ?? 'Versionen'}</span>
+            {hasNew && <span className="ml-auto w-2 h-2 bg-primary-500 rounded-full" />}
+            <span className={`${hasNew ? '' : 'ml-auto'} text-gray-400`}>›</span>
+          </button>
+
           <button onClick={() => { setShowSettings(false); setShowWiki(true) }}
             className="w-full flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl
               hover:bg-gray-100 transition-all text-left">
@@ -317,6 +330,17 @@ export default function InventoryPage() {
           <Button variant="danger" onClick={signOut} className="w-full">{t.signOutBtn}</Button>
         </div>
       </Modal>
+
+      {showRecipes && (
+        <Suspense fallback={null}>
+          <RecipePage
+            onClose={() => setShowRecipes(false)}
+            household={household}
+            inventoryItems={items}
+            addToShoppingList={addShoppingItem}
+          />
+        </Suspense>
+      )}
 
       {showShopping && <Suspense fallback={null}><ShoppingPage onClose={() => setShowShopping(false)} household={household} sendPush={sendPush} /></Suspense>}
 
