@@ -43,7 +43,11 @@ export default async function handler(req, res) {
 
     const data = await response.json()
     const rawText = data.content?.find(c => c.type === 'text')?.text?.trim()
-    const clean = rawText?.replace(/```json|```/g, '').trim()
+    // Extract JSON - find first { to last }
+    const start = rawText?.indexOf('{')
+    const end = rawText?.lastIndexOf('}')
+    if (start === -1 || end === -1) throw new Error('No JSON found in response')
+    const clean = rawText.slice(start, end + 1)
     const parsed = JSON.parse(clean)
     if (parsed.error) return res.status(400).json({ error: parsed.error })
     return res.status(200).json(parsed)
