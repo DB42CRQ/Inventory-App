@@ -14,6 +14,7 @@ const STATUS_COLORS = {
   reviewing:    { bg: '#fef9c3', text: '#854d0e' },
   implementing: { bg: '#dbeafe', text: '#1d4ed8' },
   deployed:     { bg: '#dcfce7', text: '#166534' },
+  published:    { bg: '#e0f2fe', text: '#0369a1' },
   rejected:     { bg: '#fee2e2', text: '#991b1b' },
 }
 
@@ -190,8 +191,8 @@ export default function FeedbackPage({ onClose }) {
                       ))}
                     </div>
 
-                    {/* Version Dropdown — nur wenn deployed */}
-                    {item.status === 'deployed' && versions.length > 0 && (
+                    {/* Version Dropdown — nur wenn deployed oder published */}
+                    {(item.status === 'deployed' || item.status === 'published') && versions.length > 0 && (
                       <div className="flex items-center gap-2">
                         <label className="text-xs text-gray-500 shrink-0">
                           {t.feedbackVersion ?? 'Version:'}
