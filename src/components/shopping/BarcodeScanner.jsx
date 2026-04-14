@@ -116,7 +116,7 @@ function AIScanner({ onResult, onClose, inventoryItems, t, isIOS }) {
           <p className="text-white text-center text-sm leading-relaxed opacity-80">
             {t.barcodeIosHint ?? 'Fotografiere das Produkt — die KI erkennt es automatisch.'}
           </p>
-          {debugMsg && <div className="bg-gray-800 text-green-400 rounded-xl px-3 py-2 text-xs font-mono w-full break-all">{debugMsg}</div>}
+
           {error && <div className="bg-red-500/90 text-white rounded-2xl px-4 py-3 text-sm text-center w-full">{error}</div>}
           <label className={`w-full py-4 rounded-2xl bg-primary-500 text-white font-semibold text-lg flex items-center justify-center gap-3 active:scale-95 transition-all ${scanning ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}>
             {scanning ? <><span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />{t.barcodeScanning ?? 'Analysiere…'}</> : <><span>📸</span>{t.barcodeTakePhoto ?? 'Foto aufnehmen'}</>}
@@ -128,7 +128,7 @@ function AIScanner({ onResult, onClose, inventoryItems, t, isIOS }) {
           <div className="flex-1 relative overflow-hidden">
             <video ref={videoRef} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} playsInline muted />
             {!ready && <div className="absolute inset-0 flex items-center justify-center"><p className="text-white/60 text-sm">{t.barcodeCameraStarting ?? 'Kamera wird gestartet…'}</p></div>}
-            {debugMsg && <div className="absolute top-4 left-4 right-4 bg-gray-900/80 text-green-400 rounded-xl px-3 py-2 text-xs font-mono break-all">{debugMsg}</div>}
+
             {error && <div className="absolute bottom-4 left-4 right-4 bg-red-500/90 text-white rounded-xl px-4 py-3 text-sm text-center">{error}</div>}
           </div>
           <div className="px-4 py-4 shrink-0">
