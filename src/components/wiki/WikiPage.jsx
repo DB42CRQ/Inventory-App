@@ -270,10 +270,10 @@ const WIKI_CONTENT = {
         { type: 'step', n: 2, text: 'Use the + button in the top right to add a new recipe.' },
         { type: 'step', n: 3, text: 'Import recipes: tap "Photo" to take a photo of a recipe — the AI automatically recognizes the name, ingredients and quantities. Or enter a URL (e.g. from a recipe website) and tap →.' },
         { type: 'step', n: 4, text: 'Alternatively, you can add the recipe manually: enter name, category, servings and ingredients.' },
-        { type: 'step', n: 5, text: 'When saving, a matching image from Unsplash is automatically fetched if you haven't chosen one. You can also choose or upload your own image.' },
+        { type: 'step', n: 5, text: 'When saving, a matching image from Unsplash is automatically fetched if you have not chosen one. You can also choose or upload your own image.' },
         { type: 'step', n: 6, text: 'Tap a recipe to see the details. Missing ingredients are highlighted and can be added to the shopping list with one tap.' },
         { type: 'tip', text: 'Categories are created automatically when you enter a new category name. Use the 🏷️ button to rename or delete categories.' },
-        { type: 'tip', text: 'The 🔍 button lets you filter recipes by ingredient — useful when you know what's in the fridge.' },
+        { type: 'tip', text: 'The 🔍 button lets you filter recipes by ingredient — useful when you know what is in the fridge.' },
         { type: 'tip', text: 'Use the ✏️ button in the detail view to edit a recipe.' },
         { type: 'tip', text: 'Name, category and ingredients are automatically translated into all three languages.' },
       ]
