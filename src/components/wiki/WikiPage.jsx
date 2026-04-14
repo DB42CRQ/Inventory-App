@@ -86,7 +86,7 @@ const WIKI_CONTENT = {
         { type: 'step', n: 6, text: 'Abgehakte Artikel erscheinen durchgestrichen unten. Mit "🗑 Leeren" kannst du erledigte oder alle Artikel löschen.' },
         { type: 'tip', text: 'Die Einkaufsliste ist für alle Haushaltsmitglieder geteilt — Änderungen sind in Echtzeit sichtbar.' },
         { type: 'tip-ios', text: 'Mit dem 📷 Button kannst du ein Foto eines Produkts aufnehmen — die KI erkennt es automatisch und sucht den passenden Artikel im Inventar.' },
-        { type: 'tip-android', text: 'Mit dem 📷 Button öffnet sich der Scanner. Wähle zwischen Barcode scannen (EAN-Code) für schnelle Erkennung oder KI-Produkterkennung (Foto) für unbekannte Produkte.' }, es und sucht den passenden Artikel.' },
+        { type: 'tip-android', text: 'Mit dem 📷 Button öffnet sich der Scanner. Wähle zwischen Barcode scannen (EAN-Code) für schnelle Erkennung oder KI-Produkterkennung (Foto) für unbekannte Produkte.' },
         { type: 'tip', text: 'Wird ein Artikel nicht erkannt, kannst du ihn direkt als Einmalkauf hinzufügen.' },
       ]
     },
