@@ -16,6 +16,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
   const { version_id } = req.body
+  console.log(`[publish-feedback] called with version_id=${version_id}`)
   if (!version_id) return res.status(400).json({ error: 'Missing version_id' })
 
   // 1. Feedback auf published setzen
@@ -34,27 +35,36 @@ export default async function handler(req, res) {
     .eq('id', version_id)
     .single()
 
-  if (!version) return res.status(200).json({ updated: true })
+  console.log(`[publish-feedback] version lookup result:`, version)
+  if (!version) {
+    console.error(`[publish-feedback] version not found for id=${version_id}`)
+    return res.status(200).json({ updated: true })
+  }
 
   // 3. Alle Push-Subscriptions der App holen (haushaltsunabhängig)
   const { data: subs } = await supabase
     .from('push_subscriptions')
     .select('subscription, preferences, profile_id')
 
-  console.log(`[publish-feedback] version=${version.version} subs=${subs?.length ?? 0}`)
+  console.log(`[publish-feedback] version=${version.version} total_subs=${subs?.length ?? 0}`)
 
   // 4. Push an alle schicken
   let sent = 0
   for (const sub of subs ?? []) {
     if (sub.preferences?.new_version === false) continue
+    const prefOk = sub.preferences?.new_version !== false
+    console.log(`[publish-feedback] sub profile=${sub.profile_id} pref_ok=${prefOk}`)
+    if (!prefOk) continue
     try {
       await webpush.sendNotification(sub.subscription, JSON.stringify({
         title: '🚀 Neues Update',
         body: `Version ${version.version} ist verfügbar!`,
         url: '/',
       }))
+      console.log(`[publish-feedback] push sent to profile=${sub.profile_id}`)
       sent++
     } catch (err) {
+      console.error(`[publish-feedback] push failed profile=${sub.profile_id} status=${err.statusCode} msg=${err.message}`)
       if (err.statusCode === 410) {
         await supabase.from('push_subscriptions').delete()
           .eq('profile_id', sub.profile_id)
