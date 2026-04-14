@@ -266,44 +266,7 @@ export default function BarcodeScanner({ onResult, onClose, inventoryItems = [],
   }
 
   if (useAI) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black flex flex-col">
-        <div className="flex items-center justify-between px-4 py-3 shrink-0">
-          <button onClick={onClose}
-            className="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center text-xl">×</button>
-          <p className="text-white text-sm font-medium">{t.scanModeAI ?? 'KI-Produkterkennung'}</p>
-          <div className="w-9" />
-        </div>
-        <div className="flex-1 flex flex-col items-center justify-center gap-6 px-8">
-          <div className="text-7xl">📷</div>
-          <p className="text-white text-center text-sm leading-relaxed opacity-80">
-            {t.barcodeIosHint ?? 'Fotografiere den Barcode. Das Bild wird automatisch ausgewertet.'}
-          </p>
-          {debugMsg && (
-            <div className="bg-gray-800 text-green-400 rounded-xl px-3 py-2 text-xs font-mono w-full break-all">
-              {debugMsg}
-            </div>
-          )}
-          {error && (
-            <div className="bg-red-500/90 text-white rounded-2xl px-4 py-3 text-sm text-center w-full">
-              {error}
-            </div>
-          )}
-          <label className={`w-full py-4 rounded-2xl bg-primary-500 text-white font-semibold
-              text-lg flex items-center justify-center gap-3 active:scale-95 transition-all
-              ${scanning ? 'opacity-50 pointer-events-none' : 'cursor-pointer'}`}>
-            {scanning ? (
-              <><span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              {t.barcodeScanning ?? 'Analysiere…'}</>
-            ) : (
-              <><span>📸</span> {t.barcodeTakePhoto ?? 'Foto aufnehmen'}</>
-            )}
-            <input type="file" accept="image/*"
-              className="hidden" onChange={handleFile} disabled={scanning} />
-          </label>
-        </div>
-      </div>
-    )
+    return <AIScanner onResult={onResult} onClose={onClose} inventoryItems={inventoryItems} t={t} isIOS={isIOS} />
   }
 
   return (
