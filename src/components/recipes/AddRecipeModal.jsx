@@ -177,7 +177,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col">
-      <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
+      <header className="bg-white border-b border-gray-100 px-4 pb-3 flex items-center gap-3 shrink-0" style={{ paddingTop: "max(12px, env(safe-area-inset-top))" }}>
         <button onClick={onClose}
           className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">←</button>
         <h1 className="font-bold text-gray-900 text-lg flex-1">{initialData ? (t.recipesEdit ?? 'Rezept bearbeiten') : (t.recipesAdd ?? 'Rezept hinzufügen')}</h1>
@@ -440,7 +440,7 @@ function RecipeCamera({ onCapture, onClose, t }) {
 
   return (
     <div className="fixed inset-0 z-[60] bg-black flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 shrink-0">
+      <div className="flex items-center justify-between px-4 pb-3 shrink-0" style={{ paddingTop: "max(12px, env(safe-area-inset-top))" }}>
         <button onClick={() => { streamRef.current?.getTracks().forEach(tr => tr.stop()); onClose() }}
           className="w-9 h-9 rounded-xl bg-white/20 text-white flex items-center justify-center text-xl">×</button>
         <p className="text-white text-sm font-medium">{t.recipesFromPhoto ?? 'Foto aufnehmen'}</p>
