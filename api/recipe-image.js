@@ -24,13 +24,18 @@ export default async function handler(req, res) {
       const tData = await translateRes.json()
       const translated = tData.content?.[0]?.text?.trim()
       if (translated) searchQuery = translated
-    } catch {}
+      console.log(`[recipe-image] original: "${query}" → translated: "${searchQuery}"`)
+    } catch (e) {
+      console.log(`[recipe-image] translation failed: ${e.message}, using original: "${query}"`)
+    }
 
+    console.log(`[recipe-image] searching Unsplash for: "${searchQuery}"`)
     const response = await fetch(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchQuery)}&per_page=9&orientation=landscape`,
       { headers: { Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}` } }
     )
     const data = await response.json()
+    console.log(`[recipe-image] found ${data.results?.length ?? 0} photos`)
     const photos = data.results?.map(p => ({
       url: p.urls.regular,
       thumb: p.urls.small,
