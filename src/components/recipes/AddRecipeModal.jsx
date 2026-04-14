@@ -2,13 +2,23 @@ import { useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 import { Button, Input } from '../ui'
 
-export default function AddRecipeModal({ onClose, onSave, uploadImage, categories }) {
+export default function AddRecipeModal({ onClose, onSave, uploadImage, categories, initialData }) {
   const { t } = useTranslation()
   const [mode,       setMode]       = useState('manual') // 'manual' | 'photo' | 'url'
   const [loading,    setLoading]    = useState(false)
   const [error,      setError]      = useState('')
-  const [form,       setForm]       = useState({ name: '', category: '', servings: 4, image_url: '', source_url: '' })
-  const [ingredients, setIngredients] = useState([{ name: '', quantity: '', unit: '' }])
+  const [form,       setForm]       = useState({
+    name:       initialData?.name       || '',
+    category:   initialData?.category   || '',
+    servings:   initialData?.servings   || 4,
+    image_url:  initialData?.image_url  || '',
+    source_url: initialData?.source_url || '',
+  })
+  const [ingredients, setIngredients] = useState(
+    initialData?.ingredients?.length > 0
+      ? initialData.ingredients.map(i => ({ name: i.name || '', quantity: i.quantity ?? '', unit: i.unit || '' }))
+      : [{ name: '', quantity: '', unit: '' }]
+  )
   const [newCat,     setNewCat]     = useState(false)
 
   async function handlePhoto(e) {
@@ -105,7 +115,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
       <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0">
         <button onClick={onClose}
           className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">←</button>
-        <h1 className="font-bold text-gray-900 text-lg flex-1">{t.recipesAdd ?? 'Rezept hinzufügen'}</h1>
+        <h1 className="font-bold text-gray-900 text-lg flex-1">{initialData ? (t.recipesEdit ?? 'Rezept bearbeiten') : (t.recipesAdd ?? 'Rezept hinzufügen')}</h1>
         <Button onClick={handleSave} disabled={loading || !form.name.trim()}>
           {loading ? '…' : (t.save ?? 'Speichern')}
         </Button>
@@ -123,7 +133,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
               hover:bg-primary-100 transition-all flex items-center justify-center gap-2">
               {loading ? <span className="w-4 h-4 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" /> : '📷'}
               {t.recipesFromPhoto ?? 'Foto'}
-              <input type="file" accept="image/*" className="hidden" onChange={handlePhoto} disabled={loading} />
+              <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handlePhoto} disabled={loading} />
             </label>
             <button onClick={() => setMode(mode === 'url' ? 'manual' : 'url')}
               className="flex-1 py-2.5 rounded-xl border border-dashed border-primary-300
@@ -219,10 +229,14 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
                     placeholder={t.recipesQty ?? 'Menge'}
                     className="w-0 flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm text-center
                       focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                  <input value={ing.unit} onChange={e => updateIngredient(i, 'unit', e.target.value)}
-                    placeholder={t.recipesUnit ?? 'Einheit'}
+                  <select value={ing.unit} onChange={e => updateIngredient(i, 'unit', e.target.value)}
                     className="w-0 flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm
-                      focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                      focus:outline-none focus:ring-2 focus:ring-primary-500">
+                    <option value="">—</option>
+                    {['g','kg','ml','l','EL','TL','Stück','Prise','Bund','Dose','Packung','Scheibe','Zehe','Becher'].map(u => (
+                      <option key={u} value={u}>{u}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             ))}

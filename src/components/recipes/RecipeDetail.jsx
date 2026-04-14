@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 import { Button } from '../ui'
+import AddRecipeModal from './AddRecipeModal'
 
 export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inventoryItems, addToShoppingList, uploadImage, categories }) {
   const { t } = useTranslation()
   const [confirm,   setConfirm]   = useState(false)
+  const [showEdit,   setShowEdit]   = useState(false)
   const [adding,    setAdding]    = useState(false)
   const [added,     setAdded]     = useState(false)
 
@@ -42,6 +44,9 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
         <button onClick={onClose}
           className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">←</button>
         <h1 className="font-bold text-gray-900 text-lg flex-1 truncate">{recipe.name}</h1>
+        <button onClick={() => setShowEdit(true)}
+          className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
+            flex items-center justify-center text-gray-600 text-sm">✏️</button>
         {!confirm ? (
           <button onClick={() => setConfirm(true)}
             className="text-gray-300 hover:text-red-400 text-2xl leading-none">🗑</button>
@@ -130,6 +135,15 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
           </div>
         </div>
       </main>
+    {showEdit && (
+        <AddRecipeModal
+          onClose={() => setShowEdit(false)}
+          onSave={async (data) => { await onUpdate(data); setShowEdit(false) }}
+          uploadImage={uploadImage}
+          categories={categories}
+          initialData={{ ...recipe, ingredients: recipe.recipe_ingredients }}
+        />
+      )}
     </div>
   )
 }

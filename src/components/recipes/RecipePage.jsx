@@ -40,9 +40,7 @@ function CategoryManager({ categories, recipes, onRename, onDelete, onClose, t }
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">×</button>
         </div>
         <div className="px-5 py-4 flex flex-col gap-2 max-h-80 overflow-y-auto">
-          {categories.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-4">{t.recipesNoCats ?? 'Keine Kategorien'}</p>
-          ) : categories.map(cat => (
+          {categories.map(cat => (
             <div key={cat} className="flex items-center gap-2">
               {editing === cat ? (
                 <div className="flex-1 flex gap-2">
@@ -77,8 +75,44 @@ function CategoryManager({ categories, recipes, onRename, onDelete, onClose, t }
               )}
             </div>
           ))}
+          {/* Neue Kategorie */}
+          <NewCategoryRow onAdd={async (name) => { await onRename('__new__' + name, name) }} t={t} />
         </div>
       </div>
+    </div>
+  )
+}
+
+function NewCategoryRow({ onAdd, t }) {
+  const [adding, setAdding] = useState(false)
+  const [name,   setName]   = useState('')
+
+  async function handleAdd() {
+    if (!name.trim()) return
+    await onAdd(name.trim())
+    setName('')
+    setAdding(false)
+  }
+
+  if (!adding) return (
+    <button onClick={() => setAdding(true)}
+      className="w-full py-2 rounded-xl border border-dashed border-gray-200
+        text-sm text-gray-500 hover:border-primary-300 hover:text-primary-600 transition-all">
+      + {t.recipesNewCategory ?? 'Neue Kategorie'}
+    </button>
+  )
+
+  return (
+    <div className="flex gap-2">
+      <input value={name} onChange={e => setName(e.target.value)}
+        onKeyDown={e => e.key === 'Enter' && handleAdd()}
+        autoFocus placeholder={t.recipesNewCategory ?? 'Neue Kategorie'}
+        className="flex-1 rounded-xl border border-primary-300 px-3 py-2 text-sm
+          focus:outline-none focus:ring-2 focus:ring-primary-500" />
+      <button onClick={handleAdd}
+        className="px-3 py-2 rounded-xl bg-primary-500 text-white text-sm font-medium">✓</button>
+      <button onClick={() => setAdding(false)}
+        className="px-3 py-2 rounded-xl bg-gray-100 text-gray-600 text-sm">×</button>
     </div>
   )
 }
@@ -194,6 +228,7 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
           categories={categories}
           recipes={recipes}
           onRename={async (oldCat, newCat) => {
+            if (oldCat.startsWith('__new__')) return // neue Kategorie - nichts umbenennen
             for (const r of recipes.filter(r => r.category === oldCat)) {
               await updateRecipe(r.id, { ...r, ingredients: r.recipe_ingredients, category: newCat })
             }
