@@ -23,6 +23,8 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
   const [showImgPicker, setShowImgPicker] = useState(false)
   const [adding,    setAdding]    = useState(false)
   const [added,     setAdded]     = useState(false)
+  const [sharing,   setSharing]   = useState(false)
+  const [shared,    setShared]    = useState(false)
 
 
   // Check which ingredients are already in inventory
@@ -48,6 +50,28 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
       }))
       .map(i => i.id)
   ))
+
+  async function handleShare() {
+    setSharing(true)
+    try {
+      // Generate token if not exists
+      let token = recipe.share_token
+      if (!token) {
+        const res = await fetch('/api/recipe-share', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ recipe_id: recipe.id })
+        })
+        const data = await res.json()
+        token = data.token
+      }
+      const url = `${window.location.origin}/recipe/${token}`
+      await navigator.clipboard.writeText(url)
+      setShared(true)
+      setTimeout(() => setShared(false), 3000)
+    } catch {}
+    setSharing(false)
+  }
 
   function toggleIngredient(id) {
     setCheckedOff(prev => {
@@ -81,6 +105,11 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
         <button onClick={onClose}
           className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">←</button>
         <h1 className="font-bold text-gray-900 text-lg flex-1 truncate">{recipe.name}</h1>
+        <button onClick={handleShare} disabled={sharing}
+          className={`w-9 h-9 rounded-xl transition-all flex items-center justify-center text-sm
+            ${shared ? 'bg-green-100 text-green-600' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}>
+          {shared ? '✓' : '🔗'}
+        </button>
         <button onClick={() => setShowEdit(true)}
           className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
             flex items-center justify-center text-gray-600 text-sm">✏️</button>
