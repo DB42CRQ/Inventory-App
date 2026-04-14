@@ -56,33 +56,26 @@ export function useVersions(sendPush) {
   }
 
   async function createVersion(version, notes, notes_en, notes_es, is_draft = false) {
-    const { error } = await supabase.from('versions').insert({
+    const { data, error } = await supabase.from('versions').insert({
       version, notes,
       notes_en: notes_en || null,
       notes_es: notes_es || null,
       is_draft
-    })
+    }).select().single()
     if (!error) {
       await fetchVersions()
-      // Push wenn direkt publiziert
-      if (!is_draft) {
-        // Feedback mit dieser Version auf 'published' setzen
-        if (data?.id) {
-          await fetch('/api/publish-feedback', {
+      // Push + feedback publish wenn direkt publiziert
+      if (!is_draft && data?.id) {
+        try {
+          const res = await fetch('/api/publish-feedback', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ version_id: data.id })
           })
+          console.log('[createVersion] publish-feedback status:', res.status)
+        } catch (err) {
+          console.error('[createVersion] publish-feedback error:', err.message)
         }
-        console.log('[createVersion] sending push for version:', version)
-
-        sendPushRef.current?.({
-          title: '🚀 Neues Update',
-          body: `Version ${version} ist verfügbar!`,
-          excludeSelf: false,
-          category: 'new_version',
-          meta: { version },
-        })
       }
     }
     return { error }
