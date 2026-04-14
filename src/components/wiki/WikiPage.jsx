@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
 
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
+
 function Section({ title, children, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen)
   return (
@@ -81,10 +83,14 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: 'Mit "+ Aus Inventar" kannst du Artikel aus dem Inventar suchen und hinzufügen. Wenn ein Artikel nicht im Inventar ist, erscheint ein grüner "+ Hinzufügen" Button — damit landet er direkt auf der Liste.' },
         { type: 'step', n: 4, text: 'Tippe einen Artikel an um ihn abzuhaken — gib die gekaufte Menge ein und bestätige. Der Bestand im Inventar wird sofort aktualisiert.' },
         { type: 'step', n: 5, text: 'Bei Einmalkäufen (nicht im Inventar) wird nach dem Abhaken gefragt ob der Artikel dauerhaft ins Inventar aufgenommen werden soll.' },
+        { type: 'tip-ios', text: 'Mit dem 📷 Button öffnet sich der Scanner. Fotografiere das Produkt — die KI erkennt es automatisch und sucht den passenden Artikel im Inventar.' },
+        { type: 'tip-android', text: 'Mit dem 📷 Button öffnet sich der Scanner. Wähle zwischen Barcode scannen (EAN-Code) oder KI-Produkterkennung (Foto des Produkts).' },
         { type: 'step', n: 5, text: 'Abgehakte Artikel erscheinen durchgestrichen unten. Mit "🗑 Leeren" kannst du erledigte oder alle Artikel löschen.' },
         { type: 'step', n: 6, text: 'Mit dem 📷-Button oben rechts kannst du einen Barcode scannen — der Artikel wird automatisch im Inventar gesucht und der Bestand direkt aktualisiert.' },
         { type: 'tip', text: 'Die Einkaufsliste ist für alle Haushaltsmitglieder geteilt — Änderungen sind in Echtzeit sichtbar.' },
-        { type: 'tip', text: 'Der Barcode-Scanner funktioniert am besten mit Chrome auf Android. Wird ein Artikel nicht erkannt, kannst du ihn direkt neu anlegen.' },
+        { type: 'tip-android', text: 'Barcode scannen: Halte den EAN-Barcode in den Rahmen — der Artikel wird automatisch im Inventar gesucht.' },
+        { type: 'tip-android', text: 'KI-Produkterkennung: Fotografiere das Produkt — die KI erkennt es und sucht den passenden Artikel.' },
+        { type: 'tip', text: 'Wird ein Artikel nicht erkannt, kannst du ihn direkt als Einmalkauf hinzufügen.' },
       ]
     },
     {
@@ -195,6 +201,8 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: '"+ From inventory" lets you search and add items. If an item is not in your inventory, a green "+ Add" button appears — this adds it directly to the list.' },
         { type: 'step', n: 4, text: 'Tap an item to check it off — enter the purchased quantity and confirm. The inventory stock is updated immediately.' },
         { type: 'step', n: 5, text: 'For one-time purchases (not in inventory), you will be asked after checking off whether to permanently add the item to your inventory.' },
+        { type: 'tip-ios', text: 'The 📷 button opens the scanner. Take a photo of the product — the AI recognizes it and finds the matching item in your inventory.' },
+        { type: 'tip-android', text: 'The 📷 button opens the scanner. Choose between barcode scanning (EAN code) or AI product recognition (photo of the product).' },
         { type: 'step', n: 5, text: 'Checked items appear crossed out at the bottom. Use "🗑 Clear" to delete done or all items.' },
         { type: 'step', n: 6, text: 'Use the 📷 button in the top right to scan a barcode — the item is automatically matched against your inventory and the stock is updated directly.' },
         { type: 'tip', text: 'The shopping list is shared with all household members — changes are visible in real time.' },
@@ -307,6 +315,8 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: '"+ Del inventario" te permite buscar y añadir artículos. Si un artículo no está en tu inventario, aparece un botón verde "+ Añadir" — esto lo añade directamente a la lista.' },
         { type: 'step', n: 4, text: 'Toca un artículo para marcarlo — introduce la cantidad comprada y confirma. El stock del inventario se actualiza inmediatamente.' },
         { type: 'step', n: 5, text: 'Para compras únicas (no en el inventario), después de marcar se preguntará si deseas añadir el artículo permanentemente al inventario.' },
+        { type: 'tip-ios', text: 'El botón 📷 abre el escáner. Fotografía el producto — la IA lo reconoce y encuentra el artículo en tu inventario.' },
+        { type: 'tip-android', text: 'El botón 📷 abre el escáner. Elige entre escanear código de barras (código EAN) o reconocimiento IA (foto del producto).' },
         { type: 'step', n: 5, text: 'Los artículos marcados aparecen tachados abajo. Con "🗑 Vaciar" puedes eliminar los completados o todos.' },
         { type: 'step', n: 6, text: 'Usa el botón 📷 arriba a la derecha para escanear un código de barras — el artículo se busca automáticamente en tu inventario y el stock se actualiza directamente.' },
         { type: 'tip', text: 'La lista de compras es compartida por todos los miembros del hogar — los cambios son visibles en tiempo real.' },
@@ -413,11 +423,17 @@ export default function WikiPage({ onClose }) {
         <div className="flex flex-col gap-2">
           {sections.map((section, i) => (
             <Section key={i} title={section.title} defaultOpen={section.defaultOpen}>
-              {section.content.map((item, j) =>
-                item.type === 'step'
-                  ? <Step key={j} number={item.n} text={item.text} />
-                  : <Tip key={j} text={item.text} />
-              )}
+              {section.content
+                .filter(item => {
+                  if (item.type === 'tip-ios') return isIOS
+                  if (item.type === 'tip-android') return !isIOS
+                  return true
+                })
+                .map((item, j) =>
+                  item.type === 'step'
+                    ? <Step key={j} number={item.n} text={item.text} />
+                    : <Tip key={j} text={item.text} />
+                )}
             </Section>
           ))}
         </div>
