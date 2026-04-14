@@ -160,14 +160,16 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
               <label className="text-sm font-medium text-gray-700 block mb-1">
                 {t.recipesCategory ?? 'Kategorie'}
               </label>
-              {newCat ? (
+              {newCat || categories.length === 0 ? (
                 <div className="flex gap-1">
                   <input value={form.category}
                     onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                     placeholder={t.recipesNewCategory ?? 'Neue Kategorie'}
                     className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm
                       focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                  <button onClick={() => setNewCat(false)} className="text-gray-400 px-2">×</button>
+                  {categories.length > 0 && (
+                    <button onClick={() => setNewCat(false)} className="text-gray-400 px-2">×</button>
+                  )}
                 </div>
               ) : (
                 <div className="flex gap-1">
@@ -203,21 +205,25 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
           </p>
           <div className="flex flex-col gap-2">
             {ingredients.map((ing, i) => (
-              <div key={i} className="flex gap-2 items-center">
-                <input value={ing.name} onChange={e => updateIngredient(i, 'name', e.target.value)}
-                  placeholder={t.recipesIngredientName ?? 'Zutat'}
-                  className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm
-                    focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                <input type="number" value={ing.quantity} onChange={e => updateIngredient(i, 'quantity', e.target.value)}
-                  placeholder={t.recipesQty ?? 'Menge'}
-                  className="w-16 rounded-xl border border-gray-200 px-2 py-2 text-sm text-center
-                    focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                <input value={ing.unit} onChange={e => updateIngredient(i, 'unit', e.target.value)}
-                  placeholder={t.recipesUnit ?? 'Einheit'}
-                  className="w-16 rounded-xl border border-gray-200 px-2 py-2 text-sm
-                    focus:outline-none focus:ring-2 focus:ring-primary-500" />
-                <button onClick={() => removeIngredient(i)}
-                  className="text-gray-300 hover:text-red-400 text-xl leading-none">×</button>
+              <div key={i} className="flex flex-col gap-1.5 pb-2 border-b border-gray-50 last:border-0">
+                <div className="flex gap-2 items-center">
+                  <input value={ing.name} onChange={e => updateIngredient(i, 'name', e.target.value)}
+                    placeholder={t.recipesIngredientName ?? 'Zutat'}
+                    className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm
+                      focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                  <button onClick={() => removeIngredient(i)}
+                    className="text-gray-300 hover:text-red-400 text-xl leading-none shrink-0">×</button>
+                </div>
+                <div className="flex gap-2">
+                  <input type="number" value={ing.quantity} onChange={e => updateIngredient(i, 'quantity', e.target.value)}
+                    placeholder={t.recipesQty ?? 'Menge'}
+                    className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm text-center
+                      focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                  <input value={ing.unit} onChange={e => updateIngredient(i, 'unit', e.target.value)}
+                    placeholder={t.recipesUnit ?? 'Einheit'}
+                    className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm
+                      focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                </div>
               </div>
             ))}
           </div>
