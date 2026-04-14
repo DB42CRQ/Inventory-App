@@ -171,7 +171,7 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
                     ${isChecked ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-400'}`}>
                     {isChecked ? '✓' : '○'}
                   </span>
-                  <span className={`flex-1 text-sm ${isChecked ? 'text-gray-400' : 'text-gray-800'}`}>
+                  <span className="flex-1 text-sm text-gray-800">
                     {getIngName(ing)}
                   </span>
                   <span className="text-sm text-gray-400 shrink-0">
