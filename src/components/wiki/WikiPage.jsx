@@ -80,7 +80,7 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Tippe auf das 🛒-Symbol oben rechts um die Einkaufsliste zu öffnen.' },
         { type: 'step', n: 2, text: 'Mit "⚠️ Alle niedrigen" werden alle Artikel mit niedrigem Bestand auf einmal hinzugefügt. Mit dem Dropdown darunter nur eine bestimmte Kategorie.' },
-        { type: 'step', n: 3, text: 'Mit "+ Aus Inventar" kannst du Artikel suchen und hinzufügen. Wenn ein Artikel nicht im Inventar ist, erscheint ein grüner "+ Hinzufügen" Button — damit landet er direkt auf der Liste.' },
+        { type: 'step', n: 3, text: 'Mit "+ Hinzufügen" kannst du Artikel aus dem Inventar suchen und direkt hinzufügen. Ist ein Artikel nicht im Inventar, erscheint trotzdem ein grüner Button — damit landet er als Einmalkauf auf der Liste.' },
         { type: 'step', n: 4, text: 'Tippe einen Artikel an um ihn abzuhaken — gib die gekaufte Menge ein und bestätige. Der Bestand im Inventar wird sofort aktualisiert.' },
         { type: 'step', n: 5, text: 'Bei Einmalkäufen wird nach dem Abhaken gefragt ob der Artikel dauerhaft ins Inventar aufgenommen werden soll.' },
         { type: 'step', n: 6, text: 'Abgehakte Artikel erscheinen durchgestrichen unten. Mit "🗑 Leeren" kannst du erledigte oder alle Artikel löschen.' },
@@ -98,10 +98,12 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: 'Rezepte importieren: Tippe auf "Foto" um ein Rezeptfoto aufzunehmen — die KI erkennt Name, Zutaten und Mengen automatisch. Oder gib eine URL ein (z.B. von chefkoch.de oder lecker.de) und tippe auf →.' },
         { type: 'step', n: 4, text: 'Alternativ kannst du das Rezept manuell anlegen: Name, Kategorie, Portionen und Zutaten eingeben.' },
         { type: 'step', n: 5, text: 'Beim Speichern wird automatisch ein passendes Bild von Unsplash gesucht, falls du keins gewählt hast. Du kannst das Bild auch selbst wählen oder hochladen.' },
-        { type: 'step', n: 6, text: 'Tippe auf ein Rezept um die Details zu sehen. Fehlende Zutaten werden markiert und können per Knopfdruck direkt auf die Einkaufsliste gesetzt werden.' },
+        { type: 'step', n: 6, text: 'Tippe auf ein Rezept um die Details zu sehen. Zutaten die du bereits hast sind vorgehakt — mit einem Klick kannst du den Stand anpassen und dann alle nicht abgehakten Zutaten auf die Einkaufsliste setzen.' },
         { type: 'tip', text: 'Kategorien entstehen automatisch wenn du eine neue Kategorie beim Anlegen eingibst. Mit dem 🏷️ Button kannst du Kategorien umbenennen oder löschen.' },
         { type: 'tip', text: 'Mit dem 🔍 Button kannst du nach Rezepten mit bestimmten Zutaten filtern — praktisch wenn du weißt was im Kühlschrank ist.' },
         { type: 'tip', text: 'Mit dem ✏️ Button in der Detailansicht kannst du ein Rezept nachträglich bearbeiten.' },
+        { type: 'tip', text: 'Mit dem 🔗 Button kannst du einen Rezept-Link kopieren und teilen. Wer den Link öffnet, kann das Rezept mit einem Klick in seinen Haushalt importieren.' },
+        { type: 'tip', text: 'In der Detailansicht kannst du Zutaten antippen um sie als vorhanden zu markieren — der Button zeigt dann nur noch die fehlenden auf die Liste setzen.' },
         { type: 'tip', text: 'Name, Kategorie und Zutaten werden automatisch in alle drei Sprachen übersetzt.' },
       ]
     },
@@ -148,7 +150,7 @@ const WIKI_CONTENT = {
         { type: 'step', n: 2, text: 'Wähle zwischen "Idee" (neue Funktion) und "Bug" (Fehler melden).' },
         { type: 'step', n: 3, text: 'Bei Bugs kannst du optional einen Screenshot anhängen.' },
         { type: 'step', n: 4, text: 'Über "Meine Vorschläge ansehen" siehst du den Status deiner Einreichungen.' },
-        { type: 'tip', text: 'Bei Status "Deployed" wird die zugehörige Version angezeigt.' },
+        { type: 'tip', text: 'Bei Status "Deployed" wird die zugehörige Version angezeigt. Sobald diese Version veröffentlicht wird, wechselt der Status automatisch auf "Veröffentlicht".' },
       ]
     },
 
@@ -166,8 +168,8 @@ const WIKI_CONTENT = {
     {
       title: '🚀 Versionen & Updates',
       content: [
-        { type: 'step', n: 1, text: 'Tippe auf 🚀 oben rechts um die Versionshistorie zu sehen.' },
-        { type: 'step', n: 2, text: 'Bei neuen Updates erscheint ein rotes Badge auf dem 🚀-Button.' },
+        { type: 'step', n: 1, text: 'Tippe auf ⚙️ und dann auf "Versionen" um die Versionshistorie zu sehen.' },
+        { type: 'step', n: 2, text: 'Bei neuen Updates erscheint eine Push-Benachrichtigung und ein Banner beim nächsten Start.' },
         { type: 'step', n: 3, text: 'Das Update-Banner erscheint automatisch beim nächsten Login nach einem neuen Release.' },
         { type: 'tip', text: 'Bestätige Updates mit "Ich habe die App installiert" damit der Entwickler weiß dass du up to date bist.' },
       ]
@@ -210,7 +212,7 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Tap the 🛒 icon in the top right to open the shopping list.' },
         { type: 'step', n: 2, text: '"⚠️ All low stock" adds all low-stock items at once. Use the dropdown to add only a specific category.' },
-        { type: 'step', n: 3, text: '"+ From inventory" lets you search and add items. If an item is not in your inventory, a green "+ Add" button appears — this adds it directly to the list.' },
+        { type: 'step', n: 3, text: 'Use "+ Add" to search and add items from your inventory. If an item is not in your inventory, a green button still appears — this adds it as a one-time purchase.' },
         { type: 'step', n: 4, text: 'Tap an item to check it off — enter the purchased quantity and confirm. The inventory stock is updated immediately.' },
         { type: 'step', n: 5, text: 'For one-time purchases you will be asked after checking off whether to permanently add the item to your inventory.' },
         { type: 'step', n: 6, text: 'Checked items appear crossed out at the bottom. Use "🗑 Clear" to delete done or all items.' },
@@ -227,10 +229,12 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: 'Import recipes: tap "Photo" to take a photo of a recipe — the AI automatically recognizes the name, ingredients and quantities. Or enter a URL (e.g. from a recipe website) and tap →.' },
         { type: 'step', n: 4, text: 'Alternatively, you can add the recipe manually: enter name, category, servings and ingredients.' },
         { type: 'step', n: 5, text: 'When saving, a matching image from Unsplash is automatically fetched if you have not chosen one. You can also choose or upload your own image.' },
-        { type: 'step', n: 6, text: 'Tap a recipe to see the details. Missing ingredients are highlighted and can be added to the shopping list with one tap.' },
+        { type: 'step', n: 6, text: 'Tap a recipe to see the details. Ingredients you already have are pre-checked — tap to adjust and then add all unchecked ingredients to the shopping list.' },
         { type: 'tip', text: 'Categories are created automatically when you enter a new category name. Use the 🏷️ button to rename or delete categories.' },
         { type: 'tip', text: 'The 🔍 button lets you filter recipes by ingredient — useful when you know what is in the fridge.' },
         { type: 'tip', text: 'Use the ✏️ button in the detail view to edit a recipe.' },
+        { type: 'tip', text: 'Use the 🔗 button to copy a recipe link and share it. Anyone who opens the link can import the recipe into their household with one tap.' },
+        { type: 'tip', text: 'In the detail view you can tap ingredients to mark them as available — the button then only adds the remaining ones to the list.' },
         { type: 'tip', text: 'Name, category and ingredients are automatically translated into all three languages.' },
       ]
     },
@@ -338,7 +342,7 @@ const WIKI_CONTENT = {
       content: [
         { type: 'step', n: 1, text: 'Toca el icono 🛒 arriba a la derecha para abrir la lista de compras.' },
         { type: 'step', n: 2, text: '"⚠️ Todos los bajos" añade todos los artículos con stock bajo de una vez. Usa el desplegable para añadir solo una categoría.' },
-        { type: 'step', n: 3, text: '"+ Del inventario" te permite buscar y añadir artículos. Si un artículo no está en tu inventario, aparece un botón verde "+ Añadir" — esto lo añade directamente a la lista.' },
+        { type: 'step', n: 3, text: 'Con "+ Añadir" puedes buscar y añadir artículos de tu inventario. Si un artículo no está en el inventario, igual aparece un botón verde — esto lo añade como compra única.' },
         { type: 'step', n: 4, text: 'Toca un artículo para marcarlo — introduce la cantidad comprada y confirma. El stock del inventario se actualiza inmediatamente.' },
         { type: 'step', n: 5, text: 'Para compras únicas se preguntará después de marcar si deseas añadir el artículo permanentemente al inventario.' },
         { type: 'step', n: 6, text: 'Los artículos marcados aparecen tachados abajo. Usa "🗑 Vaciar" para eliminar los completados o todos.' },
@@ -355,10 +359,12 @@ const WIKI_CONTENT = {
         { type: 'step', n: 3, text: 'Importar recetas: toca "Foto" para fotografiar una receta — la IA reconoce automáticamente el nombre, ingredientes y cantidades. O introduce una URL y toca →.' },
         { type: 'step', n: 4, text: 'Alternativamente puedes añadir la receta manualmente: introduce nombre, categoría, porciones e ingredientes.' },
         { type: 'step', n: 5, text: 'Al guardar, se busca automáticamente una imagen de Unsplash si no has elegido ninguna. También puedes elegir o subir tu propia imagen.' },
-        { type: 'step', n: 6, text: 'Toca una receta para ver los detalles. Los ingredientes faltantes se marcan y se pueden añadir a la lista de compras con un toque.' },
+        { type: 'step', n: 6, text: 'Toca una receta para ver los detalles. Los ingredientes que ya tienes se marcan previamente — toca para ajustar y luego añade los no marcados a la lista de compras.' },
         { type: 'tip', text: 'Las categorías se crean automáticamente cuando introduces un nuevo nombre. Usa el botón 🏷️ para renombrar o eliminar categorías.' },
         { type: 'tip', text: 'El botón 🔍 te permite filtrar recetas por ingrediente — útil cuando sabes lo que hay en el frigorífico.' },
         { type: 'tip', text: 'Usa el botón ✏️ en la vista de detalle para editar una receta.' },
+        { type: 'tip', text: 'Usa el botón 🔗 para copiar un enlace de receta y compartirlo. Quien abra el enlace puede importar la receta a su hogar con un toque.' },
+        { type: 'tip', text: 'En la vista de detalle puedes tocar ingredientes para marcarlos como disponibles — el botón entonces solo añade los restantes a la lista.' },
         { type: 'tip', text: 'El nombre, categoría e ingredientes se traducen automáticamente a los tres idiomas.' },
       ]
     },
@@ -406,7 +412,7 @@ const WIKI_CONTENT = {
         { type: 'step', n: 2, text: 'Elige entre "Idea" (nueva función) y "Error" (reportar un fallo).' },
         { type: 'step', n: 3, text: 'Para errores, puedes adjuntar opcionalmente una captura de pantalla.' },
         { type: 'step', n: 4, text: 'Con "Ver mis sugerencias" puedes ver el estado de tus envíos.' },
-        { type: 'tip', text: 'Cuando el estado es "Implementado", se muestra la versión correspondiente.' },
+        { type: 'tip', text: 'Cuando el estado es "Deployed", se muestra la versión correspondiente. Una vez publicada esa versión, el estado cambia automáticamente a "Publicado".' },
       ]
     },
 
@@ -424,8 +430,8 @@ const WIKI_CONTENT = {
     {
       title: '🚀 Versiones y actualizaciones',
       content: [
-        { type: 'step', n: 1, text: 'Toca 🚀 arriba a la derecha para ver el historial de versiones.' },
-        { type: 'step', n: 2, text: 'Aparece un badge rojo en el botón 🚀 cuando hay nuevas actualizaciones.' },
+        { type: 'step', n: 1, text: 'Toca ⚙️ y luego "Versiones" para ver el historial de versiones.' },
+        { type: 'step', n: 2, text: 'Con nuevas actualizaciones recibes una notificación push y un banner al siguiente inicio.' },
         { type: 'step', n: 3, text: 'El banner de actualización aparece automáticamente en el próximo inicio de sesión.' },
         { type: 'tip', text: 'Confirma las actualizaciones con "He instalado la app" para que el desarrollador sepa que estás al día.' },
       ]
