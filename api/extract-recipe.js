@@ -9,6 +9,12 @@ async function extractFromUrl(url) {
       'Accept-Language': 'de-DE,de;q=0.9',
     }
   })
+  if (fetchRes.status === 403 || fetchRes.status === 401) {
+    throw new Error(`Diese Website blockiert automatische Anfragen (${fetchRes.status}). Bitte kopiere das Rezept als Text oder mache ein Foto.`)
+  }
+  if (!fetchRes.ok) {
+    throw new Error(`Seite konnte nicht geladen werden (${fetchRes.status}). Bitte versuche es mit einem Foto oder gib das Rezept manuell ein.`)
+  }
   const html = await fetchRes.text()
 
   // Try JSON-LD structured data first (most recipe sites have this)

@@ -479,9 +479,24 @@ function RecipeCamera({ onCapture, onClose, t }) {
           </div>
         )}
       </div>
-      <div className="px-4 py-4 shrink-0">
+      <div className="px-4 py-4 shrink-0 flex gap-3">
+        <label className="w-12 h-12 rounded-2xl bg-white/20 text-white flex items-center justify-center
+          text-xl cursor-pointer shrink-0 active:scale-95 transition-all">
+          🖼️
+          <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
+            const file = e.target.files?.[0]
+            if (!file) return
+            streamRef.current?.getTracks().forEach(tr => tr.stop())
+            const base64 = await new Promise(res => {
+              const reader = new FileReader()
+              reader.onload = ev => res(ev.target.result.split(',')[1])
+              reader.readAsDataURL(file)
+            })
+            onCapture(base64, file)
+          }} />
+        </label>
         <button onClick={takeSnapshot} disabled={!ready}
-          className="w-full py-4 rounded-2xl bg-primary-500 text-white font-semibold text-lg
+          className="flex-1 py-4 rounded-2xl bg-primary-500 text-white font-semibold text-lg
             flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95 transition-all">
           📸 {t.barcodeTakePhoto ?? 'Foto aufnehmen'}
         </button>
