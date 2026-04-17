@@ -348,6 +348,13 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
           </div>
         </div>
 
+        {/* Zubereitung */}
+        <InstructionsSection
+          value={form.instructions}
+          onChange={v => setForm(f => ({ ...f, instructions: v }))}
+          t={t}
+        />
+
         {/* Zutaten */}
         <div className="bg-white rounded-2xl border border-gray-100 p-4">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
@@ -392,13 +399,6 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
             + {t.recipesAddIngredient ?? 'Zutat hinzufügen'}
           </button>
         </div>
-
-        {/* Zubereitung */}
-        <InstructionsSection
-          value={form.instructions}
-          onChange={v => setForm(f => ({ ...f, instructions: v }))}
-          t={t}
-        />
 
       </main>
 
