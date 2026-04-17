@@ -14,6 +14,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
     servings:   initialData?.servings   || 4,
     image_url:  initialData?.image_url  || '',
     source_url: initialData?.source_url || '',
+    instructions: initialData?.instructions || '',
   })
   const [ingredients, setIngredients] = useState(
     initialData?.ingredients?.length > 0
@@ -84,6 +85,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
       category: data.category || f.category,
       servings: data.servings || f.servings,
     }))
+    if (data.instructions) setForm(f => ({ ...f, instructions: data.instructions }))
     if (data.ingredients?.length > 0) {
       setIngredients(data.ingredients.map(i => ({
         name: i.name || '',
@@ -141,6 +143,24 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
       } catch {}
     }
 
+    // Zubereitung übersetzen
+    let instructions_de = form.instructions || null
+    let instructions_en = null
+    let instructions_es = null
+    if (form.instructions) {
+      try {
+        const res = await fetch('/api/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: form.instructions })
+        })
+        const data = await res.json()
+        instructions_de = data.de || form.instructions
+        instructions_en = data.en || null
+        instructions_es = data.es || null
+      } catch {}
+    }
+
     // Zutaten übersetzen
     const validIngredients = ingredients.filter(i => i.name.trim())
     let translatedIngredients = validIngredients
@@ -179,6 +199,10 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
 
     await onSave({
       ...form,
+      instructions: instructions_de,
+      instructions_de,
+      instructions_en,
+      instructions_es,
       name: name_de,
       name_de,
       name_en,

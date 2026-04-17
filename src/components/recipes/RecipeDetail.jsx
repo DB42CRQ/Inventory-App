@@ -13,6 +13,12 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
     return r.category_de || r.category || ''
   }
 
+  function getInstructions(r) {
+    if (lang === 'en' && r.instructions_en) return r.instructions_en
+    if (lang === 'es' && r.instructions_es) return r.instructions_es
+    return r.instructions_de || r.instructions || null
+  }
+
   function getIngName(ing) {
     if (lang === 'en' && ing.name_en) return ing.name_en
     if (lang === 'es' && ing.name_es) return ing.name_es
@@ -213,6 +219,26 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
               {t.recipesIngredientHint ?? 'Tippe zum An-/Abhaken'}
             </p>
           </div>
+
+          {/* Zubereitung */}
+          {getInstructions(recipe) && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-4">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                {t.recipesInstructions ?? 'Zubereitung'}
+              </p>
+              <div className="flex flex-col gap-3">
+                {getInstructions(recipe).split('\n').filter(s => s.trim()).map((step, i) => (
+                  <div key={i} className="flex gap-3">
+                    <span className="w-6 h-6 bg-primary-100 text-primary-700 rounded-full
+                      flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                      {i + 1}
+                    </span>
+                    <p className="text-sm text-gray-700 leading-relaxed flex-1">{step.trim()}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </main>
 

@@ -23,10 +23,10 @@ export function useRecipes(householdId) {
     setLoading(false)
   }
 
-  async function addRecipe({ name, name_de, name_en, name_es, category, category_de, category_en, category_es, image_url, source_url, servings, ingredients }) {
+  async function addRecipe({ name, name_de, name_en, name_es, category, category_de, category_en, category_es, image_url, source_url, servings, instructions, instructions_de, instructions_en, instructions_es, ingredients }) {
     const { data, error } = await supabase
       .from('recipes')
-      .insert({ household_id: householdId, name: name_de || name, name_de: name_de || null, name_en: name_en || null, name_es: name_es || null, category: category || null, category_de: category_de || null, category_en: category_en || null, category_es: category_es || null, image_url: image_url || null, source_url: source_url || null, servings: servings || 4, created_by: user.id })
+      .insert({ household_id: householdId, name: name_de || name, name_de: name_de || null, name_en: name_en || null, name_es: name_es || null, category: category || null, category_de: category_de || null, category_en: category_en || null, category_es: category_es || null, image_url: image_url || null, source_url: source_url || null, servings: servings || 4, instructions: instructions_de || instructions || null, instructions_de: instructions_de || null, instructions_en: instructions_en || null, instructions_es: instructions_es || null, created_by: user.id })
       .select()
       .single()
     if (error || !data) return { error }
@@ -40,8 +40,8 @@ export function useRecipes(householdId) {
     return { error: null, id: data.id }
   }
 
-  async function updateRecipe(id, { name, name_de, name_en, name_es, category, category_de, category_en, category_es, servings, ingredients }) {
-    await supabase.from('recipes').update({ name: name_de || name, name_de: name_de || null, name_en: name_en || null, name_es: name_es || null, category: category || null, category_de: category_de || null, category_en: category_en || null, category_es: category_es || null, servings }).eq('id', id)
+  async function updateRecipe(id, { name, name_de, name_en, name_es, category, category_de, category_en, category_es, servings, instructions, instructions_de, instructions_en, instructions_es, ingredients }) {
+    await supabase.from('recipes').update({ name: name_de || name, name_de: name_de || null, name_en: name_en || null, name_es: name_es || null, category: category || null, category_de: category_de || null, category_en: category_en || null, category_es: category_es || null, servings, instructions: instructions_de || instructions || null, instructions_de: instructions_de || null, instructions_en: instructions_en || null, instructions_es: instructions_es || null }).eq('id', id)
     if (ingredients) {
       await supabase.from('recipe_ingredients').delete().eq('recipe_id', id)
       if (ingredients.length > 0) {
