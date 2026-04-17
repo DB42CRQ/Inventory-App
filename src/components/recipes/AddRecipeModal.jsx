@@ -634,37 +634,70 @@ export function ImagePickerModal({ recipeName, currentImage, onSelect, onClose, 
 }
 
 function InstructionsSection({ value, onChange, t }) {
-  const [open, setOpen] = useState(false)
+  const [open,       setOpen]       = useState(!!value)
+  const [fullscreen, setFullscreen] = useState(false)
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-      <button onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-all">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
-            {t.recipesInstructions ?? 'Zubereitung'}
-          </span>
-          {value && (
-            <span className="w-2 h-2 rounded-full bg-primary-400" />
-          )}
-        </div>
-        <span className="text-gray-400 text-sm">{open ? '▾' : '▸'}</span>
-      </button>
-      {open && (
-        <div className="px-4 pb-4 border-t border-gray-50">
+    <>
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <button onClick={() => setOpen(o => !o)}
+          className="w-full flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-all">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+              {t.recipesInstructions ?? 'Zubereitung'}
+            </span>
+            {value && <span className="w-2 h-2 rounded-full bg-primary-400" />}
+          </div>
+          <span className="text-gray-400 text-sm">{open ? '▾' : '▸'}</span>
+        </button>
+        {open && (
+          <div className="px-4 pb-4 border-t border-gray-50">
+            <div className="relative mt-3">
+              <textarea
+                value={value}
+                onChange={e => onChange(e.target.value)}
+                placeholder={t.recipesInstructionsPlaceholder ?? 'Zubereitungsschritte…'}
+                rows={5}
+                className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm
+                  focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none pr-10" />
+              <button onClick={() => setFullscreen(true)}
+                className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-gray-100
+                  hover:bg-gray-200 flex items-center justify-center text-gray-500 text-xs transition-all"
+                title={t.recipesInstructionsExpand ?? 'Vollbild'}>
+                ⤢
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 mt-1">
+              {t.recipesInstructionsHint ?? 'Jeden Schritt in eine neue Zeile'}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {fullscreen && (
+        <div className="fixed inset-0 z-[70] bg-gray-50 flex flex-col"
+          style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}>
+          <div className="flex items-center gap-3 px-4 pb-3 bg-white border-b border-gray-100 shrink-0">
+            <button onClick={() => setFullscreen(false)}
+              className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">←</button>
+            <h2 className="font-semibold text-gray-900 flex-1">{t.recipesInstructions ?? 'Zubereitung'}</h2>
+            <button onClick={() => setFullscreen(false)}
+              className="px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-medium">
+              {t.done ?? 'Fertig'}
+            </button>
+          </div>
           <textarea
             value={value}
             onChange={e => onChange(e.target.value)}
             placeholder={t.recipesInstructionsPlaceholder ?? 'Zubereitungsschritte…'}
-            rows={8}
             autoFocus
-            className="mt-3 w-full rounded-xl border border-gray-200 px-3 py-2 text-sm
-              focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none" />
-          <p className="text-xs text-gray-400 mt-1">
+            className="flex-1 px-4 py-4 text-sm text-gray-800 bg-gray-50
+              focus:outline-none resize-none leading-relaxed" />
+          <p className="text-xs text-gray-400 text-center py-2">
             {t.recipesInstructionsHint ?? 'Jeden Schritt in eine neue Zeile'}
           </p>
         </div>
       )}
-    </div>
+    </>
   )
 }
