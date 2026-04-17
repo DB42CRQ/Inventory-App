@@ -14,7 +14,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
     servings:   initialData?.servings   || 4,
     image_url:  initialData?.image_url  || '',
     source_url: initialData?.source_url || '',
-    instructions: initialData?.instructions || '',
+    instructions: initialData?.instructions_de || initialData?.instructions || '',
   })
   const [ingredients, setIngredients] = useState(
     initialData?.ingredients?.length > 0
@@ -659,11 +659,12 @@ function InstructionsSection({ value, onChange, t }) {
                 placeholder={t.recipesInstructionsPlaceholder ?? 'Zubereitungsschritte…'}
                 rows={5}
                 className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm
-                  focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none pr-10" />
-              <button onClick={() => setFullscreen(true)}
+                  focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none" />
+              <button
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => setFullscreen(true)}
                 className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-gray-100
-                  hover:bg-gray-200 flex items-center justify-center text-gray-500 text-xs transition-all"
-                title={t.recipesInstructionsExpand ?? 'Vollbild'}>
+                  hover:bg-gray-200 flex items-center justify-center text-gray-500 text-xs transition-all">
                 ⤢
               </button>
             </div>
