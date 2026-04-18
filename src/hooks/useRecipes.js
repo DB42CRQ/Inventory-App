@@ -51,6 +51,8 @@ export function useRecipes(householdId) {
       }
     }
     await fetchRecipes()
+    const { data: updated } = await supabase.from('recipes').select('*, recipe_ingredients(*)').eq('id', id).single()
+    return updated
   }
 
   async function deleteRecipe(id) {
