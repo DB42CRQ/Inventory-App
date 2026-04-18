@@ -3,7 +3,7 @@ const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
 import { useTranslation } from '../../i18n/useTranslation'
 import { Button, Input } from '../ui'
 
-export default function AddRecipeModal({ onClose, onSave, uploadImage, categories, initialData }) {
+export default function AddRecipeModal({ onClose, onSave, uploadImage, categories = [], initialData }) {
   const { t, lang } = useTranslation()
   const [mode,       setMode]       = useState('manual') // 'manual' | 'photo' | 'url'
   const [loading,    setLoading]    = useState(false)
@@ -403,7 +403,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
       </main>
 
       {showImagePicker && (
-        <ImagePicker
+        <ImagePickerModal
           recipeName={form.name}
           currentImage={form.image_url}
           onSelect={(url) => { setForm(f => ({ ...f, image_url: url })); setShowImagePicker(false) }}
