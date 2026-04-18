@@ -41,7 +41,6 @@ export function useRecipes(householdId) {
   }
 
   async function updateRecipe(id, { name, name_de, name_en, name_es, category, category_de, category_en, category_es, servings, image_url, source_url, instructions, instructions_de, instructions_en, instructions_es, ingredients }) {
-    console.log('[updateRecipe] id:', id, 'image_url:', image_url?.slice(0, 60))
     const { error } = await supabase.from('recipes').update({
       name: name_de || name,
       name_de: name_de || null, name_en: name_en || null, name_es: name_es || null,
@@ -52,7 +51,6 @@ export function useRecipes(householdId) {
       instructions: instructions_de || instructions || null,
       instructions_de: instructions_de || null, instructions_en: instructions_en || null, instructions_es: instructions_es || null,
     }).eq('id', id)
-    console.log('[updateRecipe] DB error:', error?.message ?? 'none')
     if (ingredients) {
       await supabase.from('recipe_ingredients').delete().eq('recipe_id', id)
       if (ingredients.length > 0) {
@@ -63,7 +61,6 @@ export function useRecipes(householdId) {
     }
     await fetchRecipes()
     const { data: updated, error: fetchError } = await supabase.from('recipes').select('*, recipe_ingredients(*)').eq('id', id).single()
-    console.log('[updateRecipe] fetched updated image_url:', updated?.image_url?.slice(0, 60), 'fetchError:', fetchError?.message)
     return updated
   }
 

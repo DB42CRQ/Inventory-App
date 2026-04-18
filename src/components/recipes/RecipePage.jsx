@@ -256,7 +256,6 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
           onClose={() => setSelected(null)}
           onDelete={async () => { await deleteRecipe(selected.id); setSelected(null) }}
           onUpdate={async (data) => {
-            console.log('[RecipePage onUpdate] image_url:', data.image_url?.slice(0, 60))
             const updated = await updateRecipe(selected.id, data)
             if (updated) setSelected(updated)
             else setSelected(null)
