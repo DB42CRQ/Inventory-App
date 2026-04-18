@@ -19,7 +19,7 @@ export default async function handler(req, res) {
         max_tokens: 2000,
         messages: [{
           role: 'user',
-          content: `Translate these ingredient names to German and Spanish. Return ONLY a JSON array with objects like {"de": "...", "es": "..."}. One object per ingredient, in the same order. No markdown, no extra text.\n\nIngredients:\n${list}`
+          content: `Translate these ingredient names to German, English and Spanish. Return ONLY a JSON array with objects like {"de": "...", "en": "...", "es": "..."}. One object per ingredient, in the same order. No markdown, no extra text.\n\nIngredients:\n${list}`
         }]
       })
     })
