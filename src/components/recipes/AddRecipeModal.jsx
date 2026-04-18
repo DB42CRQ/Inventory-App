@@ -28,19 +28,32 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
   const videoRef    = useRef(null)
   const streamRef   = useRef(null)
 
+  async function resizeImage(file, maxPx = 1200, quality = 0.85) {
+    return new Promise(res => {
+      const img = new Image()
+      img.onload = () => {
+        const ratio = Math.min(maxPx / img.width, maxPx / img.height, 1)
+        const canvas = document.createElement('canvas')
+        canvas.width  = Math.round(img.width  * ratio)
+        canvas.height = Math.round(img.height * ratio)
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+        canvas.toBlob(blob => {
+          const reader = new FileReader()
+          reader.onload = e => res(e.target.result.split(',')[1])
+          reader.readAsDataURL(blob)
+        }, 'image/jpeg', quality)
+      }
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
   async function handlePhoto(e) {
     const file = e.target.files?.[0]
     if (!file) return
     setLoading(true)
     setError('')
     try {
-      const dataUrl = await new Promise((res, rej) => {
-        const reader = new FileReader()
-        reader.onload = ev => res(ev.target.result)
-        reader.onerror = rej
-        reader.readAsDataURL(file)
-      })
-      const base64 = dataUrl.split(',')[1]
+      const base64 = await resizeImage(file)
       const response = await fetch('/api/extract-recipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -49,7 +62,6 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
       const data = await response.json()
       if (data.error) throw new Error(data.error)
       applyExtracted(data)
-      // Upload image
       const url = await uploadImage(file)
       if (url) setForm(f => ({ ...f, image_url: url }))
       setMode('manual')
@@ -500,9 +512,12 @@ function RecipeCamera({ onCapture, onClose, t }) {
   async function takeSnapshot() {
     const video = videoRef.current
     const canvas = document.createElement('canvas')
-    canvas.width = video.videoWidth
-    canvas.height = video.videoHeight
-    canvas.getContext('2d').drawImage(video, 0, 0)
+    // Resize to max 1200px
+    const MAX = 1200
+    const ratio = Math.min(MAX / video.videoWidth, MAX / video.videoHeight, 1)
+    canvas.width  = Math.round(video.videoWidth  * ratio)
+    canvas.height = Math.round(video.videoHeight * ratio)
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height)
     streamRef.current?.getTracks().forEach(tr => tr.stop())
     canvas.toBlob(async blob => {
       const base64 = await new Promise(res => {
@@ -511,7 +526,7 @@ function RecipeCamera({ onCapture, onClose, t }) {
         reader.readAsDataURL(blob)
       })
       onCapture(base64, blob)
-    }, 'image/jpeg', 0.9)
+    }, 'image/jpeg', 0.85)
   }
 
   return (
@@ -545,10 +560,22 @@ function RecipeCamera({ onCapture, onClose, t }) {
             const file = e.target.files?.[0]
             if (!file) return
             streamRef.current?.getTracks().forEach(tr => tr.stop())
+            // Resize before sending
             const base64 = await new Promise(res => {
-              const reader = new FileReader()
-              reader.onload = ev => res(ev.target.result.split(',')[1])
-              reader.readAsDataURL(file)
+              const img = new Image()
+              img.onload = () => {
+                const ratio = Math.min(1200 / img.width, 1200 / img.height, 1)
+                const canvas = document.createElement('canvas')
+                canvas.width  = Math.round(img.width  * ratio)
+                canvas.height = Math.round(img.height * ratio)
+                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+                canvas.toBlob(blob => {
+                  const reader = new FileReader()
+                  reader.onload = e => res(e.target.result.split(',')[1])
+                  reader.readAsDataURL(blob)
+                }, 'image/jpeg', 0.85)
+              }
+              img.src = URL.createObjectURL(file)
             })
             onCapture(base64, file)
           }} />
