@@ -87,6 +87,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
       servings: data.servings || f.servings,
     }))
     if (data.instructions) setForm(f => ({ ...f, instructions: data.instructions }))
+    if (data.image_url) setForm(f => ({ ...f, image_url: data.image_url }))
     if (data.ingredients?.length > 0) {
       setIngredients(data.ingredients.map(i => ({
         name: i.name || '',

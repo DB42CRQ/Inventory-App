@@ -52,11 +52,20 @@ async function extractFromUrl(url) {
           instructions = recipe.step.map(s => s.text || s.name || s).filter(Boolean).join('\n')
         }
         console.log(`[extract-recipe] instructions length: ${instructions?.length ?? 0}`)
+        // Extract image URL
+        let image_url = null
+        if (recipe.image) {
+          if (typeof recipe.image === 'string') image_url = recipe.image
+          else if (Array.isArray(recipe.image)) image_url = recipe.image[0]?.url || recipe.image[0] || null
+          else if (recipe.image.url) image_url = recipe.image.url
+        }
+        console.log(`[extract-recipe] image_url: ${image_url?.slice(0, 60) ?? 'none'}`)
         return {
           name: recipe.name || null,
           category: recipe.recipeCategory || null,
           servings: parseInt(recipe.recipeYield) || null,
           instructions,
+          image_url,
           ingredients: (recipe.recipeIngredient || []).map(ing => {
             const match = ing.match(/^([\d.,]+)\s*(g|kg|ml|l|EL|TL|Stück|Prise|Bund|Dose|Packung|Scheibe|Zehe|Becher|cup|tbsp|tsp|oz|lb|piece|clove|bunch|can|slice)?\s*(.+)$/i)
             if (match) return { name: match[3].trim(), quantity: parseFloat(match[1].replace(',', '.')), unit: match[2] || null }
