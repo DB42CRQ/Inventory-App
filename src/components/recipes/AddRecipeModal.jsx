@@ -406,7 +406,11 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
         <ImagePickerModal
           recipeName={form.name}
           currentImage={form.image_url}
-          onSelect={(url) => { setForm(f => ({ ...f, image_url: url })); setShowImagePicker(false) }}
+          onSelect={(url) => {
+            console.log('[ImagePicker] selected url length:', url?.length, 'url start:', url?.slice(0, 60))
+            setForm(f => ({ ...f, image_url: url }))
+            setShowImagePicker(false)
+          }}
           onClose={() => setShowImagePicker(false)}
           uploadImage={uploadImage}
           t={t}
@@ -635,7 +639,10 @@ export function ImagePickerModal({ recipeName, currentImage, onSelect, onClose, 
         )}
         <div className="grid grid-cols-3 gap-2">
           {photos.map((photo, i) => (
-            <button key={i} onClick={() => onSelect(photo.url)}
+            <button key={i} onClick={() => {
+              console.log('[ImagePickerModal] photo clicked, url:', photo.url?.slice(0, 60))
+              onSelect(photo.url)
+            }}
               className={`relative rounded-xl overflow-hidden aspect-square
                 ${currentImage === photo.url ? 'ring-2 ring-primary-500' : ''}`}>
               <img src={photo.thumb} alt="" className="w-full h-full object-cover" />

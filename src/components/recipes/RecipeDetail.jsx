@@ -247,6 +247,7 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
           recipeName={recipe.name}
           currentImage={recipe.image_url}
           onSelect={async (url) => {
+            console.log('[RecipeDetail ImagePicker] selected url:', url?.slice(0, 60))
             await onUpdate({ ...recipe, image_url: url, ingredients: recipe.recipe_ingredients })
             setShowImgPicker(false)
           }}
