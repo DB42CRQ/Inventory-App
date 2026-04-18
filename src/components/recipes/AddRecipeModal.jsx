@@ -18,7 +18,13 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
   })
   const [ingredients, setIngredients] = useState(
     initialData?.ingredients?.length > 0
-      ? initialData.ingredients.map(i => ({ name: i.name || '', quantity: i.quantity ?? '', unit: i.unit || '' }))
+      ? initialData.ingredients.map(i => ({
+          name: (lang === 'en' && i.name_en) ? i.name_en
+              : (lang === 'es' && i.name_es) ? i.name_es
+              : (i.name_de || i.name || ''),
+          quantity: i.quantity ?? '',
+          unit: i.unit || ''
+        }))
       : [{ name: '', quantity: '', unit: '' }]
   )
   const [newCat,     setNewCat]     = useState(false)
