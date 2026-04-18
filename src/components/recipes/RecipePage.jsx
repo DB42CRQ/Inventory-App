@@ -255,7 +255,12 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
           recipe={selected}
           onClose={() => setSelected(null)}
           onDelete={async () => { await deleteRecipe(selected.id); setSelected(null) }}
-          onUpdate={async (data) => { await updateRecipe(selected.id, data); setSelected(null) }}
+          onUpdate={async (data) => {
+            console.log('[RecipePage onUpdate] image_url:', data.image_url?.slice(0, 60))
+            const updated = await updateRecipe(selected.id, data)
+            if (updated) setSelected(updated)
+            else setSelected(null)
+          }}
           inventoryItems={inventoryItems}
           addToShoppingList={addToShoppingList}
           uploadImage={uploadImage}
