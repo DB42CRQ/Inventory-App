@@ -54,12 +54,17 @@ async function extractFromUrl(url) {
         console.log(`[extract-recipe] instructions length: ${instructions?.length ?? 0}`)
         // Extract image URL
         let image_url = null
-        if (recipe.image) {
-          if (typeof recipe.image === 'string') image_url = recipe.image
-          else if (Array.isArray(recipe.image)) image_url = recipe.image[0]?.url || recipe.image[0] || null
-          else if (recipe.image.url) image_url = recipe.image.url
-        }
-        console.log(`[extract-recipe] image_url: ${image_url?.slice(0, 60) ?? 'none'}`)
+        try {
+          if (recipe.image) {
+            if (typeof recipe.image === 'string') image_url = recipe.image
+            else if (Array.isArray(recipe.image)) {
+              const first = recipe.image[0]
+              image_url = typeof first === 'string' ? first : first?.url || null
+            }
+            else if (typeof recipe.image === 'object') image_url = recipe.image.url || null
+          }
+        } catch {}
+        console.log(`[extract-recipe] image_url: ${image_url ? image_url.slice(0, 60) : 'none'}`)
         return {
           name: recipe.name || null,
           category: recipe.recipeCategory || null,
