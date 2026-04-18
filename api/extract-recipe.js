@@ -151,7 +151,10 @@ export default async function handler(req, res) {
         })
       })
       const data = await response.json()
-      console.log(`[extract-recipe] API status: ${response.status} stop_reason: ${data.stop_reason} error: ${data.error?.message}`)
+      console.log(`[extract-recipe] API status: ${response.status} stop_reason: ${data.stop_reason} error: ${data.error?.message} content_blocks: ${data.content?.length ?? 0}`)
+      if (data.content) {
+        data.content.forEach((block, i) => console.log(`[extract-recipe] block[${i}] type=${block.type} length=${block.text?.length ?? 0}`))
+      }
       const rawText = data.content?.find(c => c.type === 'text')?.text?.trim()
       console.log(`[extract-recipe] Claude response length: ${rawText?.length ?? 0}`)
       if (!rawText) throw new Error(`No response from Claude: ${data.error?.message || data.stop_reason || 'unknown'}`)

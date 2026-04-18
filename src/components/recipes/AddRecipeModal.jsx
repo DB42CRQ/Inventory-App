@@ -54,6 +54,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
     setError('')
     try {
       const base64 = await resizeImage(file)
+      console.log('[handlePhoto] resized base64 length:', base64.length)
       const response = await fetch('/api/extract-recipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -577,6 +578,7 @@ function RecipeCamera({ onCapture, onClose, t }) {
               }
               img.src = URL.createObjectURL(file)
             })
+            console.log('[RecipeCamera gallery] resized base64 length:', base64.length)
             onCapture(base64, file)
           }} />
         </label>
