@@ -38,12 +38,20 @@ async function extractFromUrl(url) {
           if (typeof recipe.recipeInstructions === 'string') {
             instructions = recipe.recipeInstructions
           } else if (Array.isArray(recipe.recipeInstructions)) {
-            instructions = recipe.recipeInstructions
-              .map(s => typeof s === 'string' ? s : s.text || '')
-              .filter(Boolean)
-              .join('\n')
+            instructions = recipe.recipeInstructions.map(s => {
+              if (typeof s === 'string') return s
+              if (s['@type'] === 'HowToStep') return s.text || s.name || ''
+              if (s['@type'] === 'HowToSection' && Array.isArray(s.itemListElement)) {
+                return s.itemListElement.map(step => step.text || step.name || '').filter(Boolean).join('\n')
+              }
+              return s.text || s.name || ''
+            }).filter(Boolean).join('\n')
           }
         }
+        if (!instructions && Array.isArray(recipe.step)) {
+          instructions = recipe.step.map(s => s.text || s.name || s).filter(Boolean).join('\n')
+        }
+        console.log(`[extract-recipe] instructions length: ${instructions?.length ?? 0}`)
         return {
           name: recipe.name || null,
           category: recipe.recipeCategory || null,
