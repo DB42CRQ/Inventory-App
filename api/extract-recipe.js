@@ -1,4 +1,4 @@
-const PROMPT = 'Extract the recipe. Keep the recipe name in its original language. Return ONLY a JSON object with: {"name": "recipe name in original language", "category": "category or null", "servings": number or null, "ingredients": [{"name": "ingredient", "quantity": number or null, "unit": "unit or null"}], "instructions": "step by step instructions as plain text, each step on a new line, or null if not available"}. No markdown, no extra text. If no recipe found, return {"error": "no recipe found"}.'
+const PROMPT = 'Extract the recipe. Keep the recipe name and instructions in their original language — do NOT translate them. Return ONLY a JSON object with: {"name": "recipe name in original language", "category": "category or null", "servings": number or null, "ingredients": [{"name": "ingredient", "quantity": number or null, "unit": "unit or null"}], "instructions": "step by step instructions as plain text in original language, each step on a new line, or null if not available"}. No markdown, no extra text. If no recipe found, return {"error": "no recipe found"}.'
 
 async function extractFromUrl(url) {
   console.log(`[extract-recipe] fetching URL: ${url}`)
