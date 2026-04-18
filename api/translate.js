@@ -9,6 +9,7 @@ export default async function handler(req, res) {
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) return res.status(500).json({ error: 'API key not configured' })
 
+  console.log(`[translate] text length: ${text.length} preview: ${text.slice(0, 80).replace(/\n/g, ' ')}`)
   try {
     async function translate(targetLang) {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -28,7 +29,9 @@ export default async function handler(req, res) {
         })
       })
       const data = await response.json()
-      return data.content?.[0]?.text ?? text
+      const result = data.content?.[0]?.text ?? text
+      console.log(`[translate] ${targetLang} result length: ${result.length} stop_reason: ${data.stop_reason}`)
+      return result
     }
 
     const [de, en, es] = await Promise.all([
