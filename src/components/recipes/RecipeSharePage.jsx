@@ -43,6 +43,12 @@ export default function RecipeSharePage({ token, onClose }) {
     return r.name_de || r.name || ''
   }
 
+  function getInstructions(r) {
+    if (lang === 'en' && r.instructions_en) return r.instructions_en
+    if (lang === 'es' && r.instructions_es) return r.instructions_es
+    return r.instructions_de || r.instructions || null
+  }
+
   function getCatName(r) {
     if (lang === 'en' && r.category_en) return r.category_en
     if (lang === 'es' && r.category_es) return r.category_es
@@ -65,6 +71,10 @@ export default function RecipeSharePage({ token, onClose }) {
         image_url: recipe.image_url,
         source_url: recipe.source_url,
         servings: recipe.servings,
+        instructions: recipe.instructions,
+        instructions_de: recipe.instructions_de,
+        instructions_en: recipe.instructions_en,
+        instructions_es: recipe.instructions_es,
         ingredients: recipe.recipe_ingredients?.map(i => ({
           name: i.name,
           name_de: i.name_de,
@@ -166,6 +176,26 @@ export default function RecipeSharePage({ token, onClose }) {
             </div>
           )}
         </div>
+
+          {/* Zubereitung */}
+          {getInstructions(recipe) && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 mx-4 mb-4">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                {t.recipesInstructions ?? 'Zubereitung'}
+              </p>
+              <div className="flex flex-col gap-3">
+                {getInstructions(recipe).split('\n').filter(s => s.trim()).map((step, i) => (
+                  <div key={i} className="flex gap-3">
+                    <span className="w-6 h-6 bg-primary-100 text-primary-700 rounded-full
+                      flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">
+                      {i + 1}
+                    </span>
+                    <p className="text-sm text-gray-700 leading-relaxed flex-1">{step.trim()}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
       </main>
     </div>
   )
