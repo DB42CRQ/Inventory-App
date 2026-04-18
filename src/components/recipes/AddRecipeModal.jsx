@@ -22,8 +22,9 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
       : [{ name: '', quantity: '', unit: '' }]
   )
   const [newCat,     setNewCat]     = useState(false)
-  const [showCamera,      setShowCamera]      = useState(false)
-  const [showImagePicker, setShowImagePicker] = useState(false)
+  const [showCamera,        setShowCamera]        = useState(false)
+  const [showImagePicker,   setShowImagePicker]   = useState(false)
+  const [showInstructions,  setShowInstructions]  = useState(false)
   const videoRef    = useRef(null)
   const streamRef   = useRef(null)
 
@@ -226,6 +227,12 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
         <Button onClick={handleSave} disabled={loading || !form.name.trim()}>
           {loading ? '…' : (t.save ?? 'Speichern')}
         </Button>
+        <button onClick={() => setShowInstructions(true)}
+          className={`w-9 h-9 rounded-xl flex items-center justify-center text-lg transition-all shrink-0
+            ${form.instructions ? 'bg-primary-100 text-primary-600' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}
+          title={t.recipesInstructions ?? 'Zubereitung'}>
+          📝
+        </button>
       </header>
 
       <main className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-4">
@@ -348,13 +355,6 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
           </div>
         </div>
 
-        {/* Zubereitung */}
-        <InstructionsSection
-          value={form.instructions}
-          onChange={v => setForm(f => ({ ...f, instructions: v }))}
-          t={t}
-        />
-
         {/* Zutaten */}
         <div className="bg-white rounded-2xl border border-gray-100 p-4">
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
@@ -411,6 +411,31 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
           uploadImage={uploadImage}
           t={t}
         />
+      )}
+
+      {showInstructions && (
+        <div className="fixed inset-0 z-[60] bg-gray-50 flex flex-col"
+          style={{ paddingTop: 'max(12px, env(safe-area-inset-top))' }}>
+          <div className="flex items-center gap-3 px-4 pb-3 bg-white border-b border-gray-100 shrink-0">
+            <button onClick={() => setShowInstructions(false)}
+              className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">←</button>
+            <h2 className="font-semibold text-gray-900 flex-1">{t.recipesInstructions ?? 'Zubereitung'}</h2>
+            <button onClick={() => setShowInstructions(false)}
+              className="px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-medium">
+              {t.done ?? 'Fertig'}
+            </button>
+          </div>
+          <textarea
+            value={form.instructions}
+            onChange={e => setForm(f => ({ ...f, instructions: e.target.value }))}
+            placeholder={t.recipesInstructionsPlaceholder ?? 'Zubereitungsschritte…'}
+            autoFocus
+            className="flex-1 px-4 py-4 text-sm text-gray-800 bg-gray-50
+              focus:outline-none resize-none leading-relaxed" />
+          <p className="text-xs text-gray-400 text-center py-2 shrink-0">
+            {t.recipesInstructionsHint ?? 'Jeden Schritt in eine neue Zeile'}
+          </p>
+        </div>
       )}
 
       {showCamera && (
