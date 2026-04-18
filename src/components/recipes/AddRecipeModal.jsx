@@ -126,7 +126,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
     if (!form.name.trim()) return
     setLoading(true)
 
-    // Name übersetzen: Original behalten, nur EN+ES übersetzen
+    // Name in alle Sprachen übersetzen
     let name_de = form.name, name_en = null, name_es = null
     try {
       const res = await fetch('/api/translate', {
@@ -135,7 +135,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
         body: JSON.stringify({ text: form.name })
       })
       const data = await res.json()
-      // name_de bleibt das Original
+      name_de = data.de || form.name
       name_en = data.en || null
       name_es = data.es || null
     } catch {}
@@ -152,13 +152,13 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
           body: JSON.stringify({ text: form.category })
         })
         const data = await res.json()
-        // category_de bleibt das Original
+        category_de = data.de || form.category
         category_en = data.en || null
         category_es = data.es || null
       } catch {}
     }
 
-    // Zubereitung: Original behalten, nur EN+ES übersetzen
+    // Zubereitung in alle Sprachen übersetzen
     let instructions_de = form.instructions || null
     let instructions_en = null
     let instructions_es = null
@@ -170,7 +170,7 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
           body: JSON.stringify({ text: form.instructions })
         })
         const data = await res.json()
-        // instructions_de bleibt das Original — nicht data.de verwenden
+        instructions_de = data.de || form.instructions
         instructions_en = data.en || null
         instructions_es = data.es || null
       } catch {}

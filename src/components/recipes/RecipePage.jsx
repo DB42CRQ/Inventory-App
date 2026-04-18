@@ -223,7 +223,7 @@ export default function RecipePage({ onClose, household, inventoryItems, addToSh
                 body: JSON.stringify({ text: newCat })
               })
               const data = await res.json()
-              // category_de bleibt das Original
+              category_de = data.de || newCat
               category_en = data.en || null
               category_es = data.es || null
             } catch {}
