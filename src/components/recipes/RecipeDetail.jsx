@@ -24,6 +24,12 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
     if (lang === 'es' && ing.name_es) return ing.name_es
     return ing.name_de || ing.name || ''
   }
+
+  function getRecipeName(r) {
+    if (lang === 'en' && r.name_en) return r.name_en
+    if (lang === 'es' && r.name_es) return r.name_es
+    return r.name_de || r.name || ''
+  }
   const [confirm,      setConfirm]      = useState(false)
   const [showEdit,     setShowEdit]     = useState(false)
   const [showImgPicker, setShowImgPicker] = useState(false)
@@ -110,7 +116,7 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
       <header className="bg-white border-b border-gray-100 px-4 py-3 flex items-center gap-3 shrink-0" style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}>
         <button onClick={onClose}
           className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">←</button>
-        <h1 className="font-bold text-gray-900 text-lg flex-1 truncate">{recipe.name}</h1>
+        <h1 className="font-bold text-gray-900 text-lg flex-1 truncate">{getRecipeName(recipe)}</h1>
         <button onClick={handleShare} disabled={sharing}
           className={`w-9 h-9 rounded-xl transition-all flex items-center justify-center text-sm
             ${shared ? 'bg-green-100 text-green-600' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}>
@@ -135,7 +141,7 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
         {/* Bild */}
         <div className="relative">
           {recipe.image_url
-            ? <img src={recipe.image_url} alt={recipe.name} className="w-full h-52 object-cover" />
+            ? <img src={recipe.image_url} alt={getRecipeName(recipe)} className="w-full h-52 object-cover" />
             : <div className="w-full h-36 bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center text-5xl">🍳</div>
           }
           <button onClick={() => setShowImgPicker(true)}
@@ -244,7 +250,7 @@ export default function RecipeDetail({ recipe, onClose, onDelete, onUpdate, inve
 
     {showImgPicker && (
         <ImagePickerModal
-          recipeName={recipe.name}
+          recipeName={getRecipeName(recipe)}
           currentImage={recipe.image_url}
           onSelect={async (url) => {
             await onUpdate({ ...recipe, image_url: url, ingredients: recipe.recipe_ingredients })
