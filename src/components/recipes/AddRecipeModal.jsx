@@ -9,12 +9,18 @@ export default function AddRecipeModal({ onClose, onSave, uploadImage, categorie
   const [loading,    setLoading]    = useState(false)
   const [error,      setError]      = useState('')
   const [form,       setForm]       = useState({
-    name:       initialData?.name       || '',
-    category:   initialData?.category   || '',
+    name: (lang === 'en' && initialData?.name_en) ? initialData.name_en
+        : (lang === 'es' && initialData?.name_es) ? initialData.name_es
+        : (initialData?.name_de || initialData?.name || ''),
+    category: (lang === 'en' && initialData?.category_en) ? initialData.category_en
+            : (lang === 'es' && initialData?.category_es) ? initialData.category_es
+            : (initialData?.category_de || initialData?.category || ''),
     servings:   initialData?.servings   || 4,
     image_url:  initialData?.image_url  || '',
     source_url: initialData?.source_url || '',
-    instructions: initialData?.instructions_de || initialData?.instructions || '',
+    instructions: (lang === 'en' && initialData?.instructions_en) ? initialData.instructions_en
+                : (lang === 'es' && initialData?.instructions_es) ? initialData.instructions_es
+                : (initialData?.instructions_de || initialData?.instructions || ''),
   })
   const [ingredients, setIngredients] = useState(
     initialData?.ingredients?.length > 0
