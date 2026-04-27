@@ -9,6 +9,7 @@ import { Spinner, Button } from '../ui'
 import BarcodeScanner from './BarcodeScanner'
 import { AddItemModal } from '../inventory/AddItemModal'
 import BarcodeScanResult from './BarcodeScanResult'
+import ReceiptScanner from './ReceiptScanner'
 import { processBarcode } from '../../hooks/useBarcodeScanner'
 
 function CheckModal({ item, onConfirm, onCancel, t }) {
@@ -81,6 +82,17 @@ function CheckModal({ item, onConfirm, onCancel, t }) {
           </Button>
         </div>
       </div>
+      {showReceipt && (
+        <ReceiptScanner
+          onClose={() => setShowReceipt(false)}
+          onItems={async (items) => {
+            for (const item of items) {
+              await addItem({ name: item.name, quantity: item.quantity || 1, unit: item.unit || 'Stück', item_id: null })
+            }
+            setShowReceipt(false)
+          }}
+        />
+      )}
     </div>
   )
 }
@@ -142,6 +154,7 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
   const [addToInventory,   setAddToInventory]   = useState(null) // { name, qty, unit }
   const [scanResult,   setScanResult]   = useState(null)
   const [scanLoading,  setScanLoading]  = useState(false)
+  const [showReceipt,  setShowReceipt]  = useState(false)
 
   const getCatName = (cat) => !cat ? '' :
     lang === 'en' ? (cat.name_en || cat.name) :
@@ -233,6 +246,11 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
           className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
             flex items-center justify-center text-lg">
           📷
+        </button>
+        <button onClick={() => setShowReceipt(true)}
+          className="w-9 h-9 rounded-xl bg-gray-100 hover:bg-gray-200 transition-all
+            flex items-center justify-center text-lg">
+          🧾
         </button>
         <span className="text-sm text-gray-400">{unchecked.length} {t.shoppingItems ?? 'Artikel'}</span>
       </header>
@@ -471,6 +489,17 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
           onAddNew={(productName) => {
             setScanResult(null)
             setAddToInventory({ name: productName, qty: 1, unit: 'Stück' })
+          }}
+        />
+      )}
+      {showReceipt && (
+        <ReceiptScanner
+          onClose={() => setShowReceipt(false)}
+          onItems={async (items) => {
+            for (const item of items) {
+              await addItem({ name: item.name, quantity: item.quantity || 1, unit: item.unit || 'Stück', item_id: null })
+            }
+            setShowReceipt(false)
           }}
         />
       )}
