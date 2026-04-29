@@ -82,17 +82,6 @@ function CheckModal({ item, onConfirm, onCancel, t }) {
           </Button>
         </div>
       </div>
-      {showReceipt && (
-        <ReceiptScanner
-          onClose={() => setShowReceipt(false)}
-          onItems={async (items) => {
-            for (const item of items) {
-              await addItem({ name: item.name, quantity: item.quantity || 1, unit: item.unit || 'Stück', item_id: null })
-            }
-            setShowReceipt(false)
-          }}
-        />
-      )}
     </div>
   )
 }
@@ -495,9 +484,20 @@ export default function ShoppingPage({ onClose, household, sendPush }) {
       {showReceipt && (
         <ReceiptScanner
           onClose={() => setShowReceipt(false)}
-          onItems={async (items) => {
-            for (const item of items) {
-              await addItem({ name: item.name, quantity: item.quantity || 1, unit: item.unit || 'Stück', item_id: null })
+          onItems={async (receiptItems) => {
+            for (const item of receiptItems) {
+              const lower = item.name.toLowerCase()
+              const match = inventoryItems.find(i =>
+                i.name.toLowerCase() === lower ||
+                (i.name.toLowerCase().includes(lower) && lower.length > 3) ||
+                (lower.includes(i.name.toLowerCase()) && i.name.length > 3)
+              )
+              await addItem({
+                name: match ? match.name : item.name,
+                quantity: item.quantity || 1,
+                unit: match ? match.unit : (item.unit || 'Stück'),
+                item_id: match ? match.id : null,
+              })
             }
             setShowReceipt(false)
           }}
