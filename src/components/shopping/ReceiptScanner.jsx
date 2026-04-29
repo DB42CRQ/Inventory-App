@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from '../../i18n/useTranslation'
+import { AddItemModal } from '../inventory/AddItemModal'
 
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent)
 
@@ -22,13 +23,14 @@ async function resizeImage(file, maxPx = 1200) {
   })
 }
 
-export default function ReceiptScanner({ onItems, onClose }) {
+export default function ReceiptScanner({ onClose, inventoryItems, categories, onAddToInventory, onUpdateInventory }) {
   const { t } = useTranslation()
-  const [showCamera, setShowCamera] = useState(false)
-  const [loading,    setLoading]    = useState(false)
-  const [error,      setError]      = useState('')
-  const [items,      setItems]      = useState(null)
-  const [selected,   setSelected]   = useState(new Set())
+  const [showCamera,  setShowCamera]  = useState(false)
+  const [loading,     setLoading]     = useState(false)
+  const [error,       setError]       = useState('')
+  const [items,       setItems]       = useState(null)
+  const [selected,    setSelected]    = useState(new Set())
+  const [addingNew,   setAddingNew]   = useState(null) // item to create as new
 
   async function processImage(base64) {
     setLoading(true)
@@ -41,8 +43,19 @@ export default function ReceiptScanner({ onItems, onClose }) {
       })
       const data = await res.json()
       if (data.error) throw new Error(data.error)
-      setItems(data.items)
-      setSelected(new Set(data.items.map((_, i) => i)))
+
+      // Match each item to inventory
+      const matched = data.items.map(item => {
+        const lower = item.name.toLowerCase()
+        const match = inventoryItems?.find(i =>
+          i.name.toLowerCase() === lower ||
+          (i.name.toLowerCase().includes(lower) && lower.length > 3) ||
+          (lower.includes(i.name.toLowerCase()) && i.name.length > 3)
+        )
+        return { ...item, inventoryItem: match || null }
+      })
+      setItems(matched)
+      setSelected(new Set(matched.map((_, i) => i)))
     } catch (err) {
       setError(err.message)
     }
@@ -62,8 +75,17 @@ export default function ReceiptScanner({ onItems, onClose }) {
     })
   }
 
-  function handleConfirm() {
-    onItems(items.filter((_, i) => selected.has(i)))
+  async function handleConfirm() {
+    const chosen = items.filter((_, i) => selected.has(i))
+    for (const item of chosen) {
+      if (item.inventoryItem) {
+        // Update existing inventory item
+        const newQty = (item.inventoryItem.quantity || 0) + (item.quantity || 1)
+        await onUpdateInventory(item.inventoryItem.id, newQty)
+      }
+      // Items without match are skipped — user can add them manually via the + button
+    }
+    onClose()
   }
 
   // Result view
@@ -74,31 +96,76 @@ export default function ReceiptScanner({ onItems, onClose }) {
         <button onClick={onClose}
           className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">←</button>
         <h1 className="font-bold text-gray-900 text-lg flex-1">{t.receiptFound ?? 'Artikel gefunden'}</h1>
-        <button onClick={handleConfirm} disabled={selected.size === 0}
-          className="px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-medium disabled:opacity-50">
-          {t.receiptAdd ?? 'Hinzufügen'} ({selected.size})
+        <button onClick={handleConfirm}
+          className="px-4 py-2 rounded-xl bg-primary-500 text-white text-sm font-medium">
+          {t.receiptConfirm ?? 'Ins Inventar'} ({items.filter((_, i) => selected.has(i) && items[i].inventoryItem).length})
         </button>
       </header>
+
       <p className="text-xs text-gray-500 px-4 py-2 bg-white border-b border-gray-100 shrink-0">
-        {t.receiptHint ?? 'Wähle die Artikel aus die du hinzufügen möchtest'}
+        {t.receiptInventoryHint ?? '✓ = Inventar wird aktualisiert · + = Neuen Artikel anlegen'}
       </p>
+
       <main className="flex-1 overflow-y-auto">
         <div className="bg-white divide-y divide-gray-50">
           {items.map((item, i) => (
-            <button key={i} onClick={() => toggleItem(i)}
-              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-all">
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 transition-all
-                ${selected.has(i) ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
-                {selected.has(i) ? '✓' : '○'}
-              </span>
-              <span className="flex-1 text-sm text-gray-800 text-left">{item.name}</span>
-              <span className="text-sm text-gray-400 shrink-0">
-                {item.quantity ? `${item.quantity}${item.unit ? ' ' + item.unit : ''}` : ''}
-              </span>
-            </button>
+            <div key={i} className="flex items-center gap-3 px-4 py-3">
+              {item.inventoryItem ? (
+                <button onClick={() => toggleItem(i)}
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs shrink-0 transition-all
+                    ${selected.has(i) ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'}`}>
+                  {selected.has(i) ? '✓' : '○'}
+                </button>
+              ) : (
+                <span className="w-6 h-6 rounded-full bg-orange-100 text-orange-500
+                  flex items-center justify-center text-xs shrink-0">?</span>
+              )}
+
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-gray-800">{item.name}</p>
+                {item.inventoryItem ? (
+                  <p className="text-xs text-green-600">
+                    → {item.inventoryItem.name} · {item.inventoryItem.quantity} {item.inventoryItem.unit}
+                    {selected.has(i) ? ` + ${item.quantity || 1} = ${(item.inventoryItem.quantity || 0) + (item.quantity || 1)}` : ''}
+                  </p>
+                ) : (
+                  <p className="text-xs text-orange-500">{t.receiptNoMatch ?? 'Kein Artikel gefunden'}</p>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <span className="text-sm text-gray-400">
+                  {item.quantity ? `${item.quantity}${item.unit ? ' ' + item.unit : ''}` : ''}
+                </span>
+                {!item.inventoryItem && (
+                  <button onClick={() => setAddingNew(item)}
+                    className="w-7 h-7 rounded-lg bg-primary-100 text-primary-600
+                      flex items-center justify-center text-sm font-bold hover:bg-primary-200 transition-all">
+                    +
+                  </button>
+                )}
+              </div>
+            </div>
           ))}
         </div>
       </main>
+
+      {addingNew && (
+        <AddItemModal
+          open={true}
+          onClose={() => setAddingNew(null)}
+          categories={categories}
+          prefill={{ name: addingNew.name, qty: addingNew.quantity || 1, unit: addingNew.unit || 'Stück' }}
+          onAdd={async (newItem) => {
+            await onAddToInventory(newItem)
+            // Mark as matched in the list
+            setItems(prev => prev.map((it, idx) =>
+              it.name === addingNew.name ? { ...it, inventoryItem: { ...newItem, name: newItem.name } } : it
+            ))
+            setAddingNew(null)
+          }}
+        />
+      )}
     </div>
   )
 
@@ -111,6 +178,7 @@ export default function ReceiptScanner({ onItems, onClose }) {
           className="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-lg">←</button>
         <h1 className="font-bold text-gray-900 text-lg flex-1">{t.receiptScan ?? 'Kassenbon scannen'}</h1>
       </header>
+
       <main className="flex-1 flex flex-col items-center justify-center gap-6 px-8">
         {loading ? (
           <div className="flex flex-col items-center gap-3">
@@ -150,6 +218,7 @@ export default function ReceiptScanner({ onItems, onClose }) {
           </>
         )}
       </main>
+
       {showCamera && (
         <ReceiptCamera
           onCapture={async base64 => { setShowCamera(false); await processImage(base64) }}
